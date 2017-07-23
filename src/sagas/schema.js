@@ -20,11 +20,6 @@ export function* firstVertex(action) {
   if (!_.isEmpty(vertex)) {
     console.log('pushing to history')
     yield put(push('/explore/vertex/' + vertex.gid))
-    // yield put({
-    //   type: 'NAVIGATE_VERTEX',
-    //   gid: vertex.gid,
-    //   label: vertex.label,
-    // })
   }
 }
 

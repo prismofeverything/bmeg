@@ -1,7 +1,5 @@
 export default function schema(state = {}, action) {
   switch (action.type) {
-    // case '@@router/LOCATION_CHANGE':
-      
     case 'SCHEMA_SAVE':
       return {...state, schema: {...action.schema, schema: action.schema}}
     case 'VERTEX_SAVE':

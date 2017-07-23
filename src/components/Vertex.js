@@ -36,7 +36,6 @@ export class VertexEdges extends Component {
 
 var EdgesView = function(props) {
   var inEdges = Object.keys(props.vertex['in'])
-  // Filter out edges with "hasInstance" in label
       .filter(key => key != 'hasInstance')
       .map(function(key) {
         return (
@@ -50,7 +49,6 @@ var EdgesView = function(props) {
         )})
 
   var outEdges = Object.keys(props.vertex['out'])
-  // Filter out edges with "hasInstance" in label
       .filter(key => key != 'hasInstance')
       .map(function(key) {
         return (
@@ -77,10 +75,6 @@ var EdgesView = function(props) {
       </div>
     </div>
   )
-}
-
-function labelFor(gid) {
-  return gid.split(':')[0];
 }
 
 var Expando = React.createClass({
@@ -121,46 +115,6 @@ var Expando = React.createClass({
 
 function ExpandoItem(props) {
   return <span className="mdl-navigation__link">{props.children}</span>
-}
-
-function extractLabel(label) {
-  var front = label.split(':')[0]
-  return front.charAt(0).toUpperCase() + front.slice(1)
-}
-
-function fetchEdge(from, label, to, callback) {
-  fetch("/edge/find/" + from + '/' + label + '/' + to).then(
-    function(response) {
-      return response.json()
-    }
-  ).then(callback)
-}
-
-function flatGid(gid) {
-  if (gid['from']) {
-    return '(' + gid['from'] + ')--' + gid['label'] + '->(' + gid['to'] + ')';
-  } else {
-    return gid;
-  }
-}
-
-function viewGid(gid) {
-  if (gid['from']) {
-    return '(' + snipPrefix(gid['from']) + ')--' + gid['label'] + '->(' + snipPrefix(gid['to']) + ')';
-  } else {
-    return gid;
-  }
-}
-
-function extractEdgeGid(gid) {
-  var match = gid.match('\\\(([^()]+)\\\)--([^-]+)->\\\(([^()]+)\\\)');
-  if (match) {
-    return {
-      from: match[1],
-      label: match[2],
-      to: match[3]
-    }
-  }
 }
 
 function makeTitle(vertex) {
