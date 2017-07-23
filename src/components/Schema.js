@@ -70,9 +70,10 @@ export class Schema extends Component {
     var nodeText = '#ffffff'
     var edgeColor = '#f22f08'
     var edgeText = '#ffffff'
+    const {dispatch, width, height} = this.props
 
     console.log(this.props)
-    var radius = Math.min(this.props.width, this.props.height) * 0.08;
+    var radius = Math.min(width, height) * 0.08;
 
     var cyelement = this.refs.cytoscape
     this.cy = cytoscape({
@@ -120,9 +121,18 @@ export class Schema extends Component {
       elements: schemaToCytoscape(schema)
     })
 
+    this.cy.on('tap', 'node', function(cy) {
+      const label = this.id()
+      console.log(label)
+      dispatch({
+        type: 'SCHEMA_TAP_VERTEX',
+        label: label,
+      })
+    })
+
     this.layout = this.cy.makeLayout({
       name: 'preset',
-      positions: this.calculatePositions(this.props.width, this.props.height)
+      positions: this.calculatePositions(width, height)
       // animate: true,
       // padding: 30,
       // animationThreshold: 250,
