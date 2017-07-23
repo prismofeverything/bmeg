@@ -37,3 +37,13 @@ export function* fetchVertex(action) {
     })
   }
 }
+
+export function* fetchEdge(action) {
+  const edge = yield call(Schema.fetchEdge, action.from, action.label, action.to)
+  if (!_.isEmpty(edge)) {
+    yield put({
+      type: 'EDGE_SAVE',
+      edge: edge,
+    })
+  }
+}

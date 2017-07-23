@@ -1,9 +1,12 @@
 package main
 
 import (
+	"os"
 	"log"
 	"fmt"
 	"flag"
+	"path"
+	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
 	//"net/url"
@@ -20,6 +23,26 @@ func NewReverseProxy(dst string) *httputil.ReverseProxy {
 	}
 }
 
+func NotFound(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "the orb rotates, but not for you")
+}
+
+func FileServerWithIndex(fs http.FileSystem) http.Handler {
+	fsh := http.FileServer(fs)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, err := fs.Open(path.Clean(r.URL.Path))
+		if os.IsNotExist(err) {
+			log.Printf(r.URL.Path)
+			bytes, _ := ioutil.ReadFile("public/index.html")
+			index := string(bytes)
+			fmt.Fprintf(w, index)
+			// NotFound(w, r)
+			return
+		}
+		fsh.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	port := flag.Uint("-p", 8000, "Proxy Port")
 	flag.Parse()
@@ -30,7 +53,7 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	fs := http.FileServer(http.Dir("./public"))
+	fs := FileServerWithIndex(http.Dir("./public"))
 	mux.Handle("/vertex/", proxy)
 	mux.Handle("/schema/protograph", proxy)
 	mux.Handle("/vertex/find", proxy)

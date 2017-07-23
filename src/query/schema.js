@@ -25,4 +25,12 @@ export default class Schema {
       }
     )
   }
+
+  static fetchEdge(from, label, to) {
+    return fetch("/edge/find/" + from + '/' + label + '/' + to) 
+      .then(function(response) {
+        return response.json()
+      }
+    )
+  }
 }

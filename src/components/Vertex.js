@@ -2,25 +2,27 @@ import React, { Component } from 'react'
 import { render } from 'react-dom'
 import { connect } from "react-redux";
 import classNames from 'classnames';
+import { push } from 'react-router-redux'
 import * as _ from 'underscore'
+import Properties from './Properties'
 
 var snipPrefix = function(s) {
   return s.substring(s.indexOf(':') + 1)
 }
 
-var VertexEdges = React.createClass({
-  getInitialState: function() {
-    return {}
-  },
+export class VertexEdges extends Component {
+  constructor(props) {
+    super(props)
+  }
 
-  render: function() {
-    var props = this.props
-    var prefix = (props.edges[0]['in'] || props.edges[0]['out']).split(':')[0]
-    var header = <span>{props.label + ' '}<span className="edge-direction">({props.direction} {prefix})</span></span>
+  render() {
+    const props = this.props
+    const prefix = (props.edges[0]['in'] || props.edges[0]['out']).split(':')[0]
+    const header = <span>{props.label + ' '}<span className="edge-direction">({props.direction} {prefix})</span></span>
 
-    var items = props.edges.map(function(gid) {
-      var vertexGid = gid['in'] || gid['out']
-      var edgeGid = {from: gid['in'] || props.gid, label: props.label, to: gid['out'] || props.gid};
+    const items = props.edges.map(function(gid) {
+      const vertexGid = gid['in'] || gid['out']
+      const edgeGid = {from: gid['in'] || props.gid, label: props.label, to: gid['out'] || props.gid};
       return (
         <ExpandoItem key={vertexGid}>
           <a onClick={() => props.navigate(edgeGid)}>{snipPrefix(vertexGid)}</a>
@@ -30,39 +32,6 @@ var VertexEdges = React.createClass({
 
     return <Expando header={header}>{items}</Expando>
   }
-})
-
-function PropertyRow(props) {
-  var value = props.value
-  if (_.isArray(value)) {
-    value = JSON.stringify(value)
-  } else if (_.isObject(value)) {
-    value = JSON.stringify(value)
-  }
-
-  return (<tr>
-          <td className="prop-key mdl-data-table__cell--non-numeric">{props.name}</td>
-          <td className="mdl-data-table__cell--non-numeric">{value}</td>
-          </tr>)
-}
-
-var PropertiesView = function(props) {
-  var properties = Object.keys(props.vertex.properties).map(function(key) {
-    var v = props.vertex.properties[key]
-    return <PropertyRow key={key} name={key} value={v} />
-  })
-
-  return (
-      <div>
-      <div className="vertex-properties">
-      <table
-    className="prop-table mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shad--2dp"
-      ><tbody>
-      {properties}
-    </tbody></table>
-      </div>
-      </div>
-  )
 }
 
 var EdgesView = function(props) {
@@ -70,101 +39,49 @@ var EdgesView = function(props) {
   // Filter out edges with "hasInstance" in label
       .filter(key => key != 'hasInstance')
       .map(function(key) {
-        return <VertexEdges
-        key={key}
-        gid={props.vertex['gid']}
-        label={key}
-        navigate={props.navigate}
-        edges={props.vertex['in'][key]}
-        direction="from"
-          />
-      })
+        return (
+          <VertexEdges
+            key={key}
+            gid={props.vertex['gid']}
+            label={key}
+            navigate={props.navigate}
+            edges={props.vertex['in'][key]}
+            direction="from" />
+        )})
 
   var outEdges = Object.keys(props.vertex['out'])
   // Filter out edges with "hasInstance" in label
       .filter(key => key != 'hasInstance')
       .map(function(key) {
-        return <VertexEdges
-        key={key}
-        gid={props.vertex['gid']}
-        label={key}
-        navigate={props.navigate}
-        edges={props.vertex['out'][key]}
-        direction="to"
-          />
-      })
+        return (
+          <VertexEdges
+            key={key}
+            gid={props.vertex['gid']}
+            label={key}
+            navigate={props.navigate}
+            edges={props.vertex['out'][key]}
+            direction="to" />
+        )})
 
   return (
-      <div>
+    <div>
       <div className="vertex-edges-wrapper">
-      <div className="vertex-in-edges vertex-edges">
-      <h4>In Edges</h4>
-      {inEdges}
-    </div>
-      <div className="vertex-out-edges vertex-edges">
-      <h4>Out Edges</h4>
-      {outEdges}
-    </div>
+        <div className="vertex-in-edges vertex-edges">
+          <h4>In Edges</h4>
+          {inEdges}
+        </div>
+        <div className="vertex-out-edges vertex-edges">
+          <h4>Out Edges</h4>
+          {outEdges}
+        </div>
       </div>
-      </div>
+    </div>
   )
 }
 
 function labelFor(gid) {
   return gid.split(':')[0];
 }
-
-var VertexesView = function(props) {
-  var from = props.edge['out']
-  var to = props.edge['in']
-
-  return (
-      <div>
-      <div className="vertex-edges-wrapper">
-      <div className="vertex-in-edges vertex-edges">
-      <h4>from {labelFor(from)}</h4>
-      <a onClick={() => props.navigate(from)}>{snipPrefix(from)}</a>
-      </div>
-      <div className="vertex-out-edges vertex-edges">
-      <h4>to {labelFor(to)}</h4>
-      <a onClick={() => props.navigate(to)}>{snipPrefix(to)}</a>
-      </div>
-      </div>
-      </div>
-  )
-}
-
-var VertexInput = React.createClass({
-  componentDidMount() {
-    componentHandler.upgradeElement(this.refs.mdlWrapper)
-    // mdlCleanUp()
-  },
-
-  componentDidUpdate() {
-    componentHandler.upgradeElement(this.refs.mdlWrapper)
-    // mdlCleanUp()
-  },
-
-  render() {
-    return <div
-    className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label"
-    ref="mdlWrapper"
-      >
-      <label
-    className="mdl-textfield__label"
-    htmlFor="vertex-gid-input"
-      >Enter a vertex GID</label>
-      <input
-    id="vertex-gid-input"
-    type="text"
-    name="gid"
-    className="mdl-textfield__input"
-    onChange={e => this.props.onChange(e.target.value)}
-    value={this.props.value}
-      />
-      </div>
-  },
-})
 
 var Expando = React.createClass({
   getInitialState() {
@@ -251,7 +168,7 @@ function makeTitle(vertex) {
   return <h2>{vertex.label} {snipPrefix(vertex.gid)}</h2>
 }
 
-export class VertexViewer extends Component {
+export class Vertex extends Component {
   constructor(props) {
     super(props)
   }
@@ -268,8 +185,10 @@ export class VertexViewer extends Component {
     }
   }
 
-  setGid() {
-
+  navigateEdge(edge) {
+    const { dispatch } = this.props
+    const { from, label, to } = edge
+    dispatch(push('/explore/edge/' + from + '/' + label + '/' + to))
   }
 
   render() {
@@ -283,23 +202,11 @@ export class VertexViewer extends Component {
       if (this.props.vertex.properties) {
         properties = (
           <div>
-            <PropertiesView vertex={this.props.vertex} />
-            <EdgesView vertex={this.props.vertex} navigate={this.setGid} />
+            <Properties entity={this.props.vertex} />
+            <EdgesView vertex={this.props.vertex} navigate={this.navigateEdge.bind(this)} />
           </div>
         )
       }
-
-      // if (this.props.visualizations) {
-      //   var label = this.state.vertex.label || this.state.vertex.properties.label || this.state.vertex.properties['#label'] || this.state.vertex.properties.type || extractLabexl(this.state.vertex.gid)
-      //   console.log("label: " + label)
-      //   if (this.props.visualizations[label]) {
-      //     console.log("visualizations found: " + this.props.visualizations[label].length)
-      //     visualizations = visualizations.concat(this.props.visualizations[label].map(function(visualization) {
-      //       return visualization(we.state.vertex)
-      //     }))
-      //   }
-      // }
-      // }
 
       return (
         <div id="vertex-container">
@@ -320,4 +227,4 @@ function mapStateToProps(state, own) {
     vertex: state.schema.vertex,
   }
 }
-export default connect(mapStateToProps) (VertexViewer)
+export default connect(mapStateToProps) (Vertex)

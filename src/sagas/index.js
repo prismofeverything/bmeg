@@ -5,6 +5,7 @@ import { searchAll } from './query'
 import { fetchSchema } from './schema'
 import { firstVertex } from './schema'
 import { fetchVertex } from './schema'
+import { fetchEdge } from './schema'
 
 export function* sagas() {
   yield [
@@ -12,5 +13,6 @@ export function* sagas() {
     fork(takeLatest, 'SCHEMA_FETCH', fetchSchema),
     fork(takeLatest, 'SCHEMA_TAP_VERTEX', firstVertex),
     fork(takeLatest, 'VERTEX_FETCH', fetchVertex),
+    fork(takeLatest, 'EDGE_FETCH', fetchEdge),
   ];
 }
