@@ -1,21 +1,22 @@
 // required for all components
 import React, { Component } from 'react'
 import { render } from 'react-dom'
+import { connect } from "react-redux";
+import { push } from 'react-router-redux'
 import Search from './Search'
 
-export default class Header extends Component {
+export class Header extends Component {
   constructor(props) {
     super(props)
   }
 
   render() {
+    const { dispatch } = this.props
     return (
       <header className="mdl-layout__header">
         <div className="mdl-layout__header-row">
           <span className="mdl-layout-title">
-            <a href="http://bmeg.io/">
-              <img src="/media/bmeg.png" height="45"/>
-            </a>
+        <img src="/media/bmeg.png" height="45" onClick={ () => dispatch(push('/')) }/>
           </span>
           <div className="mdl-layout-spacer"></div>
           <form action="#">
@@ -31,3 +32,4 @@ export default class Header extends Component {
     )
   }
 }
+export default connect() (Header)

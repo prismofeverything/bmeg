@@ -8,7 +8,6 @@ export default class Home extends React.Component {
     return (
       <div className="page-home">
         <Schema width={800} height={800} />
-        <h4>Hello world!</h4>
       </div>
     );
   }

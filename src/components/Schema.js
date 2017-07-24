@@ -118,7 +118,7 @@ export class Schema extends Component {
           'text-outline-width': radius * 0.02, // 2
         }),
 
-      elements: schemaToCytoscape(schema)
+      elements: schema // schemaToCytoscape(schema)
     })
 
     this.cy.on('tap', 'node', function(cy) {
@@ -148,25 +148,29 @@ export class Schema extends Component {
     // })
   }
 
-  // componentDidMount() {
-  //   console.log('didmount')
-  //   this.renderCytoscape()
-  //   this.runLayout()
-  // }
+  generateSchema(schema) {
+    var next = schemaToCytoscape(schema)
+    if (this.cy) {
+      this.cy.json(next)
+    } else {
+      this.renderCytoscape(next)
+    }
+
+    this.runLayout()
+  }
+
+  componentDidMount() {
+    if (this.props.schema) {
+      this.generateSchema(this.props.schema)
+    }
+  }
 
   shouldComponentUpdate() {
     return false
   }
 
   componentWillReceiveProps(props) {
-    console.log('willreceiveprops')
-    console.log(props)
-    const schema = props.schema
-    // var next = schemaToCytoscape(props.schema)
-    // console.log(next)
-    // this.cy.json(next)
-    this.renderCytoscape(schema)
-    this.runLayout()
+    this.generateSchema(props.schema)
   }
 
   componentWillUnmount() {
