@@ -131,7 +131,7 @@ export class Vertex extends Component {
     console.log('vertex mounting!')
     console.log(this.props)
     const { dispatch, vertex, gid } = this.props
-    if (_.isEmpty(vertex)) {
+    if (_.isEmpty(vertex) || vertex.gid !== gid) {
       dispatch({
         type: 'VERTEX_FETCH',
         gid: gid

@@ -54,6 +54,10 @@ export class VertexesView extends Component {
   }
 }
 
+function edgeEq(f, l, t, g, m, u) {
+  return f === g && l === m && t === u
+}
+
 export class Edge extends Component {
   constructor(props) {
     super(props)
@@ -63,7 +67,7 @@ export class Edge extends Component {
     console.log('edge mounting!')
     console.log(this.props)
     const { dispatch, edge, from, label, to } = this.props
-    if (_.isEmpty(edge)) {
+    if (_.isEmpty(edge) || !edgeEq(edge.from, edge.label, edge.to, from, label, to) ) {
       dispatch({
         type: 'EDGE_FETCH',
         from: from,
