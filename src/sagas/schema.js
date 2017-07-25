@@ -14,8 +14,6 @@ export function* fetchSchema(action) {
 export function* firstVertex(action) {
   const results = yield call(Schema.firstVertex, action.label)
   const vertex = results[0]
-  console.log(action)
-  console.log(vertex)
 
   if (!_.isEmpty(vertex)) {
     console.log('pushing to history')

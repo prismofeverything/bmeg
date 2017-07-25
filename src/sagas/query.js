@@ -5,8 +5,10 @@ export function* searchAll(action) {
   const results = yield call(OphionSearch.search, action.scope, action.search)
   yield put({
     type: 'SEARCH_RESULTS_SAVE',
-    search: action.search,
-    scope: action.scope,
-    results: results,
+    search: {
+      search: action.search,
+      scope: action.scope,
+      results: results,
+    }
   })
 }

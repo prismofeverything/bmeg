@@ -149,8 +149,9 @@ export class Schema extends Component {
   }
 
   generateSchema(schema) {
+    console.log(schema)
     var next = schemaToCytoscape(schema)
-    if (this.cy) {
+    if (false) { // (this.cy) {
       this.cy.json(next)
     } else {
       this.renderCytoscape(next)
@@ -200,6 +201,8 @@ export class Schema extends Component {
 }
 
 function mapStateToProps(state, own) {
-  return {... state.schema}
+  return {
+    schema: state.schema
+  }
 }
 export default connect(mapStateToProps) (Schema)
