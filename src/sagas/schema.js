@@ -21,6 +21,10 @@ export function* firstVertex(action) {
   }
 }
 
+export function* navigateCohort(action) {
+  yield put(push('/cohort/' + action.label))
+}
+
 export function* fetchVertex(action) {
   const vertex = yield call(Schema.fetchVertex, action.gid)
   if (!_.isEmpty(vertex)) {
