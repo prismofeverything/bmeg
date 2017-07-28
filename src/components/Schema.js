@@ -158,6 +158,7 @@ export class Schema extends Component {
     }
 
     this.runLayout()
+    this.cy.resize()
   }
 
   componentDidMount() {
@@ -172,6 +173,11 @@ export class Schema extends Component {
 
   componentWillReceiveProps(props) {
     this.generateSchema(props.schema)
+  }
+
+  componentDidReceiveProps(props) {
+    console.log('schema did receive props')
+    this.cy.resize()
   }
 
   componentWillUnmount() {
