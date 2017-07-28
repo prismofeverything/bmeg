@@ -2,12 +2,15 @@ import { call, put } from 'redux-saga/effects'
 import { push } from 'react-router-redux'
 import * as _ from 'underscore'
 import Schema from '../query/schema'
+import Facets from '../query/facets'
 
 export function* fetchSchema(action) {
   const schema = yield call(Schema.fetchSchema)
+  const facets = yield call(Facets.fetchFacets)
   yield put({
     type: 'SCHEMA_SAVE',
     schema: schema,
+    facets: facets
   })
 }
 
