@@ -6,6 +6,8 @@ export default function schema(state = {}, action) {
       return {...state, vertex: action.vertex}
     case 'EDGE_SAVE':
       return {...state, edge: action.edge}
+    case 'LAYOUT_COMPONENTS':
+      return {...state, sidebarWidth: action.width}
     default:
       return state
   }

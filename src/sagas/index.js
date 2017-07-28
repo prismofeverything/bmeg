@@ -6,6 +6,7 @@ import { fetchSchema } from './schema'
 import { firstVertex } from './schema'
 import { fetchVertex } from './schema'
 import { fetchEdge } from './schema'
+import { layoutComponents } from './schema'
 
 export function* sagas() {
   yield [

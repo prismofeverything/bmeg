@@ -3,9 +3,7 @@ import { connect } from "react-redux";
 import Header from "./Header"
 import "../stylesheets/main.scss";
 
-// app component
 export class App extends React.Component {
-  // render
   componentDidMount() {
     const {dispatch} = this.props;
     dispatch({
