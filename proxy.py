@@ -240,8 +240,12 @@ class FacetHandler(tornado.web.RequestHandler):
                 s = aggregations[aggregation_key]
                 t = copy.deepcopy(facets['facets'][aggregation_key])
 
-                t['buckets'] = s['buckets']
-                t['sum_other_doc_count'] = s['sum_other_doc_count']
+                if 'buckets' in s:
+                    t['buckets'] = s['buckets']
+                    t['sum_other_doc_count'] = s['sum_other_doc_count']
+                if 'values' in s:
+                    t['buckets'] = s['values']
+
                 facets_copy['facets'][aggregation_key] = t
             return facets_copy
 
@@ -342,28 +346,38 @@ class FacetHandler(tornado.web.RequestHandler):
         # create count aggregation for each field
         for aggregation_key in facets['facets'].keys():
             _label, _property = aggregation_key.split('.')
+            property_type = facets['facets'][aggregation_key]['type']
+            property_aggregation = {
+                "terms": {
+                    "field": "properties.%s.keyword" % _property,
+                    "size": size
+                }
+            }
+            if (property_type != 'text'):
+                property_aggregation = {
+                    "percentiles": {
+                        "field": "properties.%s" % _property,
+                        "keyed": False
+                    }
+                }
+            aggregation = {
+                "size": 0,
+                "query": {"query_string":
+                          {
+                            "analyze_wildcard": True,
+                            "query": 'label:{}'.format(_label)
+                           }
+                          },
+                "aggs": {
+                    '{}.{}'.format(_label, _property): property_aggregation
+                }
+            }
+
             body.extend(
                 [
                     {"index": index,
                      "ignore_unavailable": True, "preference": 1},
-                    {
-                        "size": 0,
-                        "query": {"query_string":
-                                  {
-                                    "analyze_wildcard": True,
-                                    "query": 'label:{}'.format(_label)
-                                   }
-                                  },
-                        "aggs": {
-                            '{}.{}'.format(_label, _property): {
-                                "terms": {
-                                    "field": "properties.%s.keyword"
-                                    % _property,
-                                    "size": size
-                                }
-                            }
-                        }
-                    }
+                    aggregation
                 ]
             )
         return body
