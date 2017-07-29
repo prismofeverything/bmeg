@@ -18,6 +18,8 @@ module.exports = {
     publicPath: 'js/',
     filename: 'bundle.js',
   },
+  debug: true,
+  devtool: 'inline-source-map',
   module: {
     loaders: [
       {
