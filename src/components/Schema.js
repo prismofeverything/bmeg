@@ -14,9 +14,9 @@ function schemaToCytoscape(schema) {
       return {data: {id: vertex.gid, name: vertex.label}}
     })
 
-    var edges = _.flatten(Object.keys(schema['in']).map(function(key) {
-      return schema['in'][key].map(function(edge) {
-        return {data: {source: edge['in'], target: edge['out'], label: edge['label']}}
+    var edges = _.flatten(Object.keys(schema['from']).map(function(key) {
+      return schema['from'][key].map(function(edge) {
+        return {data: {source: edge['from'], target: edge['to'], label: edge['label']}}
       })
     }))
 
