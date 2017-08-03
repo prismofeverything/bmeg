@@ -1,120 +1,83 @@
 import React, { Component } from 'react'
 import { render } from 'react-dom'
-import { connect } from "react-redux"
+import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 import * as _ from 'underscore'
+import Facet from './facet'
 
 
-import Accordion from 'react-bootstrap/lib/Accordion';
-import Panel from 'react-bootstrap/lib/Panel';
-import Well from 'react-bootstrap/lib/Well';
-
-import { VictoryPie,VictoryChart,VictoryBar,Bar } from 'victory';
-
+import Button from 'react-bootstrap/lib/Button';
 import Sidebar from 'react-sidebar-width'
 
+// a `cohort` is a selection from a type/domain/label based on selected criteria
 export class Cohort extends Component {
 
+  // when user hits query button
+  onQuery() {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'FACETS_AGGREGATE',
+      selectedFacets: this.props.selectedFacets,
+      label: this.props.label,
+    })
+  }
 
+
+  // render all facets
   render() {
-    // create renderable facets
-    const facet_items = _.map(this.props.facets, function(value, key, object) {
 
-      // compose bucket lists
-      const buckets = _.map(value.buckets, function(bucket) {
-        return (
-              <li key={bucket.key}
-                onClick={() => console.log(key, bucket.key)}
-                className="list-group-item">
-                {bucket.key}
-                <span className="badge">{bucket.doc_count ? bucket.doc_count : bucket.value}</span>
-              </li>
-            );
-      })
-      // if we have 'remainder', compose 'other' pseudo bucket
-      var other;
-      if (value.sum_other_doc_count > 0) {
-        other = <li key={'other'} className="list-group-item" ><em>{'other'}</em> <span className="badge">{value.sum_other_doc_count}</span></li> ;
-      }
-
-      // compose chart
-      const value_accessor = value.buckets[0].doc_count ? 'doc_count' : 'value';
-      const chartWellStyles = {padding:'0 25% 0 25%'}
-      var chart ;
-      if (value_accessor === 'value') {
-        chart = (
-          <Well className="text-center" style={chartWellStyles}>
-            <VictoryChart domainPadding={20} >
-              <VictoryBar
-                data={value.buckets}
-                x={(d) => `${d.key}`}
-                y={value_accessor}
-                colorScale='warm'
-                events={[{
-                  target: "data",
-                  eventHandlers: {
-                    onClick: (evt, clickedProps) => {
-                      console.log(key, clickedProps.datum.y);
-                    },
-                  }
-                }]}
-                />
-            </VictoryChart>
-          </Well>
-        )
-      } else {
-        chart = (
-          <Well className="text-center" style={chartWellStyles}>
-            <VictoryPie data={value.buckets}
-                        x="key"
-                        y={value_accessor}
-                        colorScale='warm'
-                        events={[{
-                          target: "data",
-                          eventHandlers: {
-                            onClick: (evt, clickedProps) => {
-                              console.log(key, clickedProps.datum.x);
-                            },
-                          }
-                        }]}
-                        />
-          </Well>
-        )
-      }
-
+    const _self = this ;
+    //map all facets
+    const facetItems = _.map(_self.props.facets, function(facet, key, object) {
       // all done with this facet
       return (
-        <Accordion key={key} bsStyle='accordion-custom'>
-            <Panel eventKey={key} header={key} >
-              <ol>
-                {buckets}
-                {other}
-              </ol>
-              {chart}
-            </Panel>
-        </Accordion>
+        <Facet
+          label={_self.props.label}
+          key={key}
+          property={key}
+          facet={facet}/>
       )
     });
 
     // create warnings if no facets there
     let warnings = null;
-    if (facet_items.length < 1) {
+    if (facetItems.length < 1) {
         warnings = <h5><span className="label label-warning">No facets found for {this.props.label}</span></h5>;
     }
 
-    const sidebar = (
+    const sidebarContent = (
       <div>
         <div key={this.props.label}>
-          {facet_items}
+          {facetItems}
         </div>
         {warnings}
       </div>
     );
-    const styles = {
+    const sidebarStyles = {
       root: {
         marginTop: '5em',
       }
     }
+
+    // render a `query` of what's been selected
+    const queryString = this.props.selectedFacets.map(function(selectedFacet){
+        const type = _self.props.facets[selectedFacet.key].type;
+        if (type === 'text') {
+          return `${selectedFacet.key}: '${selectedFacet.values}'`;
+        }
+        return `${selectedFacet.key}: ${selectedFacet.values}`;
+    }).join(" AND ");
+
+    // render main content
+    const queryButton  = (<Button onClick={ () => _self.onQuery() }
+                                  >Refresh</Button>);
+
+    const mainContent = (
+      <div>
+        <p>{queryString}</p>
+        {queryButton}
+      </div>
+    )
 
 
     // create warnings if no facets there
@@ -127,8 +90,13 @@ export class Cohort extends Component {
         `}</style>
 
         <div className="page-home">
-          <Sidebar styles={styles} sidebar={sidebar} open={true} docked={true} sidebarClassName='sidebar-container'>
-            <div style={{'width':'100%', 'height':'100%'}} > stuff goes here </div>
+          <Sidebar styles={sidebarStyles}
+                   sidebar={sidebarContent}
+                   open={true}
+                   docked={true}
+                   sidebarClassName='sidebar-container'
+                   >
+            <div  > {mainContent} </div>
           </Sidebar>
         </div>
 
@@ -139,36 +107,42 @@ export class Cohort extends Component {
 
 function mapStateToProps(state, own) {
   // select the facets that apply to this label
+  console.log('Cohort mapStateToProps', state, own);
   const my_facets =
-    _.pick(state.schema.facets, function(value, key, object) {
-      return key.startsWith(`${own.params.label}.`);
-    });
+    _.pick(state.facets, function(value, key, object) {
+      return key && key.startsWith(`${own.params.label}.`);
+  });
 
-  // sort by bucket's 'remainder', if low or 0 then should be good to query on ...
-  // var my_facets_sorted =  _.chain(my_facets).sortBy(function(facet, key, object) {
-  //   return facet.sum_other_doc_count;
-  // }).value();
   const sortKeysBy = function (obj, comparator) {
       var keys = _.sortBy(_.keys(obj), function (key) {
           return comparator ? comparator(obj[key], key) : key;
       });
-
       return _.object(keys, _.map(keys, function (key) {
           return obj[key];
       }));
   }
 
+  // sort by bucket's 'remainder', if low or 0 then should be good to query on ...
+  // const sortedFacets = sortKeysBy(my_facets, function (facet, key) {
+  //     return facet.sum_other_doc_count;
+  // });
 
-  const my_facets_sorted = sortKeysBy(my_facets, function (facet, key) {
-      return facet.sum_other_doc_count;
+  const sortedFacets = sortKeysBy(my_facets, function (facet, key) {
+      return key
   });
 
-  console.log(my_facets_sorted);
-
+  // are any of the selected facets ours?
+  const selectedFacets =
+    _.filter(state.selectedFacets, function(currentFacet) {
+      return currentFacet.key && currentFacet.key.startsWith(`${own.params.label}.`);
+    });
+  // our state
   return {
     label: own.params.label,
     schema: state.schema,
-    facets: my_facets_sorted,
+    facets: sortedFacets,
+    selectedFacets: selectedFacets,
   }
 }
+
 export default connect(mapStateToProps) (Cohort)

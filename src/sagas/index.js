@@ -8,6 +8,8 @@ import { navigateCohort } from './schema'
 import { fetchVertex } from './schema'
 import { fetchEdge } from './schema'
 import { layoutComponents } from './schema'
+import { fetchFacets } from './facets'
+import { aggregateFacets } from './facets'
 
 export function* sagas() {
   yield [
@@ -16,5 +18,7 @@ export function* sagas() {
     fork(takeLatest, 'SCHEMA_TAP_VERTEX', navigateCohort),
     fork(takeLatest, 'VERTEX_FETCH', fetchVertex),
     fork(takeLatest, 'EDGE_FETCH', fetchEdge),
+    fork(takeLatest, 'FACETS_FETCH', fetchFacets),
+    fork(takeLatest, 'FACETS_AGGREGATE', aggregateFacets),
   ];
 }
