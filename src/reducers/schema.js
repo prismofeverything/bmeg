@@ -1,8 +1,7 @@
 export default function schema(state = {}, action) {
   switch (action.type) {
     case 'SCHEMA_SAVE':
-      console.log(action.facets)
-      return {...state, ...action.schema, ...action.facets}
+      return {...state, ...action.schema}
     case 'VERTEX_SAVE':
       return {...state, vertex: action.vertex}
     case 'EDGE_SAVE':

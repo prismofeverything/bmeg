@@ -9,6 +9,10 @@ export class App extends React.Component {
     dispatch({
       type: 'SCHEMA_FETCH',
     })
+    dispatch({
+      type: 'FACETS_FETCH',
+    })
+
   }
 
   render() {

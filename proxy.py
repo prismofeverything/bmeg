@@ -78,68 +78,10 @@ class ProxyHandler(tornado.web.RequestHandler):
         self.finish()
 
 
-class FacetAggregationHandler(tornado.web.RequestHandler):
-    """ handle elastic requests """
-
-    def initialize(self, url, index="animaltree"):
-        self.url = url
-        self.index = index
-
-    @tornado.gen.coroutine
-    def get(self, path=None):
-        """ async GET call to ES see http://bit.ly/2rWlBeR """
-
-        @tornado.gen.coroutine
-        def _search_elastic():
-            """ threadsafe & tornado friendly way to call ES """
-            es = Elasticsearch()
-            # for explaination, see
-            # http://www.tornadoweb.org/en/stable/gen.html#utility-functions
-            raise tornado.gen.Return(es.msearch(body=self._aggregation(path)))
-
-        response = yield _search_elastic()
-        self.write(response)
-        self.finish()
-
-    def _aggregation(self, path=None):
-        """ utility, create msearch body from request """
-        query_string = self.get_query_argument('q', '*')
-        aggs = self.get_query_argument('aggs', None)
-        if aggs:
-            aggs = aggs.split(',')
-        else:
-            aggs = []
-        body = []
-        index = self.index
-        size = self.get_query_argument('size', 10)
-        # create count aggregation for each field
-        for property_name in aggs:
-            body.extend(
-                [
-                    {"index": index,
-                     "ignore_unavailable": True, "preference": 1},
-                    {
-                        "size": 0,
-                        "query": {"query_string": {"analyze_wildcard": True,
-                                                   "query": query_string}},
-                        "aggs": {
-                            property_name: {
-                                "terms": {
-                                    "field": "%s.keyword" % property_name,
-                                    "size": size
-                                }
-                            }
-                        }
-                    }
-                ]
-            )
-        return body
-
-
 class FacetHandler(tornado.web.RequestHandler):
     """ handle GET facets  request  """
 
-    def initialize(self, url, index="animaltree"):
+    def initialize(self, url, index="pentomino"):
         self.url = url
         self.index = index
 
@@ -153,24 +95,15 @@ class FacetHandler(tornado.web.RequestHandler):
             """ threadsafe & tornado friendly way to call ES """
             # for explaination, see
             # http://www.tornadoweb.org/en/stable/gen.html#utility-functions
-            es = Elasticsearch()
+            es = Elasticsearch(args.elastic_hosts)
             raise tornado.gen.Return(
                 es.msearch(body=self._edges_aggregation())
             )
 
         @tornado.gen.coroutine
-        def _get_mapping():
-            """ get ES mapping (schema) for our index """
-            es = Elasticsearch()
-            ic = IndicesClient(es)
-            raise tornado.gen.Return(
-                ic.get_mapping(self.index)
-            )
-
-        @tornado.gen.coroutine
         def _get_aggregation(facets):
             """ get default aggregation buckets for all facets """
-            es = Elasticsearch()
+            es = Elasticsearch(args.elastic_hosts)
             raise tornado.gen.Return(
                 es.msearch(body=self._aggregation(facets))
             )
@@ -178,7 +111,8 @@ class FacetHandler(tornado.web.RequestHandler):
         @tornado.gen.coroutine
         def _get_properties(edges_response):
             """ for all edges, get the properties for that edge """
-            es = Elasticsearch()
+            es = Elasticsearch(args.elastic_hosts)
+            ic = IndicesClient(es)
             """ edges_response looks like ...
                 {"responses": [{"status": 200,
                 "hits": {"hits": [], "total": 69644, "max_score": 0.0},
@@ -201,28 +135,24 @@ class FacetHandler(tornado.web.RequestHandler):
             for edge in edges:
                 edge_names.append(edge['key'])
             raise tornado.gen.Return(
-                es.msearch(body=self._properties(edge_names))
+                ic.get_mapping(index=self.index, doc_type=edge_names)
             )
 
-        def _create_facets(properties_response, mapping_response):
-            """ create facets from properties and mapping
+        def _create_facets(mapping_response):
+            """ create facets from mapping
                 returns {'facets': {label.key:{'type':...}}}
             """
             # '.responses[].hits.hits[]._source.properties | keys'
             facets = {}
-            for response in properties_response['responses']:
-                for hit in response['hits']['hits']:
-                    _label = hit['_source']['label']
-                    for key in hit['_source']['properties'].keys():
-                        facets['{}.{}'.format(_label, key)] = {}
-            all_properties = mapping_response[self.index]['mappings']['vertex']['properties']['properties']['properties']  # NOQA
-            for aggregation_key in facets:
-                _label, _property = aggregation_key.split('.')
-                prop = all_properties[_property]
-                if 'fields' in prop:
-                    del prop['fields']
-                facets[aggregation_key] = prop
-
+            mappings = mapping_response[self.index]['mappings']
+            types = mappings.keys()
+            for _type in types:
+                mapping = mappings[_type]['properties']
+                for _property in mapping.keys():
+                    prop = mapping[_property]
+                    if 'fields' in prop:
+                        del prop['fields']
+                    facets['{}.{}'.format(_type, _property)] = prop
             return {'facets': facets}
 
         def _update_facets(facets, aggregation_response):
@@ -237,73 +167,36 @@ class FacetHandler(tornado.web.RequestHandler):
             # create a copy of facets, with additional props from aggregations
             facets_copy = {'facets': {}}
             for aggregation_key in aggregations.keys():
+                # source, target
                 s = aggregations[aggregation_key]
                 t = copy.deepcopy(facets['facets'][aggregation_key])
-
                 if 'buckets' in s:
                     t['buckets'] = s['buckets']
                     t['sum_other_doc_count'] = s['sum_other_doc_count']
                 if 'values' in s:
-                    t['buckets'] = s['values']
-
+                    # remove percentiles with all NaN
+                    result = list(set([v['value'] for v in s['values']]))
+                    if result[0] == 'NaN':
+                        t['buckets'] = []
+                    else:
+                        t['buckets'] = s['values']
                 facets_copy['facets'][aggregation_key] = t
             return facets_copy
 
         # `main`
         edges_response = yield _get_edges()
-        properties_response = yield _get_properties(edges_response)
-        mapping_response = yield _get_mapping()
-        facets = _create_facets(properties_response, mapping_response)
+        mapping_response = yield _get_properties(edges_response)
+        facets = _create_facets(mapping_response)
         aggregation_response = yield _get_aggregation(facets)
         facets = _update_facets(facets, aggregation_response)
         self.write(facets)
         self.finish()
 
-    def _properties(self, labels):
-        """ create the ES search request to get 1 record for each label """
-        body = []
-        index = self.index
-        for label in labels:
-            body.extend(
-                [
-                    {"index": index,
-                     "ignore_unavailable": True, "preference": 1},
-                    {
-                      "version": True,
-                      "size": 1,
-                      "query": {
-                        "bool": {
-                          "must": [
-                            {
-                              "query_string": {
-                                "analyze_wildcard": True,
-                                "query": "*"
-                              }
-                            },
-                            {
-                              "match": {
-                                "label": {
-                                  "query": label,
-                                  "type": "phrase"
-                                }
-                              }
-                            }
-                          ]
-                        }
-                      }
-                    }
-                ]
-            )
-        return body
-
     def _edges_aggregation(self):
         """ search request for list of labels and their document counts """
         query_string = self.get_query_argument('q', '*')
-        aggs = self.get_query_argument('aggs', None)
-        if aggs:
-            aggs = aggs.split(',')
-        else:
-            aggs = []
+        if len(query_string) == 0:
+            query_string = '*'
         body = []
         index = self.index
         # create count aggregation for each field
@@ -316,7 +209,7 @@ class FacetHandler(tornado.web.RequestHandler):
                   "query": {
                     "query_string": {
                       "analyze_wildcard": True,
-                      "query": "_type: vertex"
+                      "query": query_string
                     }
                   },
                   "_source": {
@@ -325,7 +218,7 @@ class FacetHandler(tornado.web.RequestHandler):
                   "aggs": {
                     "Labels": {
                       "terms": {
-                        "field": "label.keyword",
+                        "field": "_type",
                         "size": 9999,
                         "order": {
                           "_count": "desc"
@@ -343,20 +236,26 @@ class FacetHandler(tornado.web.RequestHandler):
         body = []
         index = self.index
         size = self.get_query_argument('size', 10)
+        query_string = self.get_query_argument('q', '*')
+        if len(query_string) == 0:
+            query_string = '*'
+
         # create count aggregation for each field
         for aggregation_key in facets['facets'].keys():
             _label, _property = aggregation_key.split('.')
+            if 'type' not in facets['facets'][aggregation_key]:
+                continue
             property_type = facets['facets'][aggregation_key]['type']
             property_aggregation = {
                 "terms": {
-                    "field": "properties.%s.keyword" % _property,
+                    "field": "%s.keyword" % _property,
                     "size": size
                 }
             }
             if (property_type != 'text'):
                 property_aggregation = {
                     "percentiles": {
-                        "field": "properties.%s" % _property,
+                        "field": "%s" % _property,
                         "keyed": False
                     }
                 }
@@ -365,7 +264,8 @@ class FacetHandler(tornado.web.RequestHandler):
                 "query": {"query_string":
                           {
                             "analyze_wildcard": True,
-                            "query": 'label:{}'.format(_label)
+                            "query": 'label:{} AND {}'.format(_label,
+                                                              query_string)
                            }
                           },
                 "aggs": {
@@ -389,6 +289,12 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=8080)
     parser.add_argument("--debug", default=False, action="store_true",
                         help="Turns on autoreload and other debug features")
+    parser.add_argument("--elastic_hosts",
+                        default=['http://localhost:9200'],
+                        help="Array of elastic search hosts see https://elasticsearch-py.readthedocs.io/en/master/#ssl-and-authentication")
+    parser.add_argument("--elastic_index",
+                        default='pentomino',
+                        help="Single index or alias that stores bmeg data")
 
     args = parser.parse_args()
 
@@ -409,9 +315,8 @@ if __name__ == "__main__":
         (r"^/gaia/gene/(.*)/find/(.*)",
             ProxyHandler, dict(url="%s/gaia/vertex/find/" % args.main)),
         (r"^/facets[/]?(.*)",
-            FacetHandler, dict(url="%s" % args.main)),
-        (r"^/aggregations[/]?(.*)",
-            FacetAggregationHandler, dict(url="%s" % args.main)),
+            FacetHandler, dict(url="%s" % args.main,
+                               index="%s" % args.elastic_index)),
         (r"^/(.*)", NoCacheStaticFileHandler,
             dict(path=SITE_DIR, default_filename="index.html")),
         #  (r"^(.*)", ProxyHandler, dict(url=args.main)),
