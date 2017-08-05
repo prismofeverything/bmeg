@@ -19,7 +19,8 @@ export default class OphionSearch {
     return execute(O.query().searchVertex(value))
       .then(function(results) {
         var groups = groupResults(results)
-        console.log('results: ' + results.length)
+        console.log('results:', results)
+        console.log('results.length: ' + results.length)
         console.log('result types: ' + Object.keys(groups))
         return groups
       }
