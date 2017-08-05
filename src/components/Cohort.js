@@ -3,30 +3,91 @@ import { render } from 'react-dom'
 import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 import * as _ from 'underscore'
-import Facet from './facet'
 
+import SplitPane from 'react-flex-split-pane';
 
 import Button from 'react-bootstrap/lib/Button';
-import Sidebar from 'react-sidebar-width'
+import Schema from './Schema'
+import Facet from './Facet'
+import Table from './Table'
 
 // a `cohort` is a selection from a type/domain/label based on selected criteria
 export class Cohort extends Component {
 
+  constructor(props) {
+    super(props);
+    /* initial state */
+    this.state = { sidebarSize: 300,
+                   mainSize: 500,
+                   isSidebarResizing: false,
+                   isMainResizing: false  };
+    //TODO - we shouldn't need to do these bindings
+    // `() =>` syntax should remove the need for it
+    // for some reason, this is a syntax error. is it a webpack config issue?
+    this.onSidebarResizeStart = this.onSidebarResizeStart.bind(this)
+    this.onSidebarResizeEnd = this.onSidebarResizeEnd.bind(this)
+    this.onMainResizeStart = this.onMainResizeStart.bind(this)
+    this.onMainResizeEnd = this.onMainResizeEnd.bind(this)
+    this.onSidebarChange = this.onSidebarChange.bind(this)
+    this.onMainChange = this.onMainChange.bind(this)
+  }
+
+
   // when user hits query button
-  onQuery() {
+  onQuery(queryString) {
     const { dispatch } = this.props
     dispatch({
       type: 'FACETS_AGGREGATE',
       selectedFacets: this.props.selectedFacets,
       label: this.props.label,
     })
+    this.triggerSearch(queryString);
+  }
+  triggerSearch(value) {
+    const {dispatch, scope} = this.props;
+    return new Promise((resolve, reject) => {
+      dispatch({
+        type: 'SEARCH_ALL_SUBMIT',
+        scope: scope,
+        search: value,
+        callbackError: (error) => {
+          reject({_error: error});
+        },
+        callbackSuccess: () => {
+          resolve();
+        }
+      });
+    });
+  }
+
+  // when user resizes splitters
+  onSidebarResizeStart() {
+    this.setState({ isSidebarResizing: true })
+  }
+  onSidebarResizeEnd() {
+    this.setState({ isSidebarResizing: false })
+    // console.log('sidebarSize',this.state.sidebarSize)
+    console.log('this.schemaContainer.offsetWidth',this.schemaContainer.offsetWidth)
+    console.log('this.schemaContainer.offsetHeight',this.schemaContainer.offsetHeight)
+  }
+  onSidebarChange(sidebarSize) {
+    this.setState({ sidebarSize: sidebarSize })
+  }
+  onMainResizeStart() {
+    this.setState({ isMainResizing: true })
+  }
+  onMainResizeEnd() {
+    this.setState({ isMainResizing: false })
+    console.log('mainSize',this.state.mainSize)
+  }
+  onMainChange(mainSize) {
+    this.setState({ mainSize: mainSize })
   }
 
 
   // render all facets
   render() {
-
-    const _self = this ;
+    const _self = this;
     //map all facets
     const facetItems = _.map(_self.props.facets, function(facet, key, object) {
       // all done with this facet
@@ -46,18 +107,13 @@ export class Cohort extends Component {
     }
 
     const sidebarContent = (
-      <div>
-        <div key={this.props.label}>
+      <div >
+        <div key={this.props.label} >
           {facetItems}
         </div>
         {warnings}
       </div>
     );
-    const sidebarStyles = {
-      root: {
-        marginTop: '5em',
-      }
-    }
 
     // render a `query` of what's been selected
     const queryString = this.props.selectedFacets.map(function(selectedFacet){
@@ -68,19 +124,28 @@ export class Cohort extends Component {
         return `${selectedFacet.key}: ${selectedFacet.values}`;
     }).join(" AND ");
 
-    // render main content
-    const queryButton  = (<Button onClick={ () => _self.onQuery() }
-                                  >Refresh</Button>);
+    const queryButton  = (<Button onClick={ () => _self.onQuery(queryString) }>
+                          Refresh</Button>);
 
-    const mainContent = (
-      <div>
+    const resultsStyle = {height:'500px'}
+    const resultsContent = (
+      <div style={resultsStyle}>
         <p>{queryString}</p>
         {queryButton}
+        <Table/>
+      </div>
+    )
+    // render main content, create a ref we can interrogate later
+    // see https://facebook.github.io/react/docs/refs-and-the-dom.html
+    //
+    const schemaContent = (
+      <div    ref={(e) => { this.schemaContainer = e; }} >
+        <Schema width={this.schemaContainer ? this.schemaContainer.offsetWidth : 1000}
+                height={this.schemaContainer ? this.schemaContainer.offsetHeight : 800}
+                offset={this.state.sidebarSize} />
       </div>
     )
 
-
-    // create warnings if no facets there
     return (
       <div>
         <style type="text/css">{`
@@ -90,14 +155,33 @@ export class Cohort extends Component {
         `}</style>
 
         <div className="page-home">
-          <Sidebar styles={sidebarStyles}
-                   sidebar={sidebarContent}
-                   open={true}
-                   docked={true}
-                   sidebarClassName='sidebar-container'
-                   >
-            <div  > {mainContent} </div>
-          </Sidebar>
+          <SplitPane
+              size={this.state.sidebarSize}
+              isResizing={this.state.isSidebarResizing}
+              onResizeStart={this.onSidebarResizeStart}
+              onResizeEnd={this.onSidebarResizeEnd}
+              onChange={this.onSidebarChange}
+              type="vertical"
+              pane1Style={{ borderRight: '4px solid silver'}}
+              >
+                <div >{sidebarContent}</div>
+                <SplitPane
+                    size={this.state.mainSize}
+                    isResizing={this.state.isMainResizing}
+                    onResizeStart={this.onMainResizeStart}
+                    onResizeEnd={this.onMainResizeEnd}
+                    onChange={this.onMainChange}
+                    type="horizontal"
+                    pane1Style={{ borderBottom: '4px solid silver' }}
+                    >
+                      <div ref={(e) => { this.schemaContent = e; }} >
+                        {schemaContent}
+                      </div>
+                      <div>
+                        {resultsContent}
+                      </div>
+                </SplitPane>
+          </SplitPane>
         </div>
 
       </div>
