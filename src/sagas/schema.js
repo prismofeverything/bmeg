@@ -6,7 +6,7 @@ import Facets from '../query/facets'
 
 export function* fetchSchema(action) {
   const schema = yield call(Schema.fetchSchema);
-  console.log('fetchSchema',schema);
+  console.log('fetchSchema', schema);
   yield put({
     type: 'SCHEMA_SAVE',
     schema: schema,
@@ -24,6 +24,7 @@ export function* firstVertex(action) {
 }
 
 export function* navigateCohort(action) {
+  yield put({type: 'STEP_ON_PATH', label: action.label})
   yield put(push('/cohort/' + action.label))
 }
 
