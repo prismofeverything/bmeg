@@ -36,20 +36,21 @@ export class Cohort extends Component {
   // when user hits query button
   onQuery(queryString) {
     const { dispatch } = this.props
+    // get updated aggregations
     dispatch({
       type: 'FACETS_AGGREGATE',
       selectedFacets: this.props.selectedFacets,
       label: this.props.label,
     })
-    this.triggerSearch(queryString);
+    this.triggerSearch();
   }
-  triggerSearch(value) {
-    const {dispatch, scope} = this.props;
+  triggerSearch() {
+    const {dispatch} = this.props;
     return new Promise((resolve, reject) => {
       dispatch({
-        type: 'SEARCH_ALL_SUBMIT',
-        scope: scope,
-        search: value,
+        type: 'FACETS_SEARCH',
+        selectedFacets: this.props.selectedFacets,
+        label: this.props.label,
         callbackError: (error) => {
           reject({_error: error});
         },

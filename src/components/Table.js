@@ -19,11 +19,6 @@ export class Table extends Component {
 
   // render the table
   render() {
-    // const columns = [
-    //   <TableHeaderColumn isKey dataField='id'>Product ID</TableHeaderColumn>,
-    //   <TableHeaderColumn dataField='name'>Product Name</TableHeaderColumn>,
-    //   <TableHeaderColumn dataField='price'>Product Price</TableHeaderColumn>,
-    // ];
 
     // map the first item to columns
     const columns = _.map(this.props.data[0], function(item, key, object) {

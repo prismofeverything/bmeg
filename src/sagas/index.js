@@ -2,6 +2,7 @@ import { takeLatest } from 'redux-saga'
 import { fork } from 'redux-saga/effects'
 
 import { searchAll } from './query'
+import { facetSearch } from './query'
 import { fetchSchema } from './schema'
 import { firstVertex } from './schema'
 import { navigateCohort } from './schema'
@@ -20,5 +21,6 @@ export function* sagas() {
     fork(takeLatest, 'EDGE_FETCH', fetchEdge),
     fork(takeLatest, 'FACETS_FETCH', fetchFacets),
     fork(takeLatest, 'FACETS_AGGREGATE', aggregateFacets),
+    fork(takeLatest, 'FACETS_SEARCH', facetSearch),
   ];
 }
