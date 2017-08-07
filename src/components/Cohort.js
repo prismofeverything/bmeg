@@ -7,6 +7,8 @@ import * as _ from 'underscore'
 import SplitPane from 'react-flex-split-pane';
 
 import Button from 'react-bootstrap/lib/Button';
+import Glyphicon from 'react-bootstrap/lib/Glyphicon';
+
 import Schema from './Schema'
 import Facet from './Facet'
 import Table from './Table'
@@ -19,6 +21,8 @@ export class Cohort extends Component {
     /* initial state */
     this.state = { sidebarSize: 300,
                    mainSize: 500,
+                   sideBarOpen: true,
+                   schemaOpen: true,
                    isSidebarResizing: false,
                    isMainResizing: false  };
     //TODO - we shouldn't need to do these bindings
@@ -36,6 +40,31 @@ export class Cohort extends Component {
         label: this.props.label,
       })
     }
+  }
+
+  toggleSidebar() {
+    this.setState(
+      { sideBarOpen: !this.state.sideBarOpen },
+      () => {
+        if (!this.state.sideBarOpen) {
+          this.setState({oldSidbarSize:this.state.sidebarSize, sidebarSize: 16 })
+        } else {
+          this.setState({ sidebarSize: this.state.oldSidbarSize })
+        }
+      }
+    );
+  }
+  toggleSchema() {
+    this.setState(
+      { schemaOpen: !this.state.schemaOpen },
+      () => {
+        if (!this.state.schemaOpen) {
+          this.setState({oldMainSize:this.state.mainSize, mainSize: 16 })
+        } else {
+          this.setState({ mainSize: this.state.oldMainSize })
+        }
+      }
+    );
   }
 
   // when user hits query button
@@ -73,8 +102,8 @@ export class Cohort extends Component {
   onSidebarResizeEnd() {
     this.setState({ isSidebarResizing: false })
     // console.log('sidebarSize',this.state.sidebarSize)
-    console.log('this.schemaContainer.offsetWidth',this.schemaContainer.offsetWidth)
-    console.log('this.schemaContainer.offsetHeight',this.schemaContainer.offsetHeight)
+    // console.log('this.schemaContainer.offsetWidth',this.schemaContainer.offsetWidth)
+    // console.log('this.schemaContainer.offsetHeight',this.schemaContainer.offsetHeight)
   }
   onSidebarChange(sidebarSize) {
     this.setState({ sidebarSize: sidebarSize })
@@ -84,7 +113,7 @@ export class Cohort extends Component {
   }
   onMainResizeEnd() {
     this.setState({ isMainResizing: false })
-    console.log('mainSize',this.state.mainSize)
+    // console.log('mainSize',this.state.mainSize)
   }
   onMainChange(mainSize) {
     this.setState({ mainSize: mainSize })
@@ -152,6 +181,23 @@ export class Cohort extends Component {
       </div>
     )
 
+    const collapseSidebarStyle = {float:'left', cursor: 'pointer'}
+    const collapseSidebar = (
+      <Glyphicon
+        style={collapseSidebarStyle}
+        onClick={ () => _self.toggleSidebar() }
+        glyph={this.state.sideBarOpen ? 'chevron-left' : 'chevron-right'}  />
+    )
+    const collapseSchemaStyle = {float:'right', top:'-8px', cursor: 'pointer'}
+    const collapseSchema = (
+      <Glyphicon
+        onClick={ () => _self.toggleSchema() }
+        style={collapseSchemaStyle}
+        glyph={this.state.schemaOpen ? 'chevron-up' : 'chevron-down'}  />
+    )
+
+
+
     return (
       <div>
         <style type="text/css">{`
@@ -170,7 +216,10 @@ export class Cohort extends Component {
               type="vertical"
               pane1Style={{ borderRight: '4px solid silver'}}
               >
-                <div >{sidebarContent}</div>
+                <div >
+                  {collapseSidebar}
+                  {sidebarContent}
+                </div>
                 <SplitPane
                     size={this.state.mainSize}
                     isResizing={this.state.isMainResizing}
@@ -184,6 +233,7 @@ export class Cohort extends Component {
                         {schemaContent}
                       </div>
                       <div>
+                        {collapseSchema}
                         {resultsContent}
                       </div>
                 </SplitPane>
