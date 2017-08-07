@@ -11,6 +11,13 @@ export default function schema(state = {}, action) {
       // (confusing when there are multiple widths)
       console.log('LAYOUT_COMPONENTS',action.width)
       return {...state, sidebarWidth: action.width}
+    case 'STEP_ON_PATH':
+      const path = state.path || []
+      const step = {label: action.label, facets: {}}
+      const travel = [...path, step]
+      console.log('STEP_ON_PATH')
+      console.log(travel)
+      return {...state, path: travel}
     default:
       return state
   }
