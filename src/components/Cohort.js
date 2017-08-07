@@ -30,8 +30,13 @@ export class Cohort extends Component {
     this.onMainResizeEnd = this.onMainResizeEnd.bind(this)
     this.onSidebarChange = this.onSidebarChange.bind(this)
     this.onMainChange = this.onMainChange.bind(this)
+    if (this.props.label && _.isEmpty(this.props.path)) {
+      this.props.dispatch({
+        type: 'STEP_ON_PATH',
+        label: this.props.label,
+      })
+    }
   }
-
 
   // when user hits query button
   onQuery(queryString) {
@@ -199,12 +204,12 @@ function mapStateToProps(state, own) {
   });
 
   const sortKeysBy = function (obj, comparator) {
-      var keys = _.sortBy(_.keys(obj), function (key) {
-          return comparator ? comparator(obj[key], key) : key;
-      });
-      return _.object(keys, _.map(keys, function (key) {
-          return obj[key];
-      }));
+    var keys = _.sortBy(_.keys(obj), function (key) {
+      return comparator ? comparator(obj[key], key) : key;
+    });
+    return _.object(keys, _.map(keys, function (key) {
+      return obj[key];
+    }));
   }
 
   // sort by bucket's 'remainder', if low or 0 then should be good to query on ...
@@ -213,7 +218,7 @@ function mapStateToProps(state, own) {
   // });
 
   const sortedFacets = sortKeysBy(my_facets, function (facet, key) {
-      return key
+    return key
   });
 
   // are any of the selected facets ours?
@@ -221,11 +226,13 @@ function mapStateToProps(state, own) {
     _.filter(state.selectedFacets, function(currentFacet) {
       return currentFacet.key && currentFacet.key.startsWith(`${own.params.label}.`);
     });
+
   // our state
   return {
     label: own.params.label,
     schema: state.schema,
     facets: sortedFacets,
+    path: state.path,
     selectedFacets: selectedFacets,
   }
 }
