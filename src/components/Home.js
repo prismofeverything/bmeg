@@ -24,7 +24,7 @@ export class Home extends Component {
     return (
       <div className="page-home">
         <Sidebar styles={styles} sidebar={sidebar} open={true} docked={true} onTransitionEnd={this.sidebarWidth.bind(this)} sidebarClassName='sidebar-container'>
-        <Schema width={1000} height={800} offset={this.props.offset} />
+        <Schema width={1000} height={400} offset={this.props.offset} />
         </Sidebar>
       </div>
     );

@@ -31,23 +31,50 @@ export class Schema extends Component {
   constructor(props){
     super(props)
     this.renderCytoscape = this.renderCytoscape.bind(this)
+
+    // this.schemaPositions = {
+    //   Project: [0.0, 0.5],
+    //   Individual: [0.15, 0.5],
+    //   Cohort: [0.15, 0.3],
+    //   Biosample: [0.3, 0.5],
+    //   GeneExpression: [0.5, 0.2],
+    //   Variant: [0.5, 0.35],
+    //   CNASegment: [0.5, 0.5],
+    //   Compound: [0.5, 0.65],
+    //   Predictor: [0.5, 0.8],
+    //   OntologyTerm: [0.5, 0.95],
+    //   LinearSignature: [0.65, 0.75],
+    //   PhenotypeInstance: [0.65, 0.9],
+    //   Gene: [0.7, 0.5],
+    //   GeneDatabase: [0.85, 0.35],
+    //   Pubmed: [0.85, 0.5],
+    //   GeneFamily: [0.85, 0.65],
+    // }
+
     this.schemaPositions = {
+      // spine
       Project: [0.0, 0.5],
-      Individual: [0.15, 0.5],
-      Cohort: [0.15, 0.3],
-      Biosample: [0.3, 0.5],
-      GeneExpression: [0.5, 0.2],
-      Variant: [0.5, 0.35],
-      CNASegment: [0.5, 0.5],
-      Compound: [0.5, 0.65],
-      Predictor: [0.5, 0.8],
-      OntologyTerm: [0.5, 0.95],
-      LinearSignature: [0.65, 0.75],
-      PhenotypeInstance: [0.65, 0.9],
-      Gene: [0.7, 0.5],
-      GeneDatabase: [0.85, 0.35],
-      Pubmed: [0.85, 0.5],
-      GeneFamily: [0.85, 0.65],
+      Individual: [0.2, 0.5],
+      Biosample: [0.4, 0.5],
+      Variant: [0.6, 0.5],
+      Gene: [0.8, 0.5],
+      Pubmed: [1.0, 0.5],
+
+      // biosample halo
+      Cohort: [0.25, 0.2],
+      GeneExpression: [0.4, 0.0],
+      CNASegment: [0.55, 0.2],
+      Compound: [0.55, 0.8],
+      OntologyTerm: [0.4, 1.0],
+
+      // gene halo
+      GeneFamily: [0.7, 0.2],
+      GeneDatabase: [0.9, 0.2],
+      Evidence: [0.8, 1.0],
+
+      // Predictor: [0.5, 0.8],
+      // LinearSignature: [0.65, 0.75],
+      // PhenotypeInstance: [0.65, 0.9],
     }
   }
 
@@ -73,7 +100,7 @@ export class Schema extends Component {
     const {dispatch, width, height} = this.props
 
     console.log(this.props)
-    var radius = Math.min(width, height) * 0.08;
+    var radius = Math.min(width, height) * 0.24 // * 0.08;
 
     var cyelement = this.refs.cytoscape
     this.cy = cytoscape({

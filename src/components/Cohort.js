@@ -176,7 +176,7 @@ export class Cohort extends Component {
     const schemaContent = (
       <div    ref={(e) => { this.schemaContainer = e; }} >
         <Schema width={this.schemaContainer ? this.schemaContainer.offsetWidth : 1000}
-                height={this.schemaContainer ? this.schemaContainer.offsetHeight : 800}
+                height={this.schemaContainer ? this.schemaContainer.offsetHeight : 400}
                 offset={this.state.sidebarSize} />
       </div>
     )
@@ -195,8 +195,6 @@ export class Cohort extends Component {
         style={collapseSchemaStyle}
         glyph={this.state.schemaOpen ? 'chevron-up' : 'chevron-down'}  />
     )
-
-
 
     return (
       <div>

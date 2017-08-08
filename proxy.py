@@ -104,8 +104,9 @@ class FacetHandler(tornado.web.RequestHandler):
         def _get_aggregation(facets):
             """ get default aggregation buckets for all facets """
             es = Elasticsearch(args.elastic_hosts)
+            body = self._aggregation(facets)
             raise tornado.gen.Return(
-                es.msearch(body=self._aggregation(facets))
+                es.msearch(body=body)
             )
 
         @tornado.gen.coroutine
@@ -128,8 +129,9 @@ class FacetHandler(tornado.web.RequestHandler):
                     {"key": "GeneDatabase", "doc_count": 10}]
                 }
             """
-            if "responses" not in edges_response:
+            if "responses" not in edges_response or 'aggregations' not in edges_response['responses'][0]:
                 return None
+            print(edges_response)
             edges = edges_response["responses"][0]['aggregations']['Labels']['buckets']  # NOQA
             edge_names = []
             for edge in edges:
@@ -144,6 +146,8 @@ class FacetHandler(tornado.web.RequestHandler):
             """
             # '.responses[].hits.hits[]._source.properties | keys'
             facets = {}
+            if not mapping_response:
+                return None
             mappings = mapping_response[self.index]['mappings']
             types = mappings.keys()
             for _type in types:
@@ -239,6 +243,9 @@ class FacetHandler(tornado.web.RequestHandler):
         query_string = self.get_query_argument('q', '*')
         if len(query_string) == 0:
             query_string = '*'
+
+        if not facets:
+            return None
 
         # create count aggregation for each field
         for aggregation_key in facets['facets'].keys():
