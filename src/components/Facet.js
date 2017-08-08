@@ -7,22 +7,15 @@ import * as _ from 'underscore'
 
 import classnames from 'classnames';
 import { withStyles, createStyleSheet } from 'material-ui/styles';
-import Card, {CardActions, CardHeader, CardContent} from 'material-ui/Card';
 import Paper from 'material-ui/Paper';
+import Card, { CardContent } from 'material-ui/Card';
 import Collapse from 'material-ui/transitions/Collapse';
-import Avatar from 'material-ui/Avatar';
 import IconButton from 'material-ui/IconButton';
-import Typography from 'material-ui/Typography';
-import red from 'material-ui/colors/red';
-import FavoriteIcon from 'material-ui-icons/Favorite';
-import ShareIcon from 'material-ui-icons/Share';
 import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
 import List from 'material-ui/List';
 import ListItem from 'material-ui/List/ListItem';
 import ListItemText from 'material-ui/List/ListItemText';
 import ListItemSecondaryAction from 'material-ui/List/ListItemSecondaryAction';
-
-import CommentIcon from 'material-ui-icons/Comment';
 
 import { VictoryPie,VictoryChart,VictoryBar,Bar } from 'victory';
 
@@ -190,20 +183,6 @@ export class Facet extends Component {
       </div>
     )
 
-
-    // <Card style={{ height: '4em','font-size': '1em' }}>
-    //   <CardHeader
-    //     title={expander}
-    //     >
-    //   </CardHeader>
-    //   <Collapse in={this.state.open} transitionDuration="auto" unmountOnExit>
-    //     <CardContent>
-    //       {buckets}
-    //       {other}
-    //       {chart}
-    //     </CardContent>
-    //   </Collapse>
-    // </Card>
     const facetItem = (
       <div>
         <ListItem dense disableGutters button key={key} onClick={event => _self.toggleOpen()}>
@@ -264,9 +243,6 @@ const styleSheet = createStyleSheet(theme => ({
   },
   expandOpen: {
     transform: 'rotate(180deg)',
-  },
-  avatar: {
-    backgroundColor: red[500],
   },
   flexGrow: {
     flex: '1 1 auto',
