@@ -61,15 +61,15 @@ export class Schema extends Component {
       Pubmed: [1.0, 0.5],
 
       // biosample halo
-      Cohort: [0.25, 0.2],
+      Cohort: [0.27, 0.15],
       GeneExpression: [0.4, 0.0],
-      CNASegment: [0.55, 0.2],
-      Compound: [0.55, 0.8],
+      CNASegment: [0.55, 0.15],
+      Compound: [0.55, 0.85],
       OntologyTerm: [0.4, 1.0],
 
       // gene halo
-      GeneFamily: [0.7, 0.2],
-      GeneDatabase: [0.9, 0.2],
+      GeneFamily: [0.7, 0.0],
+      GeneDatabase: [0.9, 0.0],
       Evidence: [0.8, 1.0],
 
       // Predictor: [0.5, 0.8],
@@ -235,7 +235,8 @@ export class Schema extends Component {
 
 function mapStateToProps(state, own) {
   return {
-    schema: state.schema
+    schema: state.schema,
+    path: state.path,
   }
 }
 export default connect(mapStateToProps) (Schema)
