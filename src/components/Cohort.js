@@ -13,6 +13,8 @@ import Schema from './Schema'
 import Facet from './Facet'
 import Table from './Table'
 
+import List from 'material-ui/List';
+
 // a `cohort` is a selection from a type/domain/label based on selected criteria
 export class Cohort extends Component {
 
@@ -146,9 +148,9 @@ export class Cohort extends Component {
 
     const sidebarContent = (
       <div >
-        <div key={this.props.label} >
+        <List key={this.props.label} >
           {facetItems}
-        </div>
+        </List>
         {warnings}
       </div>
     );

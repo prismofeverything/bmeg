@@ -3,6 +3,10 @@ import { connect } from "react-redux";
 import Header from "./Header"
 import "../stylesheets/main.scss";
 
+import createMuiTheme from 'material-ui/styles/theme';
+import { MuiThemeProvider } from 'material-ui/styles';
+
+
 export class App extends React.Component {
   componentDidMount() {
     const {dispatch} = this.props;
@@ -16,11 +20,14 @@ export class App extends React.Component {
   }
 
   render() {
+    const theme = createMuiTheme();
     return (
-      <div>
-        <Header />
-        {this.props.children}
-      </div>
+      <MuiThemeProvider theme={theme}>
+        <div>
+          <Header />
+          {this.props.children}
+        </div>
+      </MuiThemeProvider>
     );
   }
 }

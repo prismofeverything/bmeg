@@ -23,8 +23,10 @@ export class Table extends Component {
     if (this.props.data) {
     // map the first item to columns
     const columns = _.map(this.props.data[0], function(item, key, object) {
+      console.log(key);
       return (
         <TableHeaderColumn
+          key={key}
           dataField={key} >
             {key}
         </TableHeaderColumn>
