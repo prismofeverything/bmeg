@@ -172,7 +172,7 @@ export class Cohort extends Component {
       <div style={resultsStyle}>
         <p>{queryString}</p>
         {queryButton}
-        <Table/>
+        <Table key={this.props.label} label={this.props.label}/>
       </div>
     )
     // render main content, create a ref we can interrogate later
