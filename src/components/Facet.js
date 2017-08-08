@@ -245,7 +245,6 @@ function mapStateToProps(state, own) {
   var selectedFacet;
   if (selectedFacets.length === 1) {
     selectedFacet = selectedFacets[0];
-    console.log('Facet.mapStateToProps selectedFacet', selectedFacet)
   }
   return {
     selectedFacets: state.selectedFacets,

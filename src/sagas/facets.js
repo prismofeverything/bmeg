@@ -5,7 +5,6 @@ import Facets from '../query/facets'
 
 export function* fetchFacets(action) {
   const facets = yield call(Facets.fetchFacets);
-  console.log('fetchFacets',facets)
   yield put({
     type: 'FACETS_SAVE',
     facets: facets

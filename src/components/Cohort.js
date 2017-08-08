@@ -250,7 +250,6 @@ export class Cohort extends Component {
 
 function mapStateToProps(state, own) {
   // select the facets that apply to this label
-  console.log('Cohort mapStateToProps', state, own);
   const my_facets =
     _.pick(state.facets, function(value, key, object) {
       return key && key.startsWith(`${own.params.label}.`);
