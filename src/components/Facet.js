@@ -36,6 +36,7 @@ export class Facet extends Component {
       open: false,
     };
     this.toggleOpen = this.toggleOpen.bind(this)
+    this.onFacetValuesSelected = this.onFacetValuesSelected.bind(this)
   }
 
   // when user (un)selects a value
@@ -205,9 +206,9 @@ export class Facet extends Component {
     // </Card>
     const facetItem = (
       <div>
-        <ListItem dense button key={key} onClick={event => _self.toggleOpen()}>
-          <ListItemText primary={key} />
-          <ListItemSecondaryAction>
+        <ListItem dense disableGutters button key={key} onClick={event => _self.toggleOpen()}>
+          <ListItemText primary={key}  />
+          <ListItemSecondaryAction >
             <IconButton aria-label="More">
               <ExpandMoreIcon />
             </IconButton>
@@ -224,7 +225,7 @@ export class Facet extends Component {
             </Card>
           </div>
         </Collapse>
-      </div>      
+      </div>
     );
 
     return facetItem;
@@ -232,8 +233,8 @@ export class Facet extends Component {
 }
 
 function mapStateToProps(state, own) {
-  console.log('Facet mapStateToProps state', state);
-  console.log('Facet.mapStateToProps own', own)
+  // console.log('Facet mapStateToProps state', state);
+  // console.log('Facet.mapStateToProps own', own)
 
   // are any of the selected facets me?
   const selectedFacets =
@@ -274,4 +275,5 @@ const styleSheet = createStyleSheet(theme => ({
 }));
 
 //export default connect(mapStateToProps) (Facet);
-export  default withStyles(styleSheet)(Facet);
+//export  default withStyles(styleSheet)(Facet);
+export default connect(mapStateToProps)(withStyles(styleSheet)(Facet));
