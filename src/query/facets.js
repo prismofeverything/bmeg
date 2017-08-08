@@ -15,8 +15,4 @@ export default class Facets {
       }
     )
   }
-
-  static translateQuery(focus, path, facets) {
-    
-  }
 }

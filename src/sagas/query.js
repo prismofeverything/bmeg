@@ -1,5 +1,6 @@
 import { call, put } from 'redux-saga/effects'
 import OphionSearch from '../query/search.js'
+import Path from '../query/path.js'
 
 export function* searchAll(action) {
   const results = yield call(OphionSearch.search, action.scope, action.search)
@@ -23,4 +24,10 @@ export function* facetSearch(action) {
       facetSearchResults: facetSearchResults,
     }
   })
+}
+
+export function* pathQuery(action) {
+  
+  console.log('path query saga')
+  console.log(action.path)
 }

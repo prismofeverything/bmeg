@@ -1,22 +1,31 @@
 import React, { Component } from 'react'
 import { render } from 'react-dom'
 import { connect } from "react-redux";
-
 import cytoscape from 'cytoscape'
 import * as _ from 'underscore'
 
-function schemaToCytoscape(schema) {
+import Path from '../query/path.js'
+
+function schemaToCytoscape(schema, path) {
   if (_.isEmpty(schema)) {
     return {nodes: [], edges: []}
   } else {
+    var steps = Path.nodesIn(path)
+    console.log('PATH SCHEMA STEPS', path, steps)
     var nodes = Object.keys(schema['vertexes']).map(function(key) {
       var vertex = schema['vertexes'][key]
-      return {data: {id: vertex.gid, name: vertex.label}}
+      return {data:
+              {id: vertex.gid,
+               name: vertex.label,
+               active: !_.isEmpty(steps[vertex.label])}}
     })
 
     var edges = _.flatten(Object.keys(schema['from']).map(function(key) {
       return schema['from'][key].map(function(edge) {
-        return {data: {source: edge['from'], target: edge['to'], label: edge['label']}}
+        return {data:
+                {source: edge['from'],
+                 target: edge['to'],
+                 label: edge['label']}}
       })
     }))
 
@@ -94,6 +103,7 @@ export class Schema extends Component {
   renderCytoscape(schema) {
     console.log('rendering schema')
     var nodeColor = '#594346'
+    var activeColor = '#7ec950'
     var nodeText = '#ffffff'
     var edgeColor = '#f22f08'
     var edgeText = '#ffffff'
@@ -111,7 +121,26 @@ export class Schema extends Component {
       userPanningEnabled: false,
 
       style: cytoscape.stylesheet()
-        .selector('node')
+        .selector('node[active]')
+        .css({
+          'content': 'data(name)',
+          'height': radius, // 80
+          'width': radius, // 80
+          'background-fit': 'cover',
+          'background-color': activeColor,
+          // 'border-color': '#000',
+          // 'border-width': 3,
+          // 'border-opacity': 0.5,
+          // 'shape': 'roundrectangle',
+          'color': nodeText,
+          'font-family': '"Lucida Sans Unicode", "Lucida Grande", sans-serif',
+          'font-size': radius * 0.24, // 24
+          'text-outline-color': nodeColor,
+          'text-outline-width': radius * 0.03, // 3,
+          'text-valign': 'center'
+        })
+
+        .selector('node[!active]')
         .css({
           'content': 'data(name)',
           'height': radius, // 80
@@ -145,7 +174,7 @@ export class Schema extends Component {
           'text-outline-width': radius * 0.02, // 2
         }),
 
-      elements: schema // schemaToCytoscape(schema)
+      elements: schema
     })
 
     this.cy.on('tap', 'node', function(cy) {
@@ -175,9 +204,9 @@ export class Schema extends Component {
     // })
   }
 
-  generateSchema(schema) {
+  generateSchema(schema, path) {
     console.log(schema)
-    var next = schemaToCytoscape(schema)
+    var next = schemaToCytoscape(schema, path)
     if (false) { // (this.cy) {
       this.cy.json(next)
     } else {
@@ -190,7 +219,7 @@ export class Schema extends Component {
 
   componentDidMount() {
     if (this.props.schema) {
-      this.generateSchema(this.props.schema)
+      this.generateSchema(this.props.schema, this.props.path)
     }
   }
 
@@ -199,7 +228,7 @@ export class Schema extends Component {
   }
 
   componentWillReceiveProps(props) {
-    this.generateSchema(props.schema)
+    this.generateSchema(props.schema, props.path)
   }
 
   componentDidReceiveProps(props) {
