@@ -68,4 +68,4 @@ const styleSheet = createStyleSheet({
   },
 });
 
-export default withStyles(styleSheet)(Header);
+export default connect() (withStyles(styleSheet) (Header));
