@@ -259,6 +259,7 @@ class FacetHandler(tornado.web.RequestHandler):
                         "keyed": False
                     }
                 }
+
             aggregation = {
                 "size": 0,
                 "query": {"query_string":

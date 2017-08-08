@@ -26,11 +26,13 @@ export class Facet extends Component {
   onFacetValuesSelected(key, values) {
     const { dispatch } = this.props
     const type = this.props.facet.type;
+    const property = key.split('.')[1]
     dispatch({
       type: 'SELECTED_FACET',
       facet: {
         label: this.props.label,
         key: key,
+        property: property,
         values: values,
         type: type,
       }

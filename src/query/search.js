@@ -14,13 +14,30 @@ function execute(query) {
 }
 
 export default class OphionSearch {
+  // search from main page
   static search(scope, value) {
     const O = Ophion()
     return execute(O.query().searchVertex(value))
       .then(function(results) {
         var groups = groupResults(results)
-        console.log('results: ' + results.length)
-        console.log('result types: ' + Object.keys(groups))
+        console.log('OphionSearch.search results:', results)
+        console.log('OphionSearch.search results.length: ' + results.length)
+        console.log('OphionSearch.search result types: ' + Object.keys(groups))
+        return groups
+      }
+    )
+  }
+  // search from cohort
+  static facetSearch(action) {
+    console.log('OphionSearch.facetSearch action:', action)
+    const O = Ophion()
+    //selectedFacets: Array(0), label: "Cohort"
+    return execute(O.query().searchVertex(action.label))
+      .then(function(results) {
+        var groups = groupResults(results)
+        console.log('OphionSearch.facetSearch results:', results)
+        console.log('OphionSearch.facetSearch results.length: ' + results.length)
+        console.log('OphionSearch.facetSearch result types: ' + Object.keys(groups))
         return groups
       }
     )

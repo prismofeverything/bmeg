@@ -82,7 +82,7 @@ export class Schema extends Component {
       autounselectify: true,
       userZoomingEnabled: false,
       userPanningEnabled: false,
-      
+
       style: cytoscape.stylesheet()
         .selector('node')
         .css({
@@ -123,7 +123,7 @@ export class Schema extends Component {
 
     this.cy.on('tap', 'node', function(cy) {
       const label = this.id()
-      console.log(label)
+      console.log('SCHEMA_TAP_VERTEX',label)
       dispatch({
         type: 'SCHEMA_TAP_VERTEX',
         label: label,
