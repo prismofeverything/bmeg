@@ -12,6 +12,7 @@ import Card, { CardContent } from 'material-ui/Card';
 import Collapse from 'material-ui/transitions/Collapse';
 import IconButton from 'material-ui/IconButton';
 import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
+import ExpandLessIcon from 'material-ui-icons/ExpandLess';
 import List from 'material-ui/List';
 import ListItem from 'material-ui/List/ListItem';
 import ListItemText from 'material-ui/List/ListItemText';
@@ -154,21 +155,12 @@ export class Facet extends Component {
     // all done with this facet
     const classes = this.props.classes;
 
-    const expander = (
-      <div>{key}
-        <IconButton
-          className={classnames(classes.expand,
-                                { [classes.expandOpen]: _self.state.open, })
-                    }
-          onClick={_self.toggleOpen}
-          aria-expanded={_self.state.open}
-          aria-label="Show more"
-          style={{float:'right'}}
-          >
-          <ExpandMoreIcon />
-        </IconButton>
-      </div>
-    )
+    var icon
+    if (this.state.open) {
+      icon = (<ExpandMoreIcon />)
+    } else {
+      icon = (<ExpandLessIcon />)
+    }
 
     const facetItem = (
       <div>
@@ -176,7 +168,7 @@ export class Facet extends Component {
           <ListItemText primary={key}  />
           <ListItemSecondaryAction >
             <IconButton aria-label="More">
-              <ExpandMoreIcon />
+              {icon}
             </IconButton>
           </ListItemSecondaryAction>
         </ListItem>
