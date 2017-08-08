@@ -89,19 +89,6 @@ export class Facet extends Component {
       other = <li key={'other'} className="list-group-item" ><em>{'other'}</em> <span className="badge">{facet.sum_other_doc_count}</span></li> ;
     }
 
-    // // double check percentiles, if we ask for percentiles of a field
-    // // not present in query subset, we will get NaN
-    // if (value_accessor === 'value') {
-    //   var good_buckets = _.filter(value.buckets,
-    //                               (b)=> { return !(b.value === 'NaN')}
-    //                              );
-    //   if (good_buckets.length == 0) {
-    //     value_accessor = undefined;
-    //     buckets = undefined;
-    //     other = undefined;
-    //   }
-    // }
-
     // compose chart
     // padding for chart container
     const chartWellStyles = {padding:'0 0 0 0'}
@@ -212,9 +199,6 @@ export class Facet extends Component {
 }
 
 function mapStateToProps(state, own) {
-  // console.log('Facet mapStateToProps state', state);
-  // console.log('Facet.mapStateToProps own', own)
-
   // are any of the selected facets me?
   const selectedFacets =
     _.filter(state.selectedFacets, function(currentFacet) {
@@ -249,6 +233,4 @@ const styleSheet = createStyleSheet(theme => ({
   },
 }));
 
-//export default connect(mapStateToProps) (Facet);
-//export  default withStyles(styleSheet)(Facet);
 export default connect(mapStateToProps)(withStyles(styleSheet)(Facet));
