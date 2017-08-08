@@ -5,14 +5,29 @@ import { push } from 'react-router-redux'
 import * as _ from 'underscore'
 
 
-import Accordion from 'react-bootstrap/lib/Accordion';
-import Panel from 'react-bootstrap/lib/Panel';
-import Well from 'react-bootstrap/lib/Well';
+import classnames from 'classnames';
+import { withStyles, createStyleSheet } from 'material-ui/styles';
+import Card, {CardActions, CardHeader, CardContent} from 'material-ui/Card';
+import Paper from 'material-ui/Paper';
+import Collapse from 'material-ui/transitions/Collapse';
+import Avatar from 'material-ui/Avatar';
+import IconButton from 'material-ui/IconButton';
+import Typography from 'material-ui/Typography';
+import red from 'material-ui/colors/red';
+import FavoriteIcon from 'material-ui-icons/Favorite';
+import ShareIcon from 'material-ui-icons/Share';
+import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
+import List from 'material-ui/List';
+import ListItem from 'material-ui/List/ListItem';
+import ListItemText from 'material-ui/List/ListItemText';
+import ListItemSecondaryAction from 'material-ui/List/ListItemSecondaryAction';
+
+import CommentIcon from 'material-ui-icons/Comment';
+
 import { VictoryPie,VictoryChart,VictoryBar,Bar } from 'victory';
 
 // a `cohort` is a selection from a type/domain/label based on selected criteria
 export class Facet extends Component {
-
 
   constructor(props) {
     super(props);
@@ -20,6 +35,7 @@ export class Facet extends Component {
     this.state = {
       open: false,
     };
+    this.toggleOpen = this.toggleOpen.bind(this)
   }
 
   // when user (un)selects a value
@@ -139,34 +155,83 @@ export class Facet extends Component {
         chart = (<p>No values for this query</p>);
       }
       chart = (
-        <Well className="text-center" style={chartWellStyles}>
+        <Paper className="text-center" style={chartWellStyles}>
           {chart}
-        </Well>)
+        </Paper>)
     }
 
 
-    // all done with this facet
-    const facetItem = (
-      <Accordion key={key}
-                 bsStyle='accordion-custom'
-                 onSelect={ ()=> _self.toggleOpen()}
-                 >
-          <Panel eventKey={key} header={key} >
-            {buckets}
-            {other}
-            {chart}
-          </Panel>
-      </Accordion>
-    );
+    // bsStyle='accordion-custom'
+    // onSelect={ ()=> _self.toggleOpen()}
 
+    // {buckets}
+    // {other}
+    // {chart}
+
+    // all done with this facet
+    const classes = this.props.classes;
+
+    const expander = (
+      <div>{key}
+        <IconButton
+          className={classnames(classes.expand,
+                                { [classes.expandOpen]: _self.state.open, })
+                    }
+          onClick={_self.toggleOpen}
+          aria-expanded={_self.state.open}
+          aria-label="Show more"
+          style={{float:'right'}}
+          >
+          <ExpandMoreIcon />
+        </IconButton>
+      </div>
+    )
+
+
+    // <Card style={{ height: '4em','font-size': '1em' }}>
+    //   <CardHeader
+    //     title={expander}
+    //     >
+    //   </CardHeader>
+    //   <Collapse in={this.state.open} transitionDuration="auto" unmountOnExit>
+    //     <CardContent>
+    //       {buckets}
+    //       {other}
+    //       {chart}
+    //     </CardContent>
+    //   </Collapse>
+    // </Card>
+    const facetItem = (
+      <div>
+        <ListItem dense button key={key} onClick={event => _self.toggleOpen()}>
+          <ListItemText primary={key} />
+          <ListItemSecondaryAction>
+            <IconButton aria-label="More">
+              <ExpandMoreIcon />
+            </IconButton>
+          </ListItemSecondaryAction>
+        </ListItem>
+        <Collapse in={_self.state.open} transitionDuration="auto" unmountOnExit>
+          <div>
+            <Card>
+              <CardContent>
+                {buckets}
+                {other}
+                {chart}
+              </CardContent>
+            </Card>
+          </div>
+        </Collapse>
+      </div>      
+    );
 
     return facetItem;
   }
 }
 
 function mapStateToProps(state, own) {
-  // console.log('Facet mapStateToProps state', state);
-  // console.log('Facet.mapStateToProps own', own)
+  console.log('Facet mapStateToProps state', state);
+  console.log('Facet.mapStateToProps own', own)
 
   // are any of the selected facets me?
   const selectedFacets =
@@ -185,4 +250,26 @@ function mapStateToProps(state, own) {
   }
 }
 
-export default connect(mapStateToProps) (Facet)
+const styleSheet = createStyleSheet(theme => ({
+  card: {
+    maxWidth: 400,
+  },
+  expand: {
+    transform: 'rotate(0deg)',
+    transition: theme.transitions.create('transform', {
+      duration: theme.transitions.duration.shortest,
+    }),
+  },
+  expandOpen: {
+    transform: 'rotate(180deg)',
+  },
+  avatar: {
+    backgroundColor: red[500],
+  },
+  flexGrow: {
+    flex: '1 1 auto',
+  },
+}));
+
+//export default connect(mapStateToProps) (Facet);
+export  default withStyles(styleSheet)(Facet);
