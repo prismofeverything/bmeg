@@ -7,7 +7,11 @@ import * as _ from 'underscore'
 
 import PropTypes from 'prop-types';
 import { withStyles, createStyleSheet } from 'material-ui/styles';
-import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
+
+// tricky import so we don't have a name collision on 'Table'
+import { default as TableMD } from 'material-ui/Table';
+import { TableBody, TableCell, TableHead, TableRow, TableSortLabel } from 'material-ui/Table';
+
 import Paper from 'material-ui/Paper';
 
 
@@ -17,12 +21,29 @@ export class Table extends Component {
   constructor(props) {
     super(props);
     /* initial state */
-    this.state = { };
+    this.state = {
+      order:'asc',
+      orderBy: 'gid'
+    };
+    this.handleRequestSort = this.handleRequestSort.bind(this)
   }
+
+  handleRequestSort(property) {
+    const orderBy = property;
+    let order = 'desc';
+    if (this.state.orderBy === property && this.state.order === 'desc') {
+      order = 'asc';
+    }
+    const data = this.props.data.sort(
+      (a, b) => (order === 'desc' ? b[orderBy] > a[orderBy] : a[orderBy] > b[orderBy]),
+    );
+    this.setState({ data:data , order:order , orderBy:orderBy });
+  };
 
 
   // render the table
   render() {
+    const _self = this ;
     const classes = this.props.classes;
     if (this.props.data) {
       // map the first item to columns TODO - map from facets
@@ -30,7 +51,15 @@ export class Table extends Component {
         return (
           <TableCell
             key={key}>
-              {key}
+            <TableSortLabel
+               active={_self.state.orderBy === key}
+               direction={_self.state.order}
+               onClick= {(evt, clickedProps) => {
+                 _self.handleRequestSort(key);
+               }}
+             >
+               {key}
+             </TableSortLabel>
           </TableCell>
         )
       });
@@ -39,42 +68,21 @@ export class Table extends Component {
         return (
           <TableRow key={item.gid}>
             {
-              const rowCells = _.map(item, function(row, key, obj) {
+              _.map(item, function(value, key, obj) {
                 return (
-                  <TableCell>
-                    {row[key]}
+                  <TableCell key={`${item.gid}.${key}`}>
+                    {value}
                   </TableCell>
                 );
-              });
+              })
             }
           </TableRow>
         );
-      }
-      {data.map(n => {
-        return (
-          <TableRow key={n.id}>
-            <TableCell>
-              {n.name}
-            </TableCell>
-            <TableCell numeric>
-              {n.calories}
-            </TableCell>
-            <TableCell numeric>
-              {n.fat}
-            </TableCell>
-            <TableCell numeric>
-              {n.carbs}
-            </TableCell>
-            <TableCell numeric>
-              {n.protein}
-            </TableCell>
-          </TableRow>
-        );
-      })}
+      });
 
       return (
-        <Paper className={this.classes.paper}>
-          <Table>
+        <Paper className={classes.paper}>
+          <TableMD>
             <TableHead>
               <TableRow>
                 {columns}
@@ -83,7 +91,7 @@ export class Table extends Component {
             <TableBody>
               {rows}
             </TableBody>
-          </Table>
+          </TableMD>
         </Paper>
       ) ;
     } else {
@@ -95,9 +103,10 @@ export class Table extends Component {
 }
 
 function mapStateToProps(state, own) {
-  console.log('Table mapStateToProps state', state);
-  console.log('Table mapStateToProps own', own)
-  const data = state.query.results ? state.query.results.map(function(result) {return {...result.properties, gid: result.gid}}) : []
+  var data;
+  if(state.query && state.query.focus === own.label) {
+    data = state.query.results ? state.query.results.map(function(result) {return {...result.properties, gid: result.gid}}) : []
+  }
   return {
     data: data,
   }
@@ -112,4 +121,4 @@ const styleSheet = createStyleSheet(theme => ({
 }));
 
 
-export default connect(mapStateToProps) (Table)
+export default connect(mapStateToProps)(withStyles(styleSheet)(Table));
