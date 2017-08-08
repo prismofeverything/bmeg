@@ -15,7 +15,7 @@ export function* searchAll(action) {
 }
 
 export function* facetSearch(action) {
-  console.log('query.js facetSearch',action)
+  // console.log('query.js facetSearch',action)
   const facetSearchResults = yield call(OphionSearch.facetSearch, action)
   yield put({
     type: 'FACET_SEARCH_RESULTS_SAVE',
@@ -27,7 +27,15 @@ export function* facetSearch(action) {
 }
 
 export function* pathQuery(action) {
-  
   console.log('path query saga')
   console.log(action.path)
+
+  const query = Path.translateQuery(action.path, action.focus).limit(10)
+  const results = yield OphionSearch.execute(query)
+  yield put({
+    type: 'QUERY_RESULTS_SAVE',
+    path: action.path,
+    focus: action.focus,
+    results: results,
+  })
 }

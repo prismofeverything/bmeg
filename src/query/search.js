@@ -9,15 +9,15 @@ function groupResults(results) {
   }
 }
 
-function execute(query) {
-  return new Promise(resolve => query.execute(resolve))
-}
-
 export default class OphionSearch {
+  static execute(query) {
+    return new Promise(resolve => query.execute(resolve))
+  }
+
   // search from main page
   static search(scope, value) {
     const O = Ophion()
-    return execute(O.query().searchVertex(value))
+    return OphionSearch.execute(O.query().searchVertex(value))
       .then(function(results) {
         var groups = groupResults(results)
         console.log('OphionSearch.search results:', results)
@@ -32,7 +32,7 @@ export default class OphionSearch {
     console.log('OphionSearch.facetSearch action:', action)
     const O = Ophion()
     //selectedFacets: Array(0), label: "Cohort"
-    return execute(O.query().searchVertex(action.label))
+    return OphionSearch.execute(O.query().searchVertex(action.label))
       .then(function(results) {
         var groups = groupResults(results)
         console.log('OphionSearch.facetSearch results:', results)

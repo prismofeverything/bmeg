@@ -13,7 +13,7 @@ export function* fetchFacets(action) {
 }
 
 export function* aggregateFacets(action) {
-  console.log('aggregateFacets.action',action);
+  // console.log('aggregateFacets.action',action);
   // render a `query` of what's been selected
   const queryString = action.selectedFacets.map(function(selectedFacet){
     const property_name = selectedFacet.key.split('.')[1]
@@ -23,8 +23,8 @@ export function* aggregateFacets(action) {
     return `${property_name}:${selectedFacet.values}`;
   }).join(" AND ");
 
-  const aggregatedFacets = yield call(Facets.aggregateFacets,queryString);
-  console.log('aggregatedFacets',aggregatedFacets);
+  const aggregatedFacets = yield call(Facets.aggregateFacets, queryString);
+  // console.log('aggregatedFacets',aggregatedFacets);
   yield put({
     type: 'AGGREGATED_FACETS_SAVE',
     facets: aggregatedFacets,

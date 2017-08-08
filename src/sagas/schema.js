@@ -18,7 +18,6 @@ export function* firstVertex(action) {
   const vertex = results[0]
 
   if (!_.isEmpty(vertex)) {
-    console.log('pushing to history')
     yield put(push('/explore/vertex/' + vertex.gid))
   }
 }

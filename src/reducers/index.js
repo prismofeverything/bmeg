@@ -3,6 +3,7 @@ import { routerReducer } from 'react-router-redux';
 import { reducer as formReducer } from 'redux-form';
 import schema from './schema'
 import search from './search'
+import query from './query'
 import path from './path'
 import FacetReducers from './facets'
 
@@ -15,4 +16,5 @@ export const reducers = combineReducers({
   path: path,
   selectedFacets: FacetReducers.selectedFacets,
   facets: FacetReducers.facets,
+  query: query,
 });

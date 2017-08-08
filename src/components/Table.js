@@ -20,6 +20,7 @@ export class Table extends Component {
   // render the table
   render() {
 
+    if (this.props.data) {
     // map the first item to columns
     const columns = _.map(this.props.data[0], function(item, key, object) {
       return (
@@ -35,6 +36,11 @@ export class Table extends Component {
         {columns}
       </BootstrapTable>
     ) ;
+    } else {
+      return (
+        <div>no results</div>
+      )
+    }
   }
 }
 
@@ -50,8 +56,10 @@ function mapStateToProps(state, own) {
         name: "Product2",
         price: 80
     }];
+
+  const data = state.query.results ? state.query.results.map(function(result) {return {...result.properties, gid: result.gid}}) : []
   return {
-    data: products
+    data: data, //products
   }
 }
 

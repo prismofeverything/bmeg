@@ -11,13 +11,17 @@ function schemaToCytoscape(schema, path) {
     return {nodes: [], edges: []}
   } else {
     var steps = Path.nodesIn(path)
-    console.log('PATH SCHEMA STEPS', path, steps)
+    var focus = _.last(path).label
+    console.log('PATH SCHEMA STEPS', focus, path, steps)
     var nodes = Object.keys(schema['vertexes']).map(function(key) {
       var vertex = schema['vertexes'][key]
       return {data:
               {id: vertex.gid,
                name: vertex.label,
-               active: !_.isEmpty(steps[vertex.label])}}
+               active: !_.isEmpty(steps[vertex.label]),
+               focus: vertex.label === focus,
+              }
+             }
     })
 
     var edges = _.flatten(Object.keys(schema['from']).map(function(key) {
@@ -101,15 +105,14 @@ export class Schema extends Component {
   }
 
   renderCytoscape(schema) {
-    console.log('rendering schema')
     var nodeColor = '#594346'
-    var activeColor = '#7ec950'
+    var focusColor = '#7ec950'
+    var activeColor = '#105a8c'
     var nodeText = '#ffffff'
     var edgeColor = '#f22f08'
     var edgeText = '#ffffff'
     const {dispatch, width, height} = this.props
 
-    console.log(this.props)
     var radius = Math.min(width, height) * 0.24 // * 0.08;
 
     var cyelement = this.refs.cytoscape
@@ -159,6 +162,11 @@ export class Schema extends Component {
           'text-valign': 'center'
         })
 
+        .selector('node[?focus]')
+        .css({
+          'background-color': focusColor,
+        })
+
         .selector('edge')
         .css({
           'content': 'data(label)',
@@ -179,7 +187,7 @@ export class Schema extends Component {
 
     this.cy.on('tap', 'node', function(cy) {
       const label = this.id()
-      console.log('SCHEMA_TAP_VERTEX',label)
+      console.log('SCHEMA_TAP_VERTEX', label)
       dispatch({
         type: 'SCHEMA_TAP_VERTEX',
         label: label,
@@ -205,7 +213,7 @@ export class Schema extends Component {
   }
 
   generateSchema(schema, path) {
-    console.log(schema)
+    console.log('rendering schema')
     var next = schemaToCytoscape(schema, path)
     if (false) { // (this.cy) {
       this.cy.json(next)
@@ -232,7 +240,6 @@ export class Schema extends Component {
   }
 
   componentDidReceiveProps(props) {
-    console.log('schema did receive props')
     this.cy.resize()
   }
 

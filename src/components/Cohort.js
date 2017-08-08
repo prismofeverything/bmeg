@@ -72,12 +72,15 @@ export class Cohort extends Component {
     const { dispatch } = this.props
     // get updated aggregations
     dispatch({
-      type: 'FACETS_AGGREGATE',
+      type: 'REFRESH_QUERY',
       selectedFacets: this.props.selectedFacets,
       label: this.props.label,
+      focus: this.props.label,
+      path: this.props.path,
     })
     this.triggerSearch();
   }
+
   triggerSearch() {
     const {dispatch} = this.props;
     return new Promise((resolve, reject) => {
