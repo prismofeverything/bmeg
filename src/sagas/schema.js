@@ -6,7 +6,6 @@ import Facets from '../query/facets'
 
 export function* fetchSchema(action) {
   const schema = yield call(Schema.fetchSchema);
-  console.log('fetchSchema', schema);
   yield put({
     type: 'SCHEMA_SAVE',
     schema: schema,

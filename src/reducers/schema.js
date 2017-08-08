@@ -11,7 +11,6 @@ export default function schema(state = {}, action) {
     case 'LAYOUT_COMPONENTS':
       // TODO - rename action.width to action.sidebarWidth
       // (confusing when there are multiple widths)
-      console.log('LAYOUT_COMPONENTS',action.width)
       return {...state, sidebarWidth: action.width}
     default:
       return state

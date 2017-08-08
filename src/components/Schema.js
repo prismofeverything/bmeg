@@ -11,8 +11,10 @@ function schemaToCytoscape(schema, path) {
     return {nodes: [], edges: []}
   } else {
     var steps = Path.nodesIn(path)
-    var focus = _.last(path).label
+    var tail = _.last(path)
+    var focus = tail ? tail.label : null
     console.log('PATH SCHEMA STEPS', focus, path, steps)
+
     var nodes = Object.keys(schema['vertexes']).map(function(key) {
       var vertex = schema['vertexes'][key]
       return {data:

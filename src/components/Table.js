@@ -5,7 +5,15 @@ import { push } from 'react-router-redux'
 import * as _ from 'underscore'
 
 
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import PropTypes from 'prop-types';
+import { withStyles, createStyleSheet } from 'material-ui/styles';
+
+// tricky import so we don't have a name collision on 'Table'
+import { default as TableMD } from 'material-ui/Table';
+import { TableBody, TableCell, TableHead, TableRow, TableSortLabel } from 'material-ui/Table';
+
+import Paper from 'material-ui/Paper';
+
 
 export class Table extends Component {
 
@@ -13,29 +21,79 @@ export class Table extends Component {
   constructor(props) {
     super(props);
     /* initial state */
-    this.state = { };
+    this.state = {
+      order:'asc',
+      orderBy: 'gid'
+    };
+    this.handleRequestSort = this.handleRequestSort.bind(this)
   }
+
+  handleRequestSort(property) {
+    const orderBy = property;
+    let order = 'desc';
+    if (this.state.orderBy === property && this.state.order === 'desc') {
+      order = 'asc';
+    }
+    const data = this.props.data.sort(
+      (a, b) => (order === 'desc' ? b[orderBy] > a[orderBy] : a[orderBy] > b[orderBy]),
+    );
+    this.setState({ data:data , order:order , orderBy:orderBy });
+  };
 
 
   // render the table
   render() {
-
+    const _self = this ;
+    const classes = this.props.classes;
     if (this.props.data) {
-    // map the first item to columns
-    const columns = _.map(this.props.data[0], function(item, key, object) {
+      // map the first item to columns TODO - map from facets
+      const columns = _.map(this.props.data[0], function(item, key, object) {
+        return (
+          <TableCell
+            key={key}>
+            <TableSortLabel
+               active={_self.state.orderBy === key}
+               direction={_self.state.order}
+               onClick= {(evt, clickedProps) => {
+                 _self.handleRequestSort(key);
+               }}
+             >
+               {key}
+             </TableSortLabel>
+          </TableCell>
+        )
+      });
+
+      const rows = _.map(this.props.data, function(item, index, list) {
+        return (
+          <TableRow key={item.gid}>
+            {
+              _.map(item, function(value, key, obj) {
+                return (
+                  <TableCell key={`${item.gid}.${key}`}>
+                    {value}
+                  </TableCell>
+                );
+              })
+            }
+          </TableRow>
+        );
+      });
+
       return (
-        <TableHeaderColumn
-          dataField={key} >
-            {key}
-        </TableHeaderColumn>
-      )
-    });
-    // gid is always the key
-    return (
-      <BootstrapTable data={this.props.data} striped hover keyField='gid'>
-        {columns}
-      </BootstrapTable>
-    ) ;
+        <Paper className={classes.paper}>
+          <TableMD>
+            <TableHead>
+              <TableRow>
+                {columns}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows}
+            </TableBody>
+          </TableMD>
+        </Paper>
+      ) ;
     } else {
       return (
         <div>no results</div>
@@ -45,22 +103,22 @@ export class Table extends Component {
 }
 
 function mapStateToProps(state, own) {
-  console.log('Table mapStateToProps state', state);
-  console.log('Table mapStateToProps own', own)
-  const products = [{
-        gid: 1,
-        name: "Product1",
-        price: 120
-    }, {
-        gid: 2,
-        name: "Product2",
-        price: 80
-    }];
-
-  const data = state.query.results ? state.query.results.map(function(result) {return {...result.properties, gid: result.gid}}) : []
+  var data;
+  if(state.query && state.query.focus === own.label) {
+    data = state.query.results ? state.query.results.map(function(result) {return {...result.properties, gid: result.gid}}) : []
+  }
   return {
-    data: data, //products
+    data: data,
   }
 }
 
-export default connect(mapStateToProps) (Table)
+const styleSheet = createStyleSheet(theme => ({
+  paper: {
+    width: '100%',
+    marginTop: theme.spacing.unit * 3,
+    overflowX: 'auto',
+  },
+}));
+
+
+export default connect(mapStateToProps)(withStyles(styleSheet)(Table));

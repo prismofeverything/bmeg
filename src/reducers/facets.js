@@ -40,7 +40,6 @@ export default class FacetReducers {
   static facets(state = {}, action) {
     switch (action.type) {
       case 'AGGREGATED_FACETS_SAVE':
-        console.log('AGGREGATED_FACETS_SAVE facets', action);
         return {...state, ...action.facets.facets};
       case 'FACETS_SAVE':
         return {...state, ...action.facets.facets}

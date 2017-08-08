@@ -14,18 +14,6 @@ export function* searchAll(action) {
   })
 }
 
-export function* facetSearch(action) {
-  // console.log('query.js facetSearch',action)
-  const facetSearchResults = yield call(OphionSearch.facetSearch, action)
-  yield put({
-    type: 'FACET_SEARCH_RESULTS_SAVE',
-    search: {
-      label: action.label,
-      facetSearchResults: facetSearchResults,
-    }
-  })
-}
-
 export function* pathQuery(action) {
   console.log('path query saga')
   console.log(action.path)

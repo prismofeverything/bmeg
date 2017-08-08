@@ -13,6 +13,8 @@ import Schema from './Schema'
 import Facet from './Facet'
 import Table from './Table'
 
+import List from 'material-ui/List';
+
 // a `cohort` is a selection from a type/domain/label based on selected criteria
 export class Cohort extends Component {
 
@@ -146,9 +148,9 @@ export class Cohort extends Component {
 
     const sidebarContent = (
       <div >
-        <div key={this.props.label} >
+        <List key={this.props.label} >
           {facetItems}
-        </div>
+        </List>
         {warnings}
       </div>
     );
@@ -170,7 +172,7 @@ export class Cohort extends Component {
       <div style={resultsStyle}>
         <p>{queryString}</p>
         {queryButton}
-        <Table/>
+        <Table key={this.props.label} label={this.props.label}/>
       </div>
     )
     // render main content, create a ref we can interrogate later
@@ -248,7 +250,6 @@ export class Cohort extends Component {
 
 function mapStateToProps(state, own) {
   // select the facets that apply to this label
-  console.log('Cohort mapStateToProps', state, own);
   const my_facets =
     _.pick(state.facets, function(value, key, object) {
       return key && key.startsWith(`${own.params.label}.`);

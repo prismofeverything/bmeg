@@ -5,14 +5,22 @@ import { push } from 'react-router-redux'
 import * as _ from 'underscore'
 
 
-import Accordion from 'react-bootstrap/lib/Accordion';
-import Panel from 'react-bootstrap/lib/Panel';
-import Well from 'react-bootstrap/lib/Well';
+import classnames from 'classnames';
+import { withStyles, createStyleSheet } from 'material-ui/styles';
+import Paper from 'material-ui/Paper';
+import Card, { CardContent } from 'material-ui/Card';
+import Collapse from 'material-ui/transitions/Collapse';
+import IconButton from 'material-ui/IconButton';
+import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
+import List from 'material-ui/List';
+import ListItem from 'material-ui/List/ListItem';
+import ListItemText from 'material-ui/List/ListItemText';
+import ListItemSecondaryAction from 'material-ui/List/ListItemSecondaryAction';
+
 import { VictoryPie,VictoryChart,VictoryBar,Bar } from 'victory';
 
 // a `cohort` is a selection from a type/domain/label based on selected criteria
 export class Facet extends Component {
-
 
   constructor(props) {
     super(props);
@@ -20,6 +28,8 @@ export class Facet extends Component {
     this.state = {
       open: false,
     };
+    this.toggleOpen = this.toggleOpen.bind(this)
+    this.onFacetValuesSelected = this.onFacetValuesSelected.bind(this)
   }
 
   // when user (un)selects a value
@@ -79,19 +89,6 @@ export class Facet extends Component {
       other = <li key={'other'} className="list-group-item" ><em>{'other'}</em> <span className="badge">{facet.sum_other_doc_count}</span></li> ;
     }
 
-    // // double check percentiles, if we ask for percentiles of a field
-    // // not present in query subset, we will get NaN
-    // if (value_accessor === 'value') {
-    //   var good_buckets = _.filter(value.buckets,
-    //                               (b)=> { return !(b.value === 'NaN')}
-    //                              );
-    //   if (good_buckets.length == 0) {
-    //     value_accessor = undefined;
-    //     buckets = undefined;
-    //     other = undefined;
-    //   }
-    // }
-
     // compose chart
     // padding for chart container
     const chartWellStyles = {padding:'0 0 0 0'}
@@ -141,35 +138,67 @@ export class Facet extends Component {
         chart = (<p>No values for this query</p>);
       }
       chart = (
-        <Well className="text-center" style={chartWellStyles}>
+        <Paper className="text-center" style={chartWellStyles}>
           {chart}
-        </Well>)
+        </Paper>)
     }
 
 
-    // all done with this facet
-    const facetItem = (
-      <Accordion key={key}
-                 bsStyle='accordion-custom'
-                 onSelect={ ()=> _self.toggleOpen()}
-                 >
-          <Panel eventKey={key} header={key} >
-            {buckets}
-            {other}
-            {chart}
-          </Panel>
-      </Accordion>
-    );
+    // bsStyle='accordion-custom'
+    // onSelect={ ()=> _self.toggleOpen()}
 
+    // {buckets}
+    // {other}
+    // {chart}
+
+    // all done with this facet
+    const classes = this.props.classes;
+
+    const expander = (
+      <div>{key}
+        <IconButton
+          className={classnames(classes.expand,
+                                { [classes.expandOpen]: _self.state.open, })
+                    }
+          onClick={_self.toggleOpen}
+          aria-expanded={_self.state.open}
+          aria-label="Show more"
+          style={{float:'right'}}
+          >
+          <ExpandMoreIcon />
+        </IconButton>
+      </div>
+    )
+
+    const facetItem = (
+      <div>
+        <ListItem dense disableGutters button key={key} onClick={event => _self.toggleOpen()}>
+          <ListItemText primary={key}  />
+          <ListItemSecondaryAction >
+            <IconButton aria-label="More">
+              <ExpandMoreIcon />
+            </IconButton>
+          </ListItemSecondaryAction>
+        </ListItem>
+        <Collapse in={_self.state.open} transitionDuration="auto" unmountOnExit>
+          <div>
+            <Card>
+              <CardContent>
+                {buckets}
+                {other}
+                {chart}
+              </CardContent>
+            </Card>
+          </div>
+        </Collapse>
+      </div>
+    );
 
     return facetItem;
   }
 }
 
 function mapStateToProps(state, own) {
-  // console.log('Facet mapStateToProps state', state);
-  // console.log('Facet.mapStateToProps own', own)
-
   // are any of the selected facets me?
   const selectedFacets =
     _.filter(state.selectedFacets, function(currentFacet) {
@@ -179,7 +208,6 @@ function mapStateToProps(state, own) {
   var selectedFacet;
   if (selectedFacets.length === 1) {
     selectedFacet = selectedFacets[0];
-    console.log('Facet.mapStateToProps selectedFacet', selectedFacet)
   }
   return {
     selectedFacets: state.selectedFacets,
@@ -187,4 +215,22 @@ function mapStateToProps(state, own) {
   }
 }
 
-export default connect(mapStateToProps) (Facet)
+const styleSheet = createStyleSheet(theme => ({
+  card: {
+    maxWidth: 400,
+  },
+  expand: {
+    transform: 'rotate(0deg)',
+    transition: theme.transitions.create('transform', {
+      duration: theme.transitions.duration.shortest,
+    }),
+  },
+  expandOpen: {
+    transform: 'rotate(180deg)',
+  },
+  flexGrow: {
+    flex: '1 1 auto',
+  },
+}));
+
+export default connect(mapStateToProps)(withStyles(styleSheet)(Facet));

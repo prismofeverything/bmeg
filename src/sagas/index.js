@@ -23,6 +23,5 @@ export function* sagas() {
     fork(takeLatest, 'EDGE_FETCH', fetchEdge),
     fork(takeLatest, 'FACETS_FETCH', fetchFacets),
     fork(takeLatest, 'REFRESH_QUERY', aggregateFacets),
-    fork(takeLatest, 'FACETS_SEARCH', facetSearch),
   ];
 }
