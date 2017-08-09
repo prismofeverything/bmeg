@@ -14,17 +14,17 @@ export default class Path {
   static translateQuery(path, focus) {
     console.log('translate query', focus, path)
     const nodes = Path.nodesIn(path)
-    const focal = nodes[focus]
+    const focal = nodes[focus] || {facets: []}
     console.log(focal)
 
     if (focal) {
       const O = Ophion()
-      const query = _.reduce(_.keys(focal.facets), function(query, key) {
+      const query = O.query().has('gid', 'type:' + focus).outgoing('hasInstance')
+      return _.reduce(_.keys(focal.facets), function(query, key) {
         console.log(key, facet)
         const facet = focal.facets[key]
         return query.has(facet.property, facet.values)
-      }, O.query().has('gid', 'type:' + focus).outgoing('hasInstance'))
-      return query
+      }, query) || query
     }
   }
 }
