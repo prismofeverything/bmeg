@@ -69,7 +69,7 @@ class ProxyHandler(tornado.web.RequestHandler):
         headers = {'Content-Type': 'application/json',
                    'Accept': 'application/json'}
         http_client = AsyncHTTPClient()
-        response = yield http_client.fetch(url, method="POST", body=payload,
+        response = yield http_client.fetch(url, method="POST", body=payload, request_timeout=60000,
                                            headers=headers)
         if response.error:
             self.write("Error: %s" % response.error)

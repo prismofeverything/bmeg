@@ -28,23 +28,24 @@ function applyFacets(query, facets) {
   }, query) || query
 }
 
-function findDuplicates(edges) {
-  var edgeMap = _.reduce(edges, function(edgeMap, edge) {
-    edgeMap[edge.label] = edge
-    return edgeMap
-  }, {})
+function findDuplicates(objects, f) {
+  var outcome = _.reduce(objects, function(outcome, object) {
+    var key = f(object)
+    outcome.map[key] = object
 
-  var outcome = _.reduce(edges, function(dup, edge) {
-    if (dup[edge.label]) {
-      dup[edge.label] += 1
+    if (outcome.dup[key]) {
+      outcome.dup[key] += 1
     } else {
-      dup[edge.label] = 1
+      outcome.dup[key] = 1
     }
-    return dup
-  }, {})
 
-  var labels = _.filter(_.keys(outcome), function(label) {return outcome[label] > 1})
-  return _.map(labels, function(label) {return edgeMap[label]})
+    return outcome
+  }, {map: {}, dup: {}})
+
+  console.log('duplicates outcome', outcome)
+
+  var labels = _.filter(_.keys(outcome.dup), function(key) {return outcome.dup[key] > 1})
+  return _.map(labels, function(key) {return outcome.map[key]})
 }
 
 function edgeFor(edge, label) {
@@ -138,7 +139,7 @@ function translateQuery(schema, visited, focus) {
     var allEdges = _.reduce(labels, function(edges, label) {
       return edges.concat(nodes[label].edges)
     }, [])
-    var duplicateEdges = findDuplicates(allEdges)
+    var duplicateEdges = findDuplicates(allEdges, function(edge) {return edge.label})
     var paths = findPaths(focus, labels, duplicateEdges)
     var journeys = followPaths(paths.paths, _.values(paths.paths), focus)
     var subqueries = _.map(journeys, function(journey) {
