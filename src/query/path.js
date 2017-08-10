@@ -138,15 +138,10 @@ function translateQuery(schema, visited, focus) {
     var allEdges = _.reduce(labels, function(edges, label) {
       return edges.concat(nodes[label].edges)
     }, [])
-    console.log('allEdges', allEdges)
     var duplicateEdges = findDuplicates(allEdges)
-    console.log('duplicateEdges', duplicateEdges)
     var paths = findPaths(focus, labels, duplicateEdges)
-    console.log('paths', paths)
     var journeys = followPaths(paths.paths, _.values(paths.paths), focus)
-    console.log('journeys', journeys)
     var subqueries = _.map(journeys, function(journey) {
-      console.log(journey)
       return _.reduce(journey.slice(1), function(subquery, step) {
         if (step['label']) {
           // it is an edge
@@ -162,12 +157,11 @@ function translateQuery(schema, visited, focus) {
       }, O.mark('root'))
     })
 
-    console.log(query)
-    console.log(subqueries)
-
     if (!_.isEmpty(subqueries)) {
       query.match(subqueries)
     }
+
+    console.log('query', query)
 
     return query
   }
