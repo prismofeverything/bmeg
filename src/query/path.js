@@ -174,27 +174,3 @@ export default class Path {
     return tq(schema, visited, focus)
   }
 }
-
-// function outerNodes(paths) {
-//   return _.difference(
-//     _.keys(paths),
-//     _.map(_.values(paths), function(edge) {return edge.target})
-//   )
-// }
-
-// function followPath(paths, label, seen = []) {
-//   console.log('followPath', label)
-//   if (paths[label].target === label) {
-//     return [paths[label]]
-//   } else {
-//     return [...followPath(paths, paths[label].target), label]
-//   }
-// }
-
-// function pathsBack(paths) {
-//   var outer = outerNodes(paths)
-//   return _.map(outer, function(label) {
-//     return _.reverse(followPath(paths, label))
-//   })
-// }
-
