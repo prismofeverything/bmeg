@@ -37,7 +37,6 @@ export class App extends React.Component {
 }
 
 function mapStateToProps(state, own) {
-  console.log('App mapStateToProps', state, own)
   return {
     focus: own.params.label,
   }
