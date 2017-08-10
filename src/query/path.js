@@ -143,7 +143,7 @@ function translateQuery(schema, visited, focus) {
     var journeys = followPaths(paths.paths, _.values(paths.paths), focus)
     var subqueries = _.map(journeys, function(journey) {
       console.log('journey', journey)
-      return _.reduce(journey.slice(1), function(subquery, step) {
+      return _.reduce(compress(journey).slice(1), function(subquery, step) {
         if (step['label']) {
           // it is an edge
           return (step['from']) ? subquery.incoming(step['label']) : subquery.outgoing(step['label'])
