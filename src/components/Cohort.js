@@ -80,6 +80,7 @@ export class Cohort extends Component {
     dispatch({
       type: 'REFRESH_QUERY',
       selectedFacets: this.props.selectedFacets,
+      schema: this.props.schema,
       label: this.props.label,
       focus: this.props.label,
       path: this.props.path,

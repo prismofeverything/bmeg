@@ -10,7 +10,7 @@ function schemaToCytoscape(schema, path) {
   if (_.isEmpty(schema)) {
     return {nodes: [], edges: []}
   } else {
-    var steps = Path.nodesIn(path)
+    var steps = Path.nodesIn(schema, path)
     var tail = _.last(path)
     var focus = tail ? tail.label : null
     console.log('PATH SCHEMA STEPS', focus, path, steps)
