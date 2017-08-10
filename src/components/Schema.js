@@ -126,26 +126,8 @@ export class Schema extends Component {
       userPanningEnabled: false,
 
       style: cytoscape.stylesheet()
-        .selector('node[active]')
-        .css({
-          'content': 'data(name)',
-          'height': radius, // 80
-          'width': radius, // 80
-          'background-fit': 'cover',
-          'background-color': activeColor,
-          // 'border-color': '#000',
-          // 'border-width': 3,
-          // 'border-opacity': 0.5,
-          // 'shape': 'roundrectangle',
-          'color': nodeText,
-          'font-family': '"Lucida Sans Unicode", "Lucida Grande", sans-serif',
-          'font-size': radius * 0.24, // 24
-          'text-outline-color': nodeColor,
-          'text-outline-width': radius * 0.03, // 3,
-          'text-valign': 'center'
-        })
-
-        .selector('node[!active]')
+        .selector('node')
+        // .selector('node[!active]')
         .css({
           'content': 'data(name)',
           'height': radius, // 80
@@ -162,6 +144,11 @@ export class Schema extends Component {
           'text-outline-color': nodeColor,
           'text-outline-width': radius * 0.03, // 3,
           'text-valign': 'center'
+        })
+
+        .selector('node[?active]')
+        .css({
+          'background-color': activeColor,
         })
 
         .selector('node[?focus]')
