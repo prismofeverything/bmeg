@@ -145,7 +145,7 @@ function translateQuery(schema, visited, focus) {
       return _.reduce(journey.slice(1), function(subquery, step) {
         if (step['label']) {
           // it is an edge
-          return (step['from']) ? subquery.incoming(step['label']) : return subquery.outgoing(step['label'])
+          return (step['from']) ? subquery.incoming(step['label']) : subquery.outgoing(step['label'])
         } else {
           // it is a vertex
           return applyFacets(subquery, nodes[step].facets)
