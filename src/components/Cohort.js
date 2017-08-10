@@ -49,14 +49,18 @@ export class Cohort extends Component {
   }
 
   toggleSidebar() {
+    const _self = this;
     this.setState(
-      { sideBarOpen: !this.state.sideBarOpen },
+      { sideBarOpen: !this.state.sideBarOpen } ,
       () => {
-        if (!this.state.sideBarOpen) {
-          this.setState({oldSidbarSize:this.state.sidebarSize, sidebarSize: 20 })
-        } else {
-          this.setState({ sidebarSize: this.state.oldSidbarSize })
+        window.setTimeout(function() {
+          if (!_self.state.sideBarOpen) {
+            _self.setState({oldSidbarSize:_self.state.sidebarSize, sidebarSize: 20 })
+          } else {
+            _self.setState({ sidebarSize: _self.state.oldSidbarSize })
+          }
         }
+        , 250) ;
       }
     );
   }
@@ -71,38 +75,6 @@ export class Cohort extends Component {
         }
       }
     );
-  }
-
-  // when user hits query button
-  onQuery(queryString) {
-    const { dispatch } = this.props
-    // get updated aggregations
-    dispatch({
-      type: 'REFRESH_QUERY',
-      selectedFacets: this.props.selectedFacets,
-      schema: this.props.schema,
-      label: this.props.label,
-      focus: this.props.label,
-      path: this.props.path,
-    })
-    this.triggerSearch();
-  }
-
-  triggerSearch() {
-    const {dispatch} = this.props;
-    return new Promise((resolve, reject) => {
-      dispatch({
-        type: 'FACETS_SEARCH',
-        selectedFacets: this.props.selectedFacets,
-        label: this.props.label,
-        callbackError: (error) => {
-          reject({_error: error});
-        },
-        callbackSuccess: () => {
-          resolve();
-        }
-      });
-    });
   }
 
   // when user resizes splitters
@@ -161,27 +133,11 @@ export class Cohort extends Component {
       </div>
     );
 
-    // render a `query` of what's been selected
-    const queryString = this.props.selectedFacets.map(function(selectedFacet){
-        const type = _self.props.facets[selectedFacet.key].type;
-        if (type === 'text') {
-          return `${selectedFacet.key}: '${selectedFacet.values}'`;
-        }
-        return `${selectedFacet.key}: ${selectedFacet.values}`;
-    }).join(" AND ");
 
-    const queryButton  = (<Button
-                            raised
-                            className={classes.button}
-                            onClick={ () => _self.onQuery(queryString) }>
-                            Refresh
-                          </Button>);
 
     const resultsStyle = {height:'500px'}
     const resultsContent = (
       <div style={resultsStyle}>
-        <p>{queryString}</p>
-        {queryButton}
         <Table key={this.props.label} label={this.props.label}/>
       </div>
     )
@@ -244,9 +200,10 @@ export class Cohort extends Component {
               onResizeEnd={this.onSidebarResizeEnd}
               onChange={this.onSidebarChange}
               type="vertical"
-              pane1Style={{ borderRight: '4px solid silver'}}
+              pane1Style={{ borderRight: '4px solid silver',
+                            transition: 'all .25s linear'}}
               >
-                <div >
+                <div>
                   {collapseSidebar}
                   {sidebarContent}
                 </div>
@@ -257,7 +214,8 @@ export class Cohort extends Component {
                     onResizeEnd={this.onMainResizeEnd}
                     onChange={this.onMainChange}
                     type="horizontal"
-                    pane1Style={{ borderBottom: '4px solid silver' }}
+                    pane1Style={{ borderBottom: '4px solid silver',
+                                  transition: 'all .25s linear'}}
                     >
                       <div ref={(e) => { this.schemaContent = e; }} >
                         {schemaContent}

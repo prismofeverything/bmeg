@@ -241,7 +241,7 @@ a {
 }
 
 .console-query-line {
-  
+
 }
 .prop-table {
   width: 100%;
@@ -387,4 +387,20 @@ h1 {
 }
 #vertex-container {
     padding-top: 100px;
+}
+
+/* stock codemirror css */
+@import "../../node_modules/codemirror/lib/codemirror.css";
+@import "../../node_modules/codemirror/addon/hint/show-hint.css";
+
+/*override*/
+.ReactCodeMirror {
+  width:100%
+}
+.CodeMirror {
+  // border: 1px solid #ccc;
+  height: auto !important ;
+  // margin: auto 0 auto 0;
+  width: 100%;
+
 }
