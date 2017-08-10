@@ -7,6 +7,7 @@ import * as _ from 'underscore'
 
 import PropTypes from 'prop-types';
 import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { CircularProgress } from 'material-ui/Progress';
 
 // tricky import so we don't have a name collision on 'Table'
 import { default as TableMD } from 'material-ui/Table';
@@ -99,9 +100,13 @@ export class Table extends Component {
           </TableMD>
         </Paper>
       ) ;
-    } else {
+    } else if (this.props.loading) {
       return (
-        <div>no results</div>
+        <CircularProgress className={classes.progress} />
+      )
+    } {
+      return (
+        <div>No active query</div>
       )
     }
   }
@@ -110,9 +115,15 @@ export class Table extends Component {
 function mapStateToProps(state, own) {
   console.log('Table mapStateToProps state',state)
   var data;
-  if(state.query && state.query.focus === own.label) {
-    data = state.query.results ? state.query.results.map(function(result) {return {...result.properties, gid: result.gid}}) : []
+  if(state.query && state.query[own.label] && !state.query[own.label].loading) {
+    data = state.query[own.label].results ? state.query[own.label].results.map(function(result) {return {...result.properties, gid: result.gid}}) : []
   }
+  var loading = false;
+  if(state.query && state.query[own.label] && state.query[own.label].loading) {
+    loading = true;
+  }
+
+
   // our facets
   const facets =
     _.pick(state.facets, function(value, key, object) {
@@ -121,7 +132,8 @@ function mapStateToProps(state, own) {
 
   return {
     data: data,
-    facets: facets
+    facets: facets,
+    loading: loading,
   }
 }
 

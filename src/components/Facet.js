@@ -186,7 +186,7 @@ export class Facet extends Component {
         <ListItem dense disableGutters button key={key} onClick={event => _self.toggleOpen()}>
           <ListItemText primary={key}  />
           <ListItemSecondaryAction >
-            <IconButton aria-label="More">
+            <IconButton aria-label="More" onClick={event => _self.toggleOpen()}>
               {icon}
             </IconButton>
           </ListItemSecondaryAction>
