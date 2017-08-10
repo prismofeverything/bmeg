@@ -116,6 +116,7 @@ export class Search extends Component {
        label: this.props.label,
        focus: this.props.label,
        path: this.props.path,
+       schema: this.props.schema,
      })
      this.triggerSearch();
    }
@@ -224,6 +225,7 @@ function mapStateToProps(state, own) {
            facets: state.facets,
            selectedFacets: state.selectedFacets,
            currentFacet: state.currentFacet,
+           schema: state.schema,
            path: state.path,
            label: state.currentFacet ? state.currentFacet.label : null
          };
