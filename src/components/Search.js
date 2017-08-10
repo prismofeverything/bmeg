@@ -45,6 +45,7 @@ export class Search extends Component {
     });
   }
 
+  // update state when search updated
   handleChange(value) {
     if (this.state.timeout) {
       clearTimeout(this.state.timeout);
@@ -57,6 +58,7 @@ export class Search extends Component {
   }
 
 
+  // set up our call back, etc for autocompletion
   componentDidMount() {
     const { dispatch, page, query } = this.props;
 
@@ -102,16 +104,37 @@ export class Search extends Component {
 
    onEnter(cm) {
        // if enter hit in query field, submit form
-       this.handleQuerySubmit();
+       this.onQuery();
+   }
+   // when user hits query button
+   onQuery(queryString) {
+     const { dispatch } = this.props
+     // get updated aggregations
+     dispatch({
+       type: 'REFRESH_QUERY',
+       selectedFacets: this.props.selectedFacets,
+       label: this.props.label,
+       focus: this.props.label,
+       path: this.props.path,
+     })
+     this.triggerSearch();
    }
 
-   insertTextAtCursor(text) {
-     if (!text) { return }
-     if (!this.refs['editor'])  { return }
-     let editor = this.refs['editor'].getCodeMirror();
-     var doc = editor.getDoc();
-     var cursor = doc.getCursor();
-     doc.replaceRange(text, cursor);
+   triggerSearch() {
+     const {dispatch} = this.props;
+     return new Promise((resolve, reject) => {
+       dispatch({
+         type: 'FACETS_SEARCH',
+         selectedFacets: this.props.selectedFacets,
+         label: this.props.label,
+         callbackError: (error) => {
+           reject({_error: error});
+         },
+         callbackSuccess: () => {
+           resolve();
+         }
+       });
+     });
    }
 
    get_hints() {
@@ -119,7 +142,7 @@ export class Search extends Component {
      return this.props.facets;
    }
 
-
+   // if a facet is selected ...
    componentWillReceiveProps(nextProps) {
      const props = nextProps;
      const currentFacetString = function()  {
@@ -136,12 +159,24 @@ export class Search extends Component {
          return `${props.currentFacet.key}:${props.currentFacet.values}`;
      }
 
+     // check that a real update happened
      const cf = currentFacetString();
      if (cf && !( cf && this.state.text && this.state.text.indexOf(cf) > -1)) {
+       // just update search bar, don't update state or re-render
        this.insertTextAtCursor(` AND ${cf} `);
      }
-     //this.setState({ text:updatedSearch });
    }
+   // ... insert it into the search bar at the current cursor
+   insertTextAtCursor(text) {
+     if (!text) { return }
+     if (!this.refs['editor'])  { return }
+     let editor = this.refs['editor'].getCodeMirror();
+     var doc = editor.getDoc();
+     var cursor = doc.getCursor();
+     doc.replaceRange(text, cursor);
+   }
+
+
 
   render() {
     const props = this.props;
@@ -174,7 +209,9 @@ export class Search extends Component {
           </div>
           <IconButton style={{
               transition: 'transform 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-            }}>
+            }}
+            onTouchTap={this.onEnter}
+            >
             <SearchIcon color={grey} />
           </IconButton>
         </Paper>
@@ -187,6 +224,8 @@ function mapStateToProps(state, own) {
            facets: state.facets,
            selectedFacets: state.selectedFacets,
            currentFacet: state.currentFacet,
+           path: state.path,
+           label: state.currentFacet ? state.currentFacet.label : null
          };
 }
 export default connect(mapStateToProps) (Search);

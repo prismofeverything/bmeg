@@ -73,37 +73,6 @@ export class Cohort extends Component {
     );
   }
 
-  // when user hits query button
-  onQuery(queryString) {
-    const { dispatch } = this.props
-    // get updated aggregations
-    dispatch({
-      type: 'REFRESH_QUERY',
-      selectedFacets: this.props.selectedFacets,
-      label: this.props.label,
-      focus: this.props.label,
-      path: this.props.path,
-    })
-    this.triggerSearch();
-  }
-
-  triggerSearch() {
-    const {dispatch} = this.props;
-    return new Promise((resolve, reject) => {
-      dispatch({
-        type: 'FACETS_SEARCH',
-        selectedFacets: this.props.selectedFacets,
-        label: this.props.label,
-        callbackError: (error) => {
-          reject({_error: error});
-        },
-        callbackSuccess: () => {
-          resolve();
-        }
-      });
-    });
-  }
-
   // when user resizes splitters
   onSidebarResizeStart() {
     this.setState({ isSidebarResizing: true })
@@ -160,27 +129,11 @@ export class Cohort extends Component {
       </div>
     );
 
-    // render a `query` of what's been selected
-    const queryString = this.props.selectedFacets.map(function(selectedFacet){
-        const type = _self.props.facets[selectedFacet.key].type;
-        if (type === 'text') {
-          return `${selectedFacet.key}: '${selectedFacet.values}'`;
-        }
-        return `${selectedFacet.key}: ${selectedFacet.values}`;
-    }).join(" AND ");
 
-    const queryButton  = (<Button
-                            raised
-                            className={classes.button}
-                            onClick={ () => _self.onQuery(queryString) }>
-                            Refresh
-                          </Button>);
 
     const resultsStyle = {height:'500px'}
     const resultsContent = (
       <div style={resultsStyle}>
-        <p>{queryString}</p>
-        {queryButton}
         <Table key={this.props.label} label={this.props.label}/>
       </div>
     )
