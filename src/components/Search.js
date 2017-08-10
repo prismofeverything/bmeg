@@ -221,7 +221,6 @@ export class Search extends Component {
 }
 
 function mapStateToProps(state, own) {
-  console.log('Search mapStateToProps', state, own)
   return { search: state.search,
            facets: state.facets,
            selectedFacets: state.selectedFacets,

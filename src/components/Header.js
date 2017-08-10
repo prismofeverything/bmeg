@@ -121,11 +121,4 @@ const styleSheet = createStyleSheet({
   },
 });
 
-// function mapStateToProps(state, own) {
-//   console.log('Header mapStateToProps', state, own)
-//   return {
-//     focus: own.params.label,
-//   }
-// }
-
 export default connect() (withStyles(styleSheet) (Header));
