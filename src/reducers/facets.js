@@ -2,6 +2,16 @@ import * as _ from 'underscore'
 
 export default class FacetReducers {
 
+  static currentFacet(state = {}, action) {
+    switch (action.type) {
+      case 'SELECTED_FACET':
+        return action.facet
+      default:
+        return state
+    }
+  }
+
+
   static selectedFacets(state = [], action) {
     switch (action.type) {
       case 'SELECTED_FACET':

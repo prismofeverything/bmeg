@@ -16,5 +16,6 @@ export const reducers = combineReducers({
   path: path,
   selectedFacets: FacetReducers.selectedFacets,
   facets: FacetReducers.facets,
+  currentFacet: FacetReducers.currentFacet,
   query: query,
 });
