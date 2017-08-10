@@ -126,6 +126,8 @@ function followPaths(paths, edges, label) {
   }
 }
 
+function identity(i) {return i}
+
 function translateQuery(schema, visited, focus) {
   var nodes = nodesIn(schema, visited)
   var focal = nodes[focus]
@@ -141,7 +143,7 @@ function translateQuery(schema, visited, focus) {
     }, [])
     var duplicateEdges = findDuplicates(allEdges, function(edge) {return edge.label})
     var paths = findPaths(focus, labels, duplicateEdges)
-    var journeys = followPaths(paths.paths, _.values(paths.paths), focus)
+    var journeys = followPaths(paths.paths, _.filter(_.values(paths.paths), identity), focus)
     var subqueries = _.map(journeys, function(journey) {
       console.log('journey', journey)
       return _.reduce(compress(journey).slice(1), function(subquery, step) {
