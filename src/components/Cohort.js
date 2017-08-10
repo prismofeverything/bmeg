@@ -49,14 +49,18 @@ export class Cohort extends Component {
   }
 
   toggleSidebar() {
+    const _self = this;
     this.setState(
-      { sideBarOpen: !this.state.sideBarOpen },
+      { sideBarOpen: !this.state.sideBarOpen } ,
       () => {
-        if (!this.state.sideBarOpen) {
-          this.setState({oldSidbarSize:this.state.sidebarSize, sidebarSize: 20 })
-        } else {
-          this.setState({ sidebarSize: this.state.oldSidbarSize })
+        window.setTimeout(function() {
+          if (!_self.state.sideBarOpen) {
+            _self.setState({oldSidbarSize:_self.state.sidebarSize, sidebarSize: 20 })
+          } else {
+            _self.setState({ sidebarSize: _self.state.oldSidbarSize })
+          }
         }
+        , 250) ;
       }
     );
   }
@@ -196,9 +200,10 @@ export class Cohort extends Component {
               onResizeEnd={this.onSidebarResizeEnd}
               onChange={this.onSidebarChange}
               type="vertical"
-              pane1Style={{ borderRight: '4px solid silver'}}
+              pane1Style={{ borderRight: '4px solid silver',
+                            transition: 'all .25s linear'}}
               >
-                <div >
+                <div>
                   {collapseSidebar}
                   {sidebarContent}
                 </div>
@@ -209,7 +214,8 @@ export class Cohort extends Component {
                     onResizeEnd={this.onMainResizeEnd}
                     onChange={this.onMainChange}
                     type="horizontal"
-                    pane1Style={{ borderBottom: '4px solid silver' }}
+                    pane1Style={{ borderBottom: '4px solid silver',
+                                  transition: 'all .25s linear'}}
                     >
                       <div ref={(e) => { this.schemaContent = e; }} >
                         {schemaContent}
