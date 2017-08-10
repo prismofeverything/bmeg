@@ -47,31 +47,36 @@ export class Table extends Component {
     const classes = this.props.classes;
     if (this.props.data) {
       // map the first item to columns TODO - map from facets
-      const columns = _.map(this.props.data[0], function(item, key, object) {
+      const columns = _.map(this.props.facets, function(facet, key, list) {
+        const property_name = key.split('.')[1];
         return (
           <TableCell
+            numeric={facet.type === 'text' ? false: true}
             key={key}>
             <TableSortLabel
-               active={_self.state.orderBy === key}
+               active={_self.state.orderBy === property_name}
                direction={_self.state.order}
                onClick= {(evt, clickedProps) => {
-                 _self.handleRequestSort(key);
+                 _self.handleRequestSort(property_name);
                }}
              >
-               {key}
+               {property_name}
              </TableSortLabel>
           </TableCell>
         )
       });
 
-      const rows = _.map(this.props.data, function(item, index, list) {
+      const rows = _.map(_self.props.data, function(item, index, list) {
         return (
           <TableRow key={item.gid}>
             {
-              _.map(item, function(value, key, obj) {
+              _.map(_self.props.facets, function(facet, key, list) {
+                const property_name = key.split('.')[1];
                 return (
-                  <TableCell key={`${item.gid}.${key}`}>
-                    {value}
+                  <TableCell
+                    numeric={facet.type === 'text' ? false: true}
+                    key={`${item.gid}.${key}`}>
+                      {item[property_name]}
                   </TableCell>
                 );
               })
@@ -103,12 +108,20 @@ export class Table extends Component {
 }
 
 function mapStateToProps(state, own) {
+  console.log('Table mapStateToProps state',state)
   var data;
   if(state.query && state.query.focus === own.label) {
     data = state.query.results ? state.query.results.map(function(result) {return {...result.properties, gid: result.gid}}) : []
   }
+  // our facets
+  const facets =
+    _.pick(state.facets, function(value, key, object) {
+      return key && key.startsWith(`${own.label}.`);
+  });
+
   return {
     data: data,
+    facets: facets
   }
 }
 

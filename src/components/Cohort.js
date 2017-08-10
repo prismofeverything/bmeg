@@ -6,8 +6,12 @@ import * as _ from 'underscore'
 
 import SplitPane from 'react-flex-split-pane';
 
-import Button from 'react-bootstrap/lib/Button';
-import Glyphicon from 'react-bootstrap/lib/Glyphicon';
+import { withStyles, createStyleSheet } from 'material-ui/styles';
+import Button from 'material-ui/Button';
+import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
+import ExpandLessIcon from 'material-ui-icons/ExpandLess';
+import ChevronLeftIcon from 'material-ui-icons/ChevronLeft';
+import ChevronRightIcon from 'material-ui-icons/ChevronRight';
 
 import Schema from './Schema'
 import Facet from './Facet'
@@ -49,7 +53,7 @@ export class Cohort extends Component {
       { sideBarOpen: !this.state.sideBarOpen },
       () => {
         if (!this.state.sideBarOpen) {
-          this.setState({oldSidbarSize:this.state.sidebarSize, sidebarSize: 16 })
+          this.setState({oldSidbarSize:this.state.sidebarSize, sidebarSize: 20 })
         } else {
           this.setState({ sidebarSize: this.state.oldSidbarSize })
         }
@@ -76,6 +80,7 @@ export class Cohort extends Component {
     dispatch({
       type: 'REFRESH_QUERY',
       selectedFacets: this.props.selectedFacets,
+      schema: this.props.schema,
       label: this.props.label,
       focus: this.props.label,
       path: this.props.path,
@@ -128,6 +133,7 @@ export class Cohort extends Component {
   // render all facets
   render() {
     const _self = this;
+    const classes = this.props.classes;
     //map all facets
     const facetItems = _.map(_self.props.facets, function(facet, key, object) {
       // all done with this facet
@@ -164,8 +170,12 @@ export class Cohort extends Component {
         return `${selectedFacet.key}: ${selectedFacet.values}`;
     }).join(" AND ");
 
-    const queryButton  = (<Button onClick={ () => _self.onQuery(queryString) }>
-                          Refresh</Button>);
+    const queryButton  = (<Button
+                            raised
+                            className={classes.button}
+                            onClick={ () => _self.onQuery(queryString) }>
+                            Refresh
+                          </Button>);
 
     const resultsStyle = {height:'500px'}
     const resultsContent = (
@@ -187,19 +197,36 @@ export class Cohort extends Component {
     )
 
     const collapseSidebarStyle = {float:'left', cursor: 'pointer'}
-    const collapseSidebar = (
-      <Glyphicon
-        style={collapseSidebarStyle}
-        onClick={ () => _self.toggleSidebar() }
-        glyph={this.state.sideBarOpen ? 'chevron-left' : 'chevron-right'}  />
-    )
+    var collapseSidebar;
+    if (this.state.sideBarOpen) {
+      collapseSidebar = (
+          <ChevronLeftIcon
+            style={collapseSidebarStyle}
+            onClick={ () => _self.toggleSidebar() } />
+      )
+    } else {
+      collapseSidebar = (
+          <ChevronRightIcon
+            style={collapseSidebarStyle}
+            onClick={ () => _self.toggleSidebar() } />
+      )
+    }
+
     const collapseSchemaStyle = {float:'right', top:'-8px', cursor: 'pointer'}
-    const collapseSchema = (
-      <Glyphicon
-        onClick={ () => _self.toggleSchema() }
-        style={collapseSchemaStyle}
-        glyph={this.state.schemaOpen ? 'chevron-up' : 'chevron-down'}  />
-    )
+    var collapseSchema
+    if (this.state.schemaOpen) {
+      collapseSchema = (
+          <ExpandLessIcon
+            style={collapseSchemaStyle}
+            onClick={ () => _self.toggleSchema() } />
+      )
+    } else {
+      collapseSchema = (
+          <ExpandMoreIcon
+            style={collapseSchemaStyle}
+            onClick={ () => _self.toggleSchema() } />
+      )
+    }
 
     return (
       <div>
@@ -289,4 +316,14 @@ function mapStateToProps(state, own) {
   }
 }
 
-export default connect(mapStateToProps) (Cohort)
+
+const styleSheet = createStyleSheet(theme => ({
+  button: {
+    margin: theme.spacing.unit,
+  },
+  input: {
+    display: 'none',
+  },
+}));
+
+export default connect(mapStateToProps)(withStyles(styleSheet)(Cohort));

@@ -12,10 +12,13 @@ import Card, { CardContent } from 'material-ui/Card';
 import Collapse from 'material-ui/transitions/Collapse';
 import IconButton from 'material-ui/IconButton';
 import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
+import ExpandLessIcon from 'material-ui-icons/ExpandLess';
 import List from 'material-ui/List';
 import ListItem from 'material-ui/List/ListItem';
 import ListItemText from 'material-ui/List/ListItemText';
 import ListItemSecondaryAction from 'material-ui/List/ListItemSecondaryAction';
+import TextField from 'material-ui/TextField';
+
 
 import { VictoryPie,VictoryChart,VictoryBar,Bar } from 'victory';
 
@@ -62,6 +65,9 @@ export class Facet extends Component {
 
     const facet = this.props.facet;
     const key = this.props.property;
+    const classes = this.props.classes;
+
+
     //  different aggregations have different structures, normalize it for
     //  the chart
     var value_accessor ;
@@ -74,7 +80,11 @@ export class Facet extends Component {
       return (
             <li key={bucket.key}
               onClick={ () => {
-                  _self.onFacetValuesSelected(key, bucket.doc_count ? bucket.key : bucket.value)
+                  if (bucket.doc_count) {
+                    _self.onFacetValuesSelected(key, bucket.key)
+                  } else {
+                    _self.setState({numericInput:  bucket.value })
+                  }
                 }
               }
               className="list-group-item">
@@ -94,9 +104,28 @@ export class Facet extends Component {
     const chartWellStyles = {padding:'0 0 0 0'}
     // char is either pie or chart ( more in future)
     var chart ;
+    // input is either numeric text field or null
+    var input ;
     if (this.state.open) {
       // percentile aggregation
       if (value_accessor === 'value') {
+        input = (
+          <TextField
+             margin="dense"
+             placeholder="123..."
+             label="Value"
+             helperText="Numeric"
+             autoFocus
+             className={classes.input}
+             onChange={ (event) => {   _self.setState({numericInput:  event.target.value}) } }
+             value={_self.state.numericInput}
+             onBlur = { (event) => { _self.onFacetValuesSelected(key, event.target.value) } }
+             inputProps={{
+               'aria-label': 'Description',
+             }}
+           />
+        ) ;
+
         chart = (
           <VictoryChart domainPadding={20} >
             <VictoryBar
@@ -108,7 +137,7 @@ export class Facet extends Component {
                 target: "data",
                 eventHandlers: {
                   onClick: (evt, clickedProps) => {
-                    _self.onFacetValuesSelected(key, clickedProps.datum.y);
+                    _self.setState({numericInput: clickedProps.datum.y })
                   },
                 }
               }]}
@@ -144,31 +173,13 @@ export class Facet extends Component {
     }
 
 
-    // bsStyle='accordion-custom'
-    // onSelect={ ()=> _self.toggleOpen()}
-
-    // {buckets}
-    // {other}
-    // {chart}
-
-    // all done with this facet
-    const classes = this.props.classes;
-
-    const expander = (
-      <div>{key}
-        <IconButton
-          className={classnames(classes.expand,
-                                { [classes.expandOpen]: _self.state.open, })
-                    }
-          onClick={_self.toggleOpen}
-          aria-expanded={_self.state.open}
-          aria-label="Show more"
-          style={{float:'right'}}
-          >
-          <ExpandMoreIcon />
-        </IconButton>
-      </div>
-    )
+    // all done with this facet, let's render it
+    var icon
+    if (this.state.open) {
+      icon = (<ExpandMoreIcon />)
+    } else {
+      icon = (<ExpandLessIcon />)
+    }
 
     const facetItem = (
       <div>
@@ -176,7 +187,7 @@ export class Facet extends Component {
           <ListItemText primary={key}  />
           <ListItemSecondaryAction >
             <IconButton aria-label="More">
-              <ExpandMoreIcon />
+              {icon}
             </IconButton>
           </ListItemSecondaryAction>
         </ListItem>
@@ -184,6 +195,7 @@ export class Facet extends Component {
           <div>
             <Card>
               <CardContent>
+                {input}
                 {buckets}
                 {other}
                 {chart}
