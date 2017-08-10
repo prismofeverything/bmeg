@@ -14,10 +14,35 @@ import Button from 'material-ui/Button';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from 'material-ui-icons/Menu';
 
+import { IndexLink, Link, browserHistory } from 'react-router';
+import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
+import Divider from 'material-ui/Divider';
+import AddCircleOutlineIcon from 'material-ui-icons/AddCircleOutline';
+import FolderOpenIcon from 'material-ui-icons/FolderOpen';
+import SaveIcon from 'material-ui-icons/Save';
+import Heart from 'mui-icons/cmdi/heart';
+import Dna from 'mui-icons/cmdi/dna';
+
+
+import Drawer from 'material-ui/Drawer';
+
 
 export class Header extends Component {
   constructor(props) {
     super(props)
+    this.state = {
+      open: false,
+    };
+    this.handleToggle = this.handleToggle.bind(this);
+    this.handleTitleTouchTap = this.handleTitleTouchTap.bind(this);
+  }
+
+  handleToggle() {
+    this.setState({ open: !this.state.open });
+  }
+
+  handleTitleTouchTap() {
+    browserHistory.push('/'); // Navigate home
   }
 
   render() {
@@ -25,15 +50,43 @@ export class Header extends Component {
     const classes = this.props.classes;
     return (
       <div className={classes.root}>
-        <AppBar position="static">
+        <AppBar position="static" >
           <Toolbar>
-            <IconButton color="contrast" aria-label="Menu">
+            <IconButton color="contrast" aria-label="Menu"
+                        onClick={event => this.handleToggle()}>
               <MenuIcon />
             </IconButton>
             <img color="contrast" src="/media/bmeg.png" height="45" onClick={ () => dispatch(push('/')) }/>
             <Search focus={this.props.focus} />
           </Toolbar>
         </AppBar>
+        <Drawer
+          docked={false}
+          width={200}
+          open={this.state.open}
+          onRequestClose={this.handleToggle}
+          onClick={this.handleToggle}
+        >
+          <List className={classes.listFull} disablePadding>
+            <ListItem button>
+              <ListItemIcon><AddCircleOutlineIcon /></ListItemIcon>
+              <ListItemText primary="New" />
+            </ListItem>
+            <ListItem button>
+              <ListItemIcon><FolderOpenIcon /></ListItemIcon>
+              <ListItemText primary="Open" />
+            </ListItem>
+            <ListItem button>
+              <ListItemIcon><SaveIcon /></ListItemIcon>
+              <ListItemText primary="Save" />
+            </ListItem>
+            <Divider />
+            <ListItem button>
+              <ListItemIcon><Dna /></ListItemIcon>
+              <ListItemText primary="About" />
+            </ListItem>
+          </List>
+        </Drawer>
       </div>
     );
 

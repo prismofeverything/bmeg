@@ -12,6 +12,7 @@ import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
 import ExpandLessIcon from 'material-ui-icons/ExpandLess';
 import ChevronLeftIcon from 'material-ui-icons/ChevronLeft';
 import ChevronRightIcon from 'material-ui-icons/ChevronRight';
+import { CircularProgress } from 'material-ui/Progress';
 
 import Schema from './Schema'
 import Facet from './Facet'
@@ -120,11 +121,11 @@ export class Cohort extends Component {
 
     // create warnings if no facets there
     let warnings = null;
-    if (facetItems.length < 1) {
+    if (!this.props.loading && facetItems.length < 1) {
         warnings = <h5><span className="label label-warning">No facets found for {this.props.label}</span></h5>;
     }
 
-    const sidebarContent = (
+    var sidebarContent = (
       <div >
         <List key={this.props.label} >
           {facetItems}
@@ -184,6 +185,12 @@ export class Cohort extends Component {
       )
     }
 
+    var sidebarLoading
+    if (this.props.loading) {
+        sidebarLoading = (<CircularProgress className={classes.progress} />)
+        sidebarContent = null
+    }
+
     return (
       <div>
         <style type="text/css">{`
@@ -205,6 +212,7 @@ export class Cohort extends Component {
               >
                 <div>
                   {collapseSidebar}
+                  {sidebarLoading}
                   {sidebarContent}
                 </div>
                 <SplitPane
@@ -264,6 +272,11 @@ function mapStateToProps(state, own) {
       return currentFacet.key && currentFacet.key.startsWith(`${own.params.label}.`);
     });
 
+  // are facets loading?
+  var loading = true
+  if (state.facets) {
+    loading = state.facets.loading
+  }
   // our state
   return {
     label: own.params.label,
@@ -271,6 +284,7 @@ function mapStateToProps(state, own) {
     facets: sortedFacets,
     path: state.path,
     selectedFacets: selectedFacets,
+    loading: loading,
   }
 }
 
