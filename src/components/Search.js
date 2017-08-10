@@ -113,8 +113,8 @@ export class Search extends Component {
      dispatch({
        type: 'REFRESH_QUERY',
        selectedFacets: this.props.selectedFacets,
-       label: this.props.label,
-       focus: this.props.label,
+       label: this.props.focus,
+       focus: this.props.focus,
        path: this.props.path,
        schema: this.props.schema,
      })
@@ -221,13 +221,13 @@ export class Search extends Component {
 }
 
 function mapStateToProps(state, own) {
+  console.log('Search mapStateToProps', state, own)
   return { search: state.search,
            facets: state.facets,
            selectedFacets: state.selectedFacets,
            currentFacet: state.currentFacet,
            schema: state.schema,
            path: state.path,
-           label: state.currentFacet ? state.currentFacet.label : null
          };
 }
 export default connect(mapStateToProps) (Search);

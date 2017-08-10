@@ -31,7 +31,7 @@ export class Header extends Component {
               <MenuIcon />
             </IconButton>
             <img color="contrast" src="/media/bmeg.png" height="45" onClick={ () => dispatch(push('/')) }/>
-            <Search scope={this.props.scope} />
+            <Search focus={this.props.focus} />
           </Toolbar>
         </AppBar>
       </div>
@@ -67,5 +67,12 @@ const styleSheet = createStyleSheet({
     flex: 1,
   },
 });
+
+// function mapStateToProps(state, own) {
+//   console.log('Header mapStateToProps', state, own)
+//   return {
+//     focus: own.params.label,
+//   }
+// }
 
 export default connect() (withStyles(styleSheet) (Header));

@@ -104,9 +104,9 @@ function followPaths(paths, edges, label) {
   console.log('here', here, 'there', there)
   
   if (_.isEmpty(here)) {
-    return [label]
+    return [[label]]
   } else {
-    var trees = compress(_.map(here, function(edge) {
+    var trees = _.map(here, function(edge) {
       var down = followPaths(paths, there, otherEnd(edge, label))
       return _.map(down, function(path) {
         var direction = {label: edge.label}
@@ -116,9 +116,9 @@ function followPaths(paths, edges, label) {
           direction.from = edge.from
         }
 
-        return [label, direction].concat(path)
+        return [label, direction].concat(compress(path))
       })
-    }))
+    })
 
     console.log('trees', trees)
     return trees
@@ -142,6 +142,7 @@ function translateQuery(schema, visited, focus) {
     var paths = findPaths(focus, labels, duplicateEdges)
     var journeys = followPaths(paths.paths, _.values(paths.paths), focus)
     var subqueries = _.map(journeys, function(journey) {
+      console.log('journey', journey)
       return _.reduce(journey.slice(1), function(subquery, step) {
         if (step['label']) {
           // it is an edge

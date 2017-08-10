@@ -28,11 +28,18 @@ export class App extends React.Component {
     return (
       <MuiThemeProvider theme={theme}>
         <div>
-          <Header />
+          <Header focus={this.props.focus} />
           {this.props.children}
         </div>
       </MuiThemeProvider>
     );
   }
 }
-export default connect() (App)
+
+function mapStateToProps(state, own) {
+  console.log('App mapStateToProps', state, own)
+  return {
+    focus: own.params.label,
+  }
+}
+export default connect(mapStateToProps) (App)
