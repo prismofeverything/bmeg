@@ -144,7 +144,8 @@ function translateQuery(schema, visited, focus, order, orderBy) {
     var duplicateEdges = findDuplicates(allEdges, function(edge) {return edge.label})
     var paths = findPaths(focus, labels, duplicateEdges)
     var journeys = followPaths(paths.paths, _.filter(_.values(paths.paths), identity), focus)
-    var subqueries = _.map(journeys, function(journey) {
+    var relevant = _.filter(journeys, function(journey) {return journey.length > 1})
+    var subqueries = _.map(relevant, function(journey) {
       console.log('journey', journey)
       return _.reduce(compress(journey).slice(1), function(subquery, step) {
         if (step['label']) {
@@ -162,7 +163,12 @@ function translateQuery(schema, visited, focus, order, orderBy) {
       query.select('root')
     }
 
-    console.log('query', query.query.toString())
+    if (orderBy) {
+      var ascending = order !== 'desc'
+      query.order(orderBy, ascending)
+    }
+
+    console.log('query', JSON.stringify(query.query))
     return query
   }
 }
