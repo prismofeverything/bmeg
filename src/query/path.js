@@ -159,9 +159,10 @@ function translateQuery(schema, visited, focus, order, orderBy) {
 
     if (!_.isEmpty(subqueries)) {
       query.match(subqueries)
+      query.select('root')
     }
 
-    console.log('query', query)
+    console.log('query', query.query.toString())
     return query
   }
 }
