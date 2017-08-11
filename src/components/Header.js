@@ -13,6 +13,7 @@ import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from 'material-ui-icons/Menu';
+import Badge from 'material-ui/Badge';
 
 import { IndexLink, Link, browserHistory } from 'react-router';
 import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
@@ -45,6 +46,21 @@ export class Header extends Component {
     browserHistory.push('/'); // Navigate home
   }
 
+
+  // <IconButton color="contrast" aria-label="Menu"
+  //             onClick={event => this.handleToggle()}>
+  //   <MenuIcon />
+  // </IconButton>
+
+
+  // <Badge className={classes.badge}
+  //        badgeContent={'BMEG'}
+  //        color="contrast"
+  //        style={{marginRight:'20px'}}
+  //        onClick={event => this.handleToggle()}>
+  //    <MenuIcon />
+  //  </Badge>
+
   render() {
     const { dispatch } = this.props
     const classes = this.props.classes;
@@ -52,11 +68,14 @@ export class Header extends Component {
       <div className={classes.root}>
         <AppBar position="static" >
           <Toolbar>
-            <IconButton color="contrast" aria-label="Menu"
-                        onClick={event => this.handleToggle()}>
-              <MenuIcon />
-            </IconButton>
-            <img color="contrast" src="/media/bmeg.png" height="45" onClick={ () => dispatch(push('/')) }/>
+            <Badge className={classes.badge}
+                   badgeContent={'BMEG'}
+                   color="contrast"
+                   style={{marginRight:'20px'}}
+                   onClick={event => this.handleToggle()}>
+               <Dna />
+             </Badge>
+
             <Search focus={this.props.focus} />
           </Toolbar>
         </AppBar>
