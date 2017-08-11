@@ -104,11 +104,12 @@ export class Search extends Component {
 
    onEnter(cm) {
        // if enter hit in query field, submit form
-       this.onQuery();
+       this.onQuery(this.state.text);
    }
    // when user hits query button
    onQuery(queryString) {
      const { dispatch } = this.props
+
      // get updated aggregations
      dispatch({
        type: 'REFRESH_QUERY',
@@ -117,6 +118,8 @@ export class Search extends Component {
        focus: this.props.focus,
        path: this.props.path,
        schema: this.props.schema,
+       currentQuery: this.props.currentQuery,
+       queryString: queryString,
      })
      this.triggerSearch();
    }
@@ -227,6 +230,7 @@ function mapStateToProps(state, own) {
            currentFacet: state.currentFacet,
            schema: state.schema,
            path: state.path,
+           currentQuery: state.currentQuery,
          };
 }
 export default connect(mapStateToProps) (Search);
