@@ -8,6 +8,8 @@ import * as _ from 'underscore'
 import PropTypes from 'prop-types';
 import { withStyles, createStyleSheet } from 'material-ui/styles';
 import { CircularProgress } from 'material-ui/Progress';
+import ReactJson from 'react-json-view-callback'
+
 
 // tricky import so we don't have a name collision on 'Table'
 import { default as TableMD } from 'material-ui/Table';
@@ -65,7 +67,7 @@ export class Table extends Component {
     const _self = this ;
     const classes = this.props.classes;
     if (this.props.data) {
-      // map the first item to columns TODO - map from facets
+      // map the first item to columns
       const columns = _.map(this.props.facets, function(facet, key, list) {
         const property_name = key.split('.')[1];
         return (
@@ -89,16 +91,21 @@ export class Table extends Component {
         return (
           <TableRow key={item.gid}>
             {
-              _.map(_self.props.facets, function(facet, key, list) {
-                const property_name = key.split('.')[1];
-                return (
-                  <TableCell
-                    numeric={facet.type === 'text' ? false: true}
-                    key={`${item.gid}.${key}`}>
-                      {item[property_name]}
-                  </TableCell>
-                );
-              })
+              [<TableCell
+                key={`jsonView.${item.gid}`}>
+                  <ReactJson src={item} name={item.gid} collapsed callback={ (e) => {console.log(e)}}/>
+              </TableCell>].concat(
+                _.map(_self.props.facets, function(facet, key, list) {
+                  const property_name = key.split('.')[1];
+                  return (
+                    <TableCell
+                      numeric={facet.type === 'text' ? false: true}
+                      key={`${item.gid}.${key}`}>
+                        {item[property_name]}
+                    </TableCell>
+                  );
+                })
+              )
             }
           </TableRow>
         );
@@ -109,6 +116,11 @@ export class Table extends Component {
           <TableMD>
             <TableHead>
               <TableRow>
+                <TableCell
+                  key={'json'}>
+                  {'json'}
+                </TableCell>
+
                 {columns}
               </TableRow>
             </TableHead>
