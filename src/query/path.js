@@ -103,7 +103,7 @@ function followPaths(paths, edges, label) {
   var here = _.filter(edges, function(edge) {return edgeFor(edge, label)})
   var there = _.reject(edges, function(edge) {return edgeFor(edge, label)})
   console.log('here', here, 'there', there)
-  
+
   if (_.isEmpty(here)) {
     return [[label]]
   } else {
@@ -128,10 +128,10 @@ function followPaths(paths, edges, label) {
 
 function identity(i) {return i}
 
-function translateQuery(schema, visited, focus) {
+function translateQuery(schema, visited, focus, order, orderBy) {
   var nodes = nodesIn(schema, visited)
   var focal = nodes[focus]
-  console.log('translate query', focus, visited, focal, nodes)
+  console.log('translate query', focus, visited, focal, nodes, order, orderBy)
 
   if (focal) {
     var O = Ophion()
@@ -174,7 +174,7 @@ export default class Path {
     return ni(schema, path)
   }
 
-  static translateQuery(schema, visited, focus) {
-    return tq(schema, visited, focus)
+  static translateQuery(schema, visited, focus, order, orderBy) {
+    return tq(schema, visited, focus, order, orderBy)
   }
 }
