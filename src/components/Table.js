@@ -33,7 +33,7 @@ export class Table extends Component {
   }
 
   handleJsonCallback(clickEvent) {
-    // callback from jsonViewer one of [FILTER_FOR_VALUE,FILTER_OUT_VALUE,TOGGLE_IN_TABLE]
+    // callback from jsonViewer one of [TOGGLE_IN_TABLE]
     // since the jsonViewer is a separate, external component without knowledge
     // of the label/focus, we recreate the key here using the variable passed
     // from the viewer and our state
@@ -89,7 +89,7 @@ export class Table extends Component {
     const classes = this.props.classes;
     if (this.props.data) {
       // map the first item to columns
-      const columns = _.map(this.props.facets, function(facet, key, list) {
+      const columns = _.map(this.props.tableFacets, function(facet, key, list) {
         const property_name = key.split('.')[1];
         return (
           <TableCell
@@ -121,7 +121,7 @@ export class Table extends Component {
                     }
                 }/>
               </TableCell>].concat(
-                _.map(_self.props.facets, function(facet, key, list) {
+                _.map(_self.props.tableFacets, function(facet, key, list) {
                   const property_name = key.split('.')[1];
                   return (
                     <TableCell
@@ -144,7 +144,7 @@ export class Table extends Component {
               <TableRow>
                 <TableCell
                   key={'json'}>
-                  {'json'}
+                  {'{}'}
                 </TableCell>
 
                 {columns}
@@ -169,7 +169,7 @@ export class Table extends Component {
 }
 
 function mapStateToProps(state, own) {
-  console.log('Table mapStateToProps state',state)
+
   var data;
   const currentQuery = state.currentQuery;
   if(currentQuery && currentQuery[own.label] && !currentQuery[own.label].loading) {
@@ -187,12 +187,23 @@ function mapStateToProps(state, own) {
       return key && key.startsWith(`${own.label}.`);
   });
 
+
+  const tableFacets =
+    _.pick(facets, function(value, key, object) {
+      return key
+            && currentQuery[own.label].tableSelectedColumns
+            && currentQuery[own.label].tableSelectedColumns[key];
+  });
+
+
+
   return {
     data: data,
     facets: facets,
     loading: loading,
     currentQuery: currentQuery,
     schema: state.schema,
+    tableFacets: tableFacets,
   }
 }
 
