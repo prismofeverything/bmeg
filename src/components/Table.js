@@ -29,6 +29,27 @@ export class Table extends Component {
       orderBy: 'gid'
     };
     this.handleRequestSort = this.handleRequestSort.bind(this)
+    this.handleJsonCallback = this.handleJsonCallback.bind(this)
+  }
+
+  handleJsonCallback(clickEvent) {
+    // callback from jsonViewer one of [FILTER_FOR_VALUE,FILTER_OUT_VALUE,TOGGLE_IN_TABLE]
+    // since the jsonViewer is a separate, external component without knowledge
+    // of the label/focus, we recreate the key here using the variable passed
+    // from the viewer and our state
+    const { dispatch } = this.props
+    dispatch({
+      type: clickEvent.name,
+      label: this.props.label,
+      focus: this.props.label,
+      facet: {
+        key: `${this.props.label}.${clickEvent.variable.name}`,
+        property: clickEvent.variable.name,
+        values: clickEvent.variable.value,
+        type: clickEvent.variable.type,
+      }
+    })
+
   }
 
   handleRequestSort(property) {
@@ -93,7 +114,12 @@ export class Table extends Component {
             {
               [<TableCell
                 key={`jsonView.${item.gid}`}>
-                  <ReactJson src={item} name={item.gid} collapsed callback={ (e) => {console.log(e)}}/>
+                  <ReactJson src={item} name={item.gid} collapsed
+                    callback={
+                    (clickEvent) => {
+                      _self.handleJsonCallback(clickEvent);
+                    }
+                }/>
               </TableCell>].concat(
                 _.map(_self.props.facets, function(facet, key, list) {
                   const property_name = key.split('.')[1];

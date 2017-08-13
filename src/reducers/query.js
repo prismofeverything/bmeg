@@ -1,3 +1,5 @@
+import * as _ from 'underscore'
+
 export default function query(state = {}, action) {
   const label = action.focus
   switch (action.type) {
@@ -17,10 +19,38 @@ export function queries(state = {}, action) {
   }
 }
 
-export function currentQuery(state = {name:'test'}, action) {
+export function currentQuery(state = {name:'test' }, action) {
   switch (action.type) {
+    case 'TOGGLE_IN_TABLE':
+      return {...state,
+          [action.focus]: {
+            ...state[action.focus],
+            tableSelectedColumns:{
+              ...state[action.focus].tableSelectedColumns,
+                [action.facet.key]:!state[action.focus].tableSelectedColumns[action.facet.key]
+            }
+          }
+        }
+    case 'FILTER_FOR_VALUE':
+      return {...state,
+        [action.focus]: {
+          ...state[action.focus],
+          selectedFacets:{
+            ...state[action.focus].selectedFacets,
+              [action.facet.key]:action.facet
+          }
+        }
+      }
+    case 'FILTER_OUT_VALUE':
+      const filteredFacets = _.omit(state[action.focus].selectedFacets, action.facet.key)
+      return {...state,
+        [action.focus]: {
+          ...state[action.focus],
+          selectedFacets:filteredFacets
+        }
+      }
     case 'REFRESH_QUERY':
-      return {...state, [action.focus]: {queryString:action.queryString, selectedFacets:action.selectedFacets, order: action.order, orderBy: action.orderBy, loading:true} }
+      return {...state, [action.focus]: {queryString:action.queryString, selectedFacets:action.selectedFacets, order: action.order, orderBy: action.orderBy, tableSelectedColumns: {},  loading:true} }
     case 'QUERY_RESULTS_SAVE':
       return {...state, [action.focus]: {...state[action.focus], path: action.path, focus: action.focus, results: action.results, loading:false}}
     default:
