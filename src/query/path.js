@@ -143,11 +143,11 @@ function translateQuery(schema, visited, focus, order, orderBy) {
     }, [])
     var duplicateEdges = findDuplicates(allEdges, function(edge) {return edge.label})
     var paths = findPaths(focus, labels, duplicateEdges)
-    var journeys = followPaths(paths.paths, _.filter(_.values(paths.paths), identity), focus)
+    var journeys = _.map(followPaths(paths.paths, _.filter(_.values(paths.paths), identity), focus), compress)
     var relevant = _.filter(journeys, function(journey) {return journey.length > 1})
     var subqueries = _.map(relevant, function(journey) {
       console.log('journey', journey)
-      return _.reduce(compress(journey).slice(1), function(subquery, step) {
+      return _.reduce(journey.slice(1), function(subquery, step) {
         if (step['label']) {
           // it is an edge
           return (step['from']) ? subquery.incoming(step['label']) : subquery.outgoing(step['label'])
