@@ -14,6 +14,7 @@ import ReactJson from 'react-json-view-callback'
 // tricky import so we don't have a name collision on 'Table'
 import { default as TableMD } from 'material-ui/Table';
 import { TableBody, TableCell, TableHead, TableRow, TableSortLabel } from 'material-ui/Table';
+import Terminal from 'mui-icons/fontawesome/terminal';
 
 import Paper from 'material-ui/Paper';
 
@@ -112,31 +113,31 @@ export class Table extends Component {
         return (
           <TableRow key={item.gid}>
             {
-              [<TableCell
-                key={`jsonView.${item.gid}`}>
-                  <ReactJson
-                    src={item}
-                    name={item.gid}
-                    collapsed
-                    indentWidth={2}
-                    displayDataTypes={false}
-                    displayObjectSize={false}
-                    callback={
-                    (clickEvent) => {
-                      _self.handleJsonCallback(clickEvent);
-                    }
-                }/>
-              </TableCell>].concat(
-                _.map(_self.props.tableFacets, function(facet, key, list) {
-                  const property_name = key.split('.')[1];
-                  return (
-                    <TableCell
-                      numeric={facet.type === 'text' ? false: true}
-                      key={`${item.gid}.${key}`}>
-                        {item[property_name]}
-                    </TableCell>
-                  );
-                })
+              _.map(_self.props.tableFacets, function(facet, key, list) {
+                const property_name = key.split('.')[1];
+                return (
+                  <TableCell
+                    numeric={facet.type === 'text' ? false: true}
+                    key={`${item.gid}.${key}`}>
+                      {item[property_name]}
+                  </TableCell>
+                );
+              }) .concat(
+                [<TableCell
+                  key={`jsonView.${item.gid}`}>
+                    <ReactJson
+                      src={item}
+                      name={false}
+                      collapsed
+                      indentWidth={2}
+                      displayDataTypes={false}
+                      displayObjectSize={false}
+                      callback={
+                      (clickEvent) => {
+                        _self.handleJsonCallback(clickEvent);
+                      }
+                  }/>
+                </TableCell>]
               )
             }
           </TableRow>
@@ -148,12 +149,11 @@ export class Table extends Component {
           <TableMD>
             <TableHead>
               <TableRow>
+                {columns}
                 <TableCell
                   key={'json'}>
-                  {'{}'}
+                  <Terminal/>
                 </TableCell>
-
-                {columns}
               </TableRow>
             </TableHead>
             <TableBody>
