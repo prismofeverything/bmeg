@@ -1,4 +1,4 @@
-export default function query(state = {}, action) {
+export function query(state = {}, action) {
   const label = action.focus
   switch (action.type) {
     case 'QUERY_RESULTS_SAVE':
@@ -20,9 +20,13 @@ export function queries(state = {}, action) {
 export function currentQuery(state = {name:'test'}, action) {
   switch (action.type) {
     case 'REFRESH_QUERY':
-      return {...state, [action.focus]: {queryString:action.queryString, selectedFacets:action.selectedFacets, order: action.order, orderBy: action.orderBy, loading:true} }
+      return {...state, [action.focus]: {queryString: action.queryString, selectedFacets: action.selectedFacets, order: action.order, orderBy: action.orderBy, loading: true} }
     case 'QUERY_RESULTS_SAVE':
-      return {...state, [action.focus]: {...state[action.focus], path: action.path, focus: action.focus, results: action.results, loading:false}}
+      return {...state, [action.focus]: {...state[action.focus], path: action.path, focus: action.focus, results: action.results, loading: false}}
+    case 'NEW_QUERY':
+      console.log('new query!')
+      const path = {label: action.label, facets: {}}
+      return {...state, [action.focus]: {...state[action.focus], path: path, focus: action.focus, results: [], loading: false}}
     default:
       return state
   }

@@ -17,6 +17,7 @@ import { CircularProgress } from 'material-ui/Progress';
 import Schema from './Schema'
 import Facet from './Facet'
 import Table from './Table'
+import QueryControls from './QueryControls'
 
 import List from 'material-ui/List';
 
@@ -227,6 +228,7 @@ export class Cohort extends Component {
                     >
                       <div ref={(e) => { this.schemaContent = e; }} >
                         {schemaContent}
+      <QueryControls />
                       </div>
                       <div>
                         {collapseSchema}

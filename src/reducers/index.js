@@ -4,6 +4,8 @@ import { reducer as formReducer } from 'redux-form';
 import schema from './schema'
 import search from './search'
 import {query, queries, currentQuery} from './query'
+// import queries from './query'
+// import currentQuery from './query'
 import path from './path'
 import FacetReducers from './facets'
 

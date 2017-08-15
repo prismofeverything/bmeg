@@ -14,6 +14,8 @@ export default function path(state = [], action) {
       var travel = [...state.slice(0, -1), onward]
       console.log('PATH - SELECTED_FACET')
       return travel
+    case 'NEW_QUERY':
+      return [{label: action.label, facets: {}}]
     default:
       return state
   }
