@@ -21,6 +21,10 @@ export function queries(state = {}, action) {
 
 export function currentQuery(state = {name:'test' }, action) {
   switch (action.type) {
+    case 'STEP_ON_PATH':
+      // run default search when user selects vertex
+      const resultsPresent = state[action.label] && state[action.label].results && state[action.label].results.length > 1
+      return {...state, [action.label]: {...state[action.label], runSearch:!resultsPresent}}
     case 'TOGGLE_IN_TABLE':
       return {...state,
           [action.focus]: {
@@ -50,7 +54,8 @@ export function currentQuery(state = {name:'test' }, action) {
         }
       }
     case 'REFRESH_QUERY':
-      return {...state, [action.focus]: {queryString:action.queryString, selectedFacets:action.selectedFacets, order: action.order, orderBy: action.orderBy, tableSelectedColumns: {},  loading:true} }
+      const tableSelectedColumns = state[action.focus] && state[action.focus].tableSelectedColumns ? state[action.focus].tableSelectedColumns : {}
+      return {...state, [action.focus]: {queryString:action.queryString, selectedFacets:action.selectedFacets, order: action.order, orderBy: action.orderBy, tableSelectedColumns: tableSelectedColumns,  loading:true} }
     case 'QUERY_RESULTS_SAVE':
       return {...state, [action.focus]: {...state[action.focus], path: action.path, focus: action.focus, results: action.results, loading:false}}
     default:

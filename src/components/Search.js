@@ -97,7 +97,7 @@ export class Search extends Component {
        });
      }
 
-  autocomplete(cm) {
+   autocomplete(cm) {
        let codeMirror = this.refs['editor'].getCodeMirrorInstance();
        codeMirror.showHint(cm, codeMirror.hint.tag);
    }
@@ -169,6 +169,14 @@ export class Search extends Component {
        // just update search bar, don't update state or re-render
        this.insertTextAtCursor(` AND ${cf} `);
      }
+
+    //  // now check to see if default search should be run
+    //  if ( nextProps.currentQuery[nextProps.focus]
+    //     && nextProps.currentQuery[nextProps.focus].runSearch) {
+    //       console.log('*** *** *** Search onEnter')
+    //       window.setTimeout(this.onEnter(), 1000);
+    //  }
+
    }
    // ... insert it into the search bar at the current cursor
    insertTextAtCursor(text) {
@@ -195,6 +203,8 @@ export class Search extends Component {
        },
       hints: this.get_hints
     };
+
+
     return (
         <Paper
           style={{ width:'100%',

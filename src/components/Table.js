@@ -114,7 +114,13 @@ export class Table extends Component {
             {
               [<TableCell
                 key={`jsonView.${item.gid}`}>
-                  <ReactJson src={item} name={item.gid} collapsed
+                  <ReactJson
+                    src={item}
+                    name={item.gid}
+                    collapsed
+                    indentWidth={2}
+                    displayDataTypes={false}
+                    displayObjectSize={false}
                     callback={
                     (clickEvent) => {
                       _self.handleJsonCallback(clickEvent);
@@ -188,11 +194,13 @@ function mapStateToProps(state, own) {
   });
 
 
+  // facets to display in table
   const tableFacets =
     _.pick(facets, function(value, key, object) {
       return key
-            && currentQuery[own.label].tableSelectedColumns
-            && currentQuery[own.label].tableSelectedColumns[key];
+          && currentQuery[own.label]
+          && currentQuery[own.label].tableSelectedColumns
+          && currentQuery[own.label].tableSelectedColumns[key];
   });
 
 
