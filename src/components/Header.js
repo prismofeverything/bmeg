@@ -46,21 +46,6 @@ export class Header extends Component {
     browserHistory.push('/'); // Navigate home
   }
 
-
-  // <IconButton color="contrast" aria-label="Menu"
-  //             onClick={event => this.handleToggle()}>
-  //   <MenuIcon />
-  // </IconButton>
-
-
-  // <Badge className={classes.badge}
-  //        badgeContent={'BMEG'}
-  //        color="contrast"
-  //        style={{marginRight:'20px'}}
-  //        onClick={event => this.handleToggle()}>
-  //    <MenuIcon />
-  //  </Badge>
-
   render() {
     const { dispatch } = this.props
     const classes = this.props.classes;
@@ -70,7 +55,6 @@ export class Header extends Component {
           <Toolbar>
             <Badge className={classes.badge}
                    badgeContent={'BMEG'}
-                   color="contrast"
                    style={{marginRight:'20px'}}
                    onClick={event => this.handleToggle()}>
                <Dna />
