@@ -103,42 +103,13 @@ export class Search extends Component {
    }
 
    onEnter(cm) {
-       // if enter hit in query field, submit form
-       this.onQuery(this.state.text);
-   }
-   // when user hits query button
-   onQuery(queryString) {
-     const { dispatch } = this.props
-
-     // get updated aggregations
-     dispatch({
-       type: 'REFRESH_QUERY',
-       selectedFacets: this.props.selectedFacets,
-       label: this.props.focus,
-       focus: this.props.focus,
-       path: this.props.path,
-       schema: this.props.schema,
-       currentQuery: this.props.currentQuery,
-       queryString: queryString,
-     })
-     this.triggerSearch();
-   }
-
-   triggerSearch() {
-     const {dispatch} = this.props;
-     return new Promise((resolve, reject) => {
+       // if user clicked query icon or hit enter key,
+       const { dispatch } = this.props
        dispatch({
-         type: 'FACETS_SEARCH',
-         selectedFacets: this.props.selectedFacets,
-         label: this.props.label,
-         callbackError: (error) => {
-           reject({_error: error});
-         },
-         callbackSuccess: () => {
-           resolve();
-         }
+         type: 'SEARCH',
+         queryString: this.state.text,
        });
-     });
+
    }
 
    get_hints() {
@@ -223,6 +194,8 @@ export class Search extends Component {
           </div>
           <IconButton style={{
               transition: 'transform 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
+              backgroundColor: 'lightgrey',
+              borderRadius: 'inherit',
             }}
             onTouchTap={this.onEnter}
             >

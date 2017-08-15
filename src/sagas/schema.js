@@ -10,6 +10,11 @@ export function* fetchSchema(action) {
     type: 'SCHEMA_SAVE',
     schema: schema,
   })
+  // run default search
+  yield put({
+    ...action,
+    type: 'SEARCH',
+  })
 }
 
 export function* firstVertex(action) {
@@ -24,6 +29,7 @@ export function* firstVertex(action) {
 export function* navigateCohort(action) {
   yield put({type: 'STEP_ON_PATH', label: action.label})
   yield put(push('/cohort/' + action.label))
+  yield put({...action, type: 'SEARCH'})
 }
 
 export function* fetchVertex(action) {

@@ -1,4 +1,4 @@
-import { call, put } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 import OphionSearch from '../query/search.js'
 import Path from '../query/path.js'
 
@@ -26,5 +26,38 @@ export function* pathQuery(action) {
     focus: action.focus,
     results: results,
     currentQuery: action.currentQuery,
+  })
+}
+
+export function* search(action) {
+  const state = yield select();
+  // get updated aggregations
+  yield put({
+    type: 'REFRESH_QUERY',
+    selectedFacets: state.selectedFacets,
+    label: action.label,
+    focus: action.label,
+    path: state.path,
+    schema: state.schema,
+    currentQuery: state.currentQuery,
+    queryString: action.queryString ? action.queryString : state.queryString,
+  })
+  // get updated data
+  yield put({
+    type: 'FACETS_SEARCH',
+    selectedFacets: state.selectedFacets,
+    label: action.label,
+    focus: action.label,
+  });
+}
+
+export function* startup(action) {
+  yield put({
+    ...action,
+    type: 'SCHEMA_FETCH',
+  })
+  yield put({
+    ...action,
+    type: 'FACETS_FETCH',
   })
 }
