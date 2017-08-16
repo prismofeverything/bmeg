@@ -17,7 +17,7 @@ export function* aggregateFacets(action) {
   const queryString = action.selectedFacets.map(function(selectedFacet){
     const property_name = selectedFacet.key.split('.')[1]
     if (selectedFacet.type === 'text') {
-      return `${property_name}:'${selectedFacet.values}'`;
+      return `${property_name}:"${selectedFacet.values}"`;
     }
     return `${property_name}:${selectedFacet.values}`;
   }).join(" AND ");
