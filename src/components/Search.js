@@ -131,7 +131,7 @@ export class Search extends Component {
          }
          const type = props.facets[props.currentFacet.key].type;
          if (type === 'text') {
-           return `${props.currentFacet.key}:'${props.currentFacet.values}'`;
+           return `${props.currentFacet.key}:"${props.currentFacet.values}"`;
          }
          return `${props.currentFacet.key}:${props.currentFacet.values}`;
      }
