@@ -113,31 +113,31 @@ export class Table extends Component {
         return (
           <TableRow key={item.gid}>
             {
-              _.map(_self.props.tableFacets, function(facet, key, list) {
-                const property_name = key.split('.')[1];
-                return (
-                  <TableCell
-                    numeric={facet.type === 'text' ? false: true}
-                    key={`${item.gid}.${key}`}>
-                      {item[property_name]}
-                  </TableCell>
-                );
-              }) .concat(
-                [<TableCell
-                  key={`jsonView.${item.gid}`}>
-                    <ReactJson
-                      src={item}
-                      name={false}
-                      collapsed
-                      indentWidth={2}
-                      displayDataTypes={false}
-                      displayObjectSize={false}
-                      callback={
-                      (clickEvent) => {
-                        _self.handleJsonCallback(clickEvent);
-                      }
-                  }/>
-                </TableCell>]
+              [<TableCell
+                key={`jsonView.${item.gid}`}>
+                  <ReactJson
+                    src={item}
+                    name={false}
+                    collapsed
+                    indentWidth={2}
+                    displayDataTypes={false}
+                    displayObjectSize={false}
+                    callback={
+                    (clickEvent) => {
+                      _self.handleJsonCallback(clickEvent);
+                    }
+                }/>
+              </TableCell>].concat(
+                _.map(_self.props.tableFacets, function(facet, key, list) {
+                  const property_name = key.split('.')[1];
+                  return (
+                    <TableCell
+                      numeric={facet.type === 'text' ? false: true}
+                      key={`${item.gid}.${key}`}>
+                        {item[property_name]}
+                    </TableCell>
+                  );
+                })                 
               )
             }
           </TableRow>
@@ -149,11 +149,11 @@ export class Table extends Component {
           <TableMD>
             <TableHead>
               <TableRow>
-                {columns}
                 <TableCell
                   key={'json'}>
                   <Terminal/>
                 </TableCell>
+                {columns}
               </TableRow>
             </TableHead>
             <TableBody>
