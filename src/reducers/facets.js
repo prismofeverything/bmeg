@@ -2,6 +2,16 @@ import * as _ from 'underscore'
 
 export default class FacetReducers {
 
+  static currentFacet(state = {}, action) {
+    switch (action.type) {
+      case 'SELECTED_FACET':
+        return action.facet
+      default:
+        return state
+    }
+  }
+
+
   static selectedFacets(state = [], action) {
     switch (action.type) {
       case 'SELECTED_FACET':
@@ -39,10 +49,14 @@ export default class FacetReducers {
 
   static facets(state = {}, action) {
     switch (action.type) {
+      case 'REFRESH_QUERY':
+        return {...state, loading:true};
+      case 'FACETS_FETCH':
+        return {...state, loading:true};
       case 'AGGREGATED_FACETS_SAVE':
-        return {...state, ...action.facets.facets};
+        return {...state, ...action.facets.facets, loading:false};
       case 'FACETS_SAVE':
-        return {...state, ...action.facets.facets}
+        return {...state, ...action.facets.facets, loading:false}
       default:
         return state
     }

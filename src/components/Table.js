@@ -7,6 +7,7 @@ import * as _ from 'underscore'
 
 import PropTypes from 'prop-types';
 import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { CircularProgress } from 'material-ui/Progress';
 
 // tricky import so we don't have a name collision on 'Table'
 import { default as TableMD } from 'material-ui/Table';
@@ -29,6 +30,7 @@ export class Table extends Component {
   }
 
   handleRequestSort(property) {
+    //TODO - remove local sort once server returns sorted data
     const orderBy = property;
     let order = 'desc';
     if (this.state.orderBy === property && this.state.order === 'desc') {
@@ -37,7 +39,24 @@ export class Table extends Component {
     const data = this.props.data.sort(
       (a, b) => (order === 'desc' ? b[orderBy] > a[orderBy] : a[orderBy] > b[orderBy]),
     );
+
     this.setState({ data:data , order:order , orderBy:orderBy });
+    const { dispatch } = this.props
+    const cq = this.props.currentQuery;
+    const focus = this.props.label;
+    dispatch({
+      type: 'REFRESH_QUERY',
+      selectedFacets: cq[focus].selectedFacets,
+      label: focus,
+      focus: focus,
+      path: cq[focus].path,
+      schema: this.props.schema,
+      currentQuery: cq[focus].currentQuery,
+      queryString: cq[focus].queryString,
+      order:order,
+      orderBy:orderBy
+    })
+
   };
 
 
@@ -99,9 +118,13 @@ export class Table extends Component {
           </TableMD>
         </Paper>
       ) ;
-    } else {
+    } else if (this.props.loading) {
       return (
-        <div>no results</div>
+        <CircularProgress className={classes.progress} />
+      )
+    } {
+      return (
+        <div>No active query</div>
       )
     }
   }
@@ -110,9 +133,16 @@ export class Table extends Component {
 function mapStateToProps(state, own) {
   console.log('Table mapStateToProps state',state)
   var data;
-  if(state.query && state.query.focus === own.label) {
-    data = state.query.results ? state.query.results.map(function(result) {return {...result.properties, gid: result.gid}}) : []
+  const currentQuery = state.currentQuery;
+  if(currentQuery && currentQuery[own.label] && !currentQuery[own.label].loading) {
+    data = currentQuery[own.label].results ? currentQuery[own.label].results.map(function(result) {return {...result.properties, gid: result.gid}}) : []
   }
+  var loading = false;
+  if(currentQuery && currentQuery[own.label] && currentQuery[own.label].loading) {
+    loading = true;
+  }
+
+
   // our facets
   const facets =
     _.pick(state.facets, function(value, key, object) {
@@ -121,7 +151,10 @@ function mapStateToProps(state, own) {
 
   return {
     data: data,
-    facets: facets
+    facets: facets,
+    loading: loading,
+    currentQuery: currentQuery,
+    schema: state.schema,
   }
 }
 
