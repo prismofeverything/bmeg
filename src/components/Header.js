@@ -22,8 +22,7 @@ import AddCircleOutlineIcon from 'material-ui-icons/AddCircleOutline';
 import FolderOpenIcon from 'material-ui-icons/FolderOpen';
 import SaveIcon from 'material-ui-icons/Save';
 import Heart from 'mui-icons/cmdi/heart';
-import Dna from 'mui-icons/cmdi/dna';
-
+import Dna from 'mui-icons/cmdi/Dna';
 
 import Drawer from 'material-ui/Drawer';
 
@@ -53,13 +52,10 @@ export class Header extends Component {
       <div className={classes.root}>
         <AppBar position="static" >
           <Toolbar>
-            <Badge className={classes.badge}
-                   badgeContent={'BMEG'}
-                   style={{marginRight:'20px'}}
-                   onClick={event => this.handleToggle()}>
-               <Dna />
-             </Badge>
-
+            <IconButton color="contrast" aria-label="Menu"  onClick={event => this.handleToggle()}>
+              <MenuIcon />
+            </IconButton>
+            <img color="contrast" src="/media/bmeg-logo-white.png" height="45" onClick={ () => dispatch(push('/')) }/>
             <Search focus={this.props.focus} />
           </Toolbar>
         </AppBar>
