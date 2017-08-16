@@ -147,8 +147,8 @@ export class Cohort extends Component {
     //
     const schemaContent = (
       <div    ref={(e) => { this.schemaContainer = e; }} >
-        <Schema width={this.schemaContainer ? this.schemaContainer.offsetWidth : 1000}
-                height={this.schemaContainer ? this.schemaContainer.offsetHeight : 400}
+        <Schema width={1000} // {this.schemaContainer ? this.schemaContainer.offsetWidth : 1000}
+                height={400} // {this.schemaContainer ? this.schemaContainer.offsetHeight : 400}
                 offset={this.state.sidebarSize} />
       </div>
     )
