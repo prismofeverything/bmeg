@@ -37,7 +37,7 @@
     "cytoscape": "^3.1.4",
     "istanbul": "^0.4.5",
     "jsdom": "^10.1.0",
-    "material-ui": "1.0.0-beta.4",
+    "material-ui": "^1.0.0-beta.5",
     "material-ui-icons": "^1.0.0-alpha.19",
     "material-ui-search-bar": "^1.0.0-beta.2",
     "mui-icons": "^1.2.1",
