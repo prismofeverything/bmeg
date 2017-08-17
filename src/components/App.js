@@ -15,12 +15,10 @@ export class App extends React.Component {
   componentDidMount() {
     const {dispatch} = this.props;
     dispatch({
-      type: 'SCHEMA_FETCH',
+      type: 'STARTUP',
+      focus: this.props.focus,
+      label: this.props.focus
     })
-    dispatch({
-      type: 'FACETS_FETCH',
-    })
-
   }
 
   render() {

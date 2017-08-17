@@ -12,6 +12,8 @@ import { fetchEdge } from './schema'
 import { layoutComponents } from './schema'
 import { fetchFacets } from './facets'
 import { aggregateFacets } from './facets'
+import { search } from './query'
+import { startup } from './query'
 
 export function* sagas() {
   yield [
@@ -23,5 +25,7 @@ export function* sagas() {
     fork(takeLatest, 'EDGE_FETCH', fetchEdge),
     fork(takeLatest, 'FACETS_FETCH', fetchFacets),
     fork(takeLatest, 'REFRESH_QUERY', aggregateFacets),
+    fork(takeLatest, 'SEARCH', search),
+    fork(takeLatest, 'STARTUP', startup),
   ];
 }

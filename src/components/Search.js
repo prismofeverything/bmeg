@@ -97,48 +97,21 @@ export class Search extends Component {
        });
      }
 
-  autocomplete(cm) {
+   autocomplete(cm) {
        let codeMirror = this.refs['editor'].getCodeMirrorInstance();
        codeMirror.showHint(cm, codeMirror.hint.tag);
    }
 
    onEnter(cm) {
-       // if enter hit in query field, submit form
-       this.onQuery(this.state.text);
-   }
-   // when user hits query button
-   onQuery(queryString) {
-     const { dispatch } = this.props
-
-     // get updated aggregations
-     dispatch({
-       type: 'REFRESH_QUERY',
-       selectedFacets: this.props.selectedFacets,
-       label: this.props.focus,
-       focus: this.props.focus,
-       path: this.props.path,
-       schema: this.props.schema,
-       currentQuery: this.props.currentQuery,
-       queryString: queryString,
-     })
-     this.triggerSearch();
-   }
-
-   triggerSearch() {
-     const {dispatch} = this.props;
-     return new Promise((resolve, reject) => {
+       // if user clicked query icon or hit enter key,
+       const { dispatch } = this.props
        dispatch({
-         type: 'FACETS_SEARCH',
-         selectedFacets: this.props.selectedFacets,
-         label: this.props.label,
-         callbackError: (error) => {
-           reject({_error: error});
-         },
-         callbackSuccess: () => {
-           resolve();
-         }
+         type: 'SEARCH',
+         queryString: this.state.text,
+         label: this.props.focus,
+         focus: this.props.focus,
        });
-     });
+
    }
 
    get_hints() {
@@ -158,7 +131,7 @@ export class Search extends Component {
          }
          const type = props.facets[props.currentFacet.key].type;
          if (type === 'text') {
-           return `${props.currentFacet.key}:'${props.currentFacet.values}'`;
+           return `${props.currentFacet.key}:"${props.currentFacet.values}"`;
          }
          return `${props.currentFacet.key}:${props.currentFacet.values}`;
      }
@@ -169,6 +142,7 @@ export class Search extends Component {
        // just update search bar, don't update state or re-render
        this.insertTextAtCursor(` AND ${cf} `);
      }
+
    }
    // ... insert it into the search bar at the current cursor
    insertTextAtCursor(text) {
@@ -195,6 +169,8 @@ export class Search extends Component {
        },
       hints: this.get_hints
     };
+
+
     return (
         <Paper
           style={{ width:'100%',
@@ -213,6 +189,8 @@ export class Search extends Component {
           </div>
           <IconButton style={{
               transition: 'transform 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
+              backgroundColor: 'lightgrey',
+              borderRadius: 'inherit',
             }}
             onTouchTap={this.onEnter}
             >

@@ -1,4 +1,4 @@
-import { call, put } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 import { push } from 'react-router-redux'
 import * as _ from 'underscore'
 import Schema from '../query/schema'
@@ -9,6 +9,11 @@ export function* fetchSchema(action) {
   yield put({
     type: 'SCHEMA_SAVE',
     schema: schema,
+  })
+  // run default search
+  yield put({
+    ...action,
+    type: 'SEARCH',
   })
 }
 
@@ -22,8 +27,12 @@ export function* firstVertex(action) {
 }
 
 export function* navigateCohort(action) {
-  yield put({type: 'STEP_ON_PATH', label: action.label})
-  yield put(push('/cohort/' + action.label))
+  yield put.resolve({type: 'STEP_ON_PATH', label: action.label})
+  yield put.resolve(push('/cohort/' + action.label))
+  const state = yield select();
+  if (state.currentQuery[action.label].runSearch) {
+    yield put({...action, type: 'SEARCH'})
+  }
 }
 
 export function* fetchVertex(action) {
