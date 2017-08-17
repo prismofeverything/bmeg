@@ -14,6 +14,7 @@ import Button from 'material-ui/Button';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from 'material-ui-icons/Menu';
 import Badge from 'material-ui/Badge';
+import Avatar from 'material-ui/Avatar';
 
 import { IndexLink, Link, browserHistory } from 'react-router';
 import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
@@ -23,6 +24,7 @@ import FolderOpenIcon from 'material-ui-icons/FolderOpen';
 import SaveIcon from 'material-ui-icons/Save';
 import Heart from 'mui-icons/cmdi/heart';
 import Dna from 'mui-icons/cmdi/Dna';
+import FaceIcon from 'material-ui-icons/Face';
 
 import Drawer from 'material-ui/Drawer';
 
@@ -57,6 +59,7 @@ export class Header extends Component {
             </IconButton>
             <img color="contrast" src="/media/bmeg-logo-white.png" height="45" onClick={ () => dispatch(push('/')) }/>
             <Search focus={this.props.focus} />
+            <Avatar alt="TODO"  src="/media/avatar.jpg"  style={{ margin: 10}}/>
           </Toolbar>
         </AppBar>
         <Drawer
