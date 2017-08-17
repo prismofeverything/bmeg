@@ -8,10 +8,13 @@ import * as _ from 'underscore'
 import PropTypes from 'prop-types';
 import { withStyles, createStyleSheet } from 'material-ui/styles';
 import { CircularProgress } from 'material-ui/Progress';
+import ReactJson from 'react-json-view-callback'
+
 
 // tricky import so we don't have a name collision on 'Table'
 import { default as TableMD } from 'material-ui/Table';
 import { TableBody, TableCell, TableHead, TableRow, TableSortLabel } from 'material-ui/Table';
+import Terminal from 'mui-icons/fontawesome/terminal';
 
 import Paper from 'material-ui/Paper';
 
@@ -27,6 +30,27 @@ export class Table extends Component {
       orderBy: 'gid'
     };
     this.handleRequestSort = this.handleRequestSort.bind(this)
+    this.handleJsonCallback = this.handleJsonCallback.bind(this)
+  }
+
+  handleJsonCallback(clickEvent) {
+    // callback from jsonViewer one of [TOGGLE_IN_TABLE]
+    // since the jsonViewer is a separate, external component without knowledge
+    // of the label/focus, we recreate the key here using the variable passed
+    // from the viewer and our state
+    const { dispatch } = this.props
+    dispatch({
+      type: clickEvent.name,
+      label: this.props.label,
+      focus: this.props.label,
+      facet: {
+        key: `${this.props.label}.${clickEvent.variable.name}`,
+        property: clickEvent.variable.name,
+        values: clickEvent.variable.value,
+        type: clickEvent.variable.type,
+      }
+    })
+
   }
 
   handleRequestSort(property) {
@@ -65,8 +89,8 @@ export class Table extends Component {
     const _self = this ;
     const classes = this.props.classes;
     if (this.props.data) {
-      // map the first item to columns TODO - map from facets
-      const columns = _.map(this.props.facets, function(facet, key, list) {
+      // map the first item to columns
+      const columns = _.map(this.props.tableFacets, function(facet, key, list) {
         const property_name = key.split('.')[1];
         return (
           <TableCell
@@ -89,16 +113,32 @@ export class Table extends Component {
         return (
           <TableRow key={item.gid}>
             {
-              _.map(_self.props.facets, function(facet, key, list) {
-                const property_name = key.split('.')[1];
-                return (
-                  <TableCell
-                    numeric={facet.type === 'text' ? false: true}
-                    key={`${item.gid}.${key}`}>
-                      {item[property_name]}
-                  </TableCell>
-                );
-              })
+              [<TableCell
+                key={`jsonView.${item.gid}`}>
+                  <ReactJson
+                    src={item}
+                    name={false}
+                    collapsed
+                    indentWidth={2}
+                    displayDataTypes={false}
+                    displayObjectSize={false}
+                    callback={
+                    (clickEvent) => {
+                      _self.handleJsonCallback(clickEvent);
+                    }
+                }/>
+              </TableCell>].concat(
+                _.map(_self.props.tableFacets, function(facet, key, list) {
+                  const property_name = key.split('.')[1];
+                  return (
+                    <TableCell
+                      numeric={facet.type === 'text' ? false: true}
+                      key={`${item.gid}.${key}`}>
+                        {item[property_name]}
+                    </TableCell>
+                  );
+                })                 
+              )
             }
           </TableRow>
         );
@@ -109,6 +149,10 @@ export class Table extends Component {
           <TableMD>
             <TableHead>
               <TableRow>
+                <TableCell
+                  key={'json'}>
+                  <Terminal/>
+                </TableCell>
                 {columns}
               </TableRow>
             </TableHead>
@@ -131,7 +175,7 @@ export class Table extends Component {
 }
 
 function mapStateToProps(state, own) {
-  console.log('Table mapStateToProps state',state)
+
   var data;
   const currentQuery = state.currentQuery;
   if(currentQuery && currentQuery[own.label] && !currentQuery[own.label].loading) {
@@ -149,12 +193,25 @@ function mapStateToProps(state, own) {
       return key && key.startsWith(`${own.label}.`);
   });
 
+
+  // facets to display in table
+  const tableFacets =
+    _.pick(facets, function(value, key, object) {
+      return key
+          && currentQuery[own.label]
+          && currentQuery[own.label].tableSelectedColumns
+          && currentQuery[own.label].tableSelectedColumns[key];
+  });
+
+
+
   return {
     data: data,
     facets: facets,
     loading: loading,
     currentQuery: currentQuery,
     schema: state.schema,
+    tableFacets: tableFacets,
   }
 }
 

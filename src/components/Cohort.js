@@ -5,14 +5,26 @@ import { push } from 'react-router-redux'
 import * as _ from 'underscore'
 
 import SplitPane from 'react-flex-split-pane';
+import classnames from 'classnames';
 
 import { withStyles, createStyleSheet } from 'material-ui/styles';
 import Button from 'material-ui/Button';
+import { CircularProgress } from 'material-ui/Progress';
+import Card, { CardContent, CardHeader, CardActions } from 'material-ui/Card';
+import Collapse from 'material-ui/transitions/Collapse';
+
 import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
 import ExpandLessIcon from 'material-ui-icons/ExpandLess';
+import IconButton from 'material-ui/IconButton';
 import ChevronLeftIcon from 'material-ui-icons/ChevronLeft';
 import ChevronRightIcon from 'material-ui-icons/ChevronRight';
-import { CircularProgress } from 'material-ui/Progress';
+import AddCircleOutlineIcon from 'material-ui-icons/AddCircleOutline';
+import FolderOpenIcon from 'material-ui-icons/FolderOpen';
+import SaveIcon from 'material-ui-icons/Save';
+import Heart from 'mui-icons/cmdi/heart';
+import Dna from 'mui-icons/cmdi/Dna';
+
+
 
 import Schema from './Schema'
 import Facet from './Facet'
@@ -38,10 +50,9 @@ export class Cohort extends Component {
     // for some reason, this is a syntax error. is it a webpack config issue?
     this.onSidebarResizeStart = this.onSidebarResizeStart.bind(this)
     this.onSidebarResizeEnd = this.onSidebarResizeEnd.bind(this)
-    this.onMainResizeStart = this.onMainResizeStart.bind(this)
-    this.onMainResizeEnd = this.onMainResizeEnd.bind(this)
     this.onSidebarChange = this.onSidebarChange.bind(this)
-    this.onMainChange = this.onMainChange.bind(this)
+    this.toggleSchema = this.toggleSchema.bind(this)
+    this.schemaBreadCrumb = this.schemaBreadCrumb.bind(this)
     if (this.props.label && _.isEmpty(this.props.path)) {
       this.props.dispatch({
         type: 'STEP_ON_PATH',
@@ -50,6 +61,7 @@ export class Cohort extends Component {
     }
   }
 
+  // shrink/restore sidebar
   toggleSidebar() {
     const _self = this;
     this.setState(
@@ -66,6 +78,8 @@ export class Cohort extends Component {
       }
     );
   }
+
+  // shrink/restore schema
   toggleSchema() {
     this.setState(
       { schemaOpen: !this.state.schemaOpen },
@@ -85,22 +99,17 @@ export class Cohort extends Component {
   }
   onSidebarResizeEnd() {
     this.setState({ isSidebarResizing: false })
-    // console.log('sidebarSize',this.state.sidebarSize)
-    // console.log('this.schemaContainer.offsetWidth',this.schemaContainer.offsetWidth)
-    // console.log('this.schemaContainer.offsetHeight',this.schemaContainer.offsetHeight)
   }
   onSidebarChange(sidebarSize) {
     this.setState({ sidebarSize: sidebarSize })
   }
-  onMainResizeStart() {
-    this.setState({ isMainResizing: true })
-  }
-  onMainResizeEnd() {
-    this.setState({ isMainResizing: false })
-    // console.log('mainSize',this.state.mainSize)
-  }
-  onMainChange(mainSize) {
-    this.setState({ mainSize: mainSize })
+
+  // take paths and render a breadcrumb
+  // TODO - turn into clickable breadcrumb or stepper
+  schemaBreadCrumb() {
+    return _.map(this.props.path, function(pathItem,index,list) {
+      return(pathItem.label)
+    }).join('/');
   }
 
 
@@ -147,11 +156,37 @@ export class Cohort extends Component {
     // see https://facebook.github.io/react/docs/refs-and-the-dom.html
     //
     const schemaContent = (
-      <div    ref={(e) => { this.schemaContainer = e; }} >
-        <Schema width={1000} // {this.schemaContainer ? this.schemaContainer.offsetWidth : 1000}
-                height={400} // {this.schemaContainer ? this.schemaContainer.offsetHeight : 400}
-                offset={this.state.sidebarSize} />
-      </div>
+      <Card raised>
+        <CardActions disableActionSpacing
+          onClick={_self.toggleSchema}
+          >
+          <CardHeader title={_self.schemaBreadCrumb()} />
+          <div style={{flex: '1 1 auto'}} />
+          <IconButton
+            className={classnames(classes.expand, {
+              [classes.expandOpen]: _self.state.schemaOpen,
+            })}
+            onClick={_self.toggleSchema}
+            aria-expanded={_self.state.schemaOpen}
+            aria-label="Show more"
+          >
+            <ExpandMoreIcon />
+          </IconButton>
+        </CardActions>
+        <Collapse in={_self.state.schemaOpen} transitionDuration="auto" unmountOnExit>
+          <CardContent>
+            <Schema width={1000}
+                    height={400}
+                    offset={this.state.sidebarSize} />
+            <div onClick={() => {alert('// TODO - as use case develops add actions here ( and make it its own component i.e. QueryStore)')}}>
+              <AddCircleOutlineIcon />
+              <FolderOpenIcon />
+              <SaveIcon />
+              <Dna />
+            </div>
+          </CardContent>
+        </Collapse>
+      </Card>
     )
 
     const collapseSidebarStyle = {float:'left', cursor: 'pointer'}
@@ -216,25 +251,10 @@ export class Cohort extends Component {
                   {sidebarLoading}
                   {sidebarContent}
                 </div>
-                <SplitPane
-                    size={this.state.mainSize}
-                    isResizing={this.state.isMainResizing}
-                    onResizeStart={this.onMainResizeStart}
-                    onResizeEnd={this.onMainResizeEnd}
-                    onChange={this.onMainChange}
-                    type="horizontal"
-                    pane1Style={{ borderBottom: '4px solid silver',
-                                  transition: 'all .25s linear'}}
-                    >
-                      <div ref={(e) => { this.schemaContent = e; }} >
-                        {schemaContent}
-      <QueryControls />
-                      </div>
-                      <div>
-                        {collapseSchema}
-                        {resultsContent}
-                      </div>
-                </SplitPane>
+                <div>
+                  {schemaContent}
+                  {resultsContent}
+                </div>
           </SplitPane>
         </div>
 
