@@ -59,7 +59,9 @@ export class Header extends Component {
             </IconButton>
             <img color="contrast" src="/media/bmeg-logo-white.png" height="45" onClick={ () => dispatch(push('/')) }/>
             <Search focus={this.props.focus} />
-            <Avatar alt="TODO"  src="/media/avatar.jpg"  style={{ margin: 10}}/>
+            <IconButton color="contrast" aria-label="Menu"  onClick={event => alert('//TODO add account details')}>
+              <Avatar alt="TODO"  src="/media/avatar.png" />
+            </IconButton>
           </Toolbar>
         </AppBar>
         <Drawer
