@@ -57,7 +57,16 @@ export function currentQuery(state = {name:'test' }, action) {
       const tableSelectedColumns = state[action.focus] && state[action.focus].tableSelectedColumns ? state[action.focus].tableSelectedColumns : {}
       return {...state, [action.focus]: {queryString:action.queryString, selectedFacets:action.selectedFacets, order: action.order, orderBy: action.orderBy, tableSelectedColumns: tableSelectedColumns,  loading:true} }
     case 'QUERY_RESULTS_SAVE':
-      return {...state, [action.focus]: {...state[action.focus], path: action.path, focus: action.focus, results: action.results, loading:false}}
+      // determine default tableFacets see  TOGGLE_IN_TABLE above
+      let defaultTableSelectedColumns = {}
+      if (action.results && action.results.length > 0) {
+        _.each(action.results[0].properties, function(value, key) {
+            this[`${action.focus}.${key}`] = true
+        }, defaultTableSelectedColumns) ;
+      }
+      return {...state, [action.focus]: {...state[action.focus],
+              path: action.path, focus: action.focus, results: action.results,
+              tableSelectedColumns:defaultTableSelectedColumns, loading:false}}
     default:
       return state
   }
