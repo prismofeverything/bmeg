@@ -109,7 +109,7 @@ export class Cohort extends Component {
   schemaBreadCrumb() {
     return _.map(this.props.path, function(pathItem,index,list) {
       return(pathItem.label)
-    }).join('/');
+    }).join(' > ');
   }
 
 
@@ -155,6 +155,12 @@ export class Cohort extends Component {
     // render main content, create a ref we can interrogate later
     // see https://facebook.github.io/react/docs/refs-and-the-dom.html
     //
+    var icon
+    if (_self.state.schemaOpen) {
+      icon = (<ExpandLessIcon />)
+    } else {
+      icon = (<ExpandMoreIcon />)
+    }
     const schemaContent = (
       <Card raised>
         <CardActions disableActionSpacing
@@ -163,14 +169,11 @@ export class Cohort extends Component {
           <CardHeader title={_self.schemaBreadCrumb()} />
           <div style={{flex: '1 1 auto'}} />
           <IconButton
-            className={classnames(classes.expand, {
-              [classes.expandOpen]: _self.state.schemaOpen,
-            })}
             onClick={_self.toggleSchema}
             aria-expanded={_self.state.schemaOpen}
             aria-label="Show more"
           >
-            <ExpandMoreIcon />
+            {icon}
           </IconButton>
         </CardActions>
         <Collapse in={_self.state.schemaOpen} transitionDuration="auto" unmountOnExit>
@@ -182,7 +185,7 @@ export class Cohort extends Component {
               <AddCircleOutlineIcon />
               <FolderOpenIcon />
               <SaveIcon />
-              <Dna />
+              <img color="contrast" src="/media/intersection.png" height="45" />
             </div>
           </CardContent>
         </Collapse>

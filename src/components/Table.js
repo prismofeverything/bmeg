@@ -40,8 +40,12 @@ export class Table extends Component {
     // of the label/focus, we recreate the key here using the variable passed
     // from the viewer and our state
     const { dispatch } = this.props
+    let type = clickEvent.name
+    if ('FILTER_FOR_VALUE' === clickEvent.name) {
+      type = 'SELECTED_FACET'
+    }
     dispatch({
-      type: clickEvent.name,
+      type: type,
       label: this.props.label,
       focus: this.props.label,
       facet: {

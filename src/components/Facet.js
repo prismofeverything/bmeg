@@ -177,9 +177,9 @@ export class Facet extends Component {
     // all done with this facet, let's render it
     var icon
     if (this.state.open) {
-      icon = (<ExpandMoreIcon />)
-    } else {
       icon = (<ExpandLessIcon />)
+    } else {
+      icon = (<ExpandMoreIcon />)
     }
 
     const facetItem = (
@@ -196,10 +196,10 @@ export class Facet extends Component {
           <div>
             <Card>
               <CardContent>
+                {chart}
                 {input}
                 {buckets}
                 {other}
-                {chart}
               </CardContent>
             </Card>
           </div>
