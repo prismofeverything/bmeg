@@ -7,7 +7,8 @@ import * as _ from 'underscore'
 import SplitPane from 'react-flex-split-pane';
 import classnames from 'classnames';
 
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
+import { createMuiTheme } from 'material-ui/styles';
 import Button from 'material-ui/Button';
 import { CircularProgress } from 'material-ui/Progress';
 import Card, { CardContent, CardHeader, CardActions } from 'material-ui/Card';
@@ -309,14 +310,14 @@ function mapStateToProps(state, own) {
   }
 }
 
-
-const styleSheet = createStyleSheet(theme => ({
+const theme = createMuiTheme();
+const styles = {
   button: {
     margin: theme.spacing.unit,
   },
   input: {
     display: 'none',
   },
-}));
+};
 
-export default connect(mapStateToProps)(withStyles(styleSheet)(Cohort));
+export default connect(mapStateToProps)(withStyles(styles)(Cohort));

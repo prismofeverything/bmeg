@@ -6,7 +6,8 @@ import * as _ from 'underscore'
 
 
 import classnames from 'classnames';
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
+import { createMuiTheme } from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
 import Card, { CardContent } from 'material-ui/Card';
 import Collapse from 'material-ui/transitions/Collapse';
@@ -227,7 +228,8 @@ function mapStateToProps(state, own) {
   }
 }
 
-const styleSheet = createStyleSheet(theme => ({
+const theme = createMuiTheme();
+const styles = {
   card: {
     maxWidth: 400,
   },
@@ -243,6 +245,6 @@ const styleSheet = createStyleSheet(theme => ({
   flexGrow: {
     flex: '1 1 auto',
   },
-}));
+};
 
-export default connect(mapStateToProps)(withStyles(styleSheet)(Facet));
+export default connect(mapStateToProps)(withStyles(styles)(Facet));
