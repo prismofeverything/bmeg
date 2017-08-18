@@ -33,6 +33,7 @@ class NoCacheStaticFileHandler(tornado.web.StaticFileHandler):
         else:
             super().write_error(status_code, *args, **kwargs)
 
+    # TODO - this should be optional, driven by args
     def set_extra_headers(self, path):
         self.set_header("Cache-control", "no-cache")
 
@@ -41,8 +42,7 @@ class ProxyHandler(tornado.web.RequestHandler):
     def initialize(self, url):
         self.url = url
 
-    @tornado.web.asynchronous
-    @tornado.gen.engine
+    @tornado.gen.coroutine
     def get(self, path=None):
         """ async GET call to BMEG vertex/query """
         url = self.url
@@ -50,15 +50,15 @@ class ProxyHandler(tornado.web.RequestHandler):
             url = url + path
         print "Proxy GET to %s" % url
         http_client = AsyncHTTPClient()
-        response = yield http_client.fetch(url)
+        response = yield http_client.fetch(url, request_timeout=60,
+                                           connect_timeout=60)
         if response.error:
             self.write("Error: %s" % response.error)
         else:
             self.write(response.body)
         self.finish()
 
-    @tornado.web.asynchronous
-    @tornado.gen.engine
+    @tornado.gen.coroutine
     def post(self, path=None):
         """ async POST call to BMEG vertex/query """
         url = self.url
@@ -69,8 +69,9 @@ class ProxyHandler(tornado.web.RequestHandler):
         headers = {'Content-Type': 'application/json',
                    'Accept': 'application/json'}
         http_client = AsyncHTTPClient()
-        response = yield http_client.fetch(url, method="POST", body=payload, request_timeout=60,
-                                           headers=headers)
+        response = yield http_client.fetch(url, method="POST", body=payload,
+                                           request_timeout=60,
+                                           connect_timeout=60, headers=headers)
         if response.error:
             self.write("Error: %s" % response.error)
         else:
@@ -88,6 +89,7 @@ class FacetHandler(tornado.web.RequestHandler):
     @tornado.gen.coroutine
     def get(self, path=None):
         """ async GET call to ES see http://bit.ly/2rWlBeR """
+        print "Proxy GET to %s" % args.elastic_hosts
 
         @tornado.gen.coroutine
         def _get_edges():
@@ -97,7 +99,7 @@ class FacetHandler(tornado.web.RequestHandler):
             # http://www.tornadoweb.org/en/stable/gen.html#utility-functions
             es = Elasticsearch(args.elastic_hosts)
             raise tornado.gen.Return(
-                es.msearch(body=self._edges_aggregation())
+                es.msearch(body=self._edges_aggregation(), request_timeout=60)
             )
 
         @tornado.gen.coroutine
@@ -106,7 +108,7 @@ class FacetHandler(tornado.web.RequestHandler):
             es = Elasticsearch(args.elastic_hosts)
             body = self._aggregation(facets)
             raise tornado.gen.Return(
-                es.msearch(body=body)
+                es.msearch(body=body, request_timeout=60)
             )
 
         @tornado.gen.coroutine
@@ -129,15 +131,21 @@ class FacetHandler(tornado.web.RequestHandler):
                     {"key": "GeneDatabase", "doc_count": 10}]
                 }
             """
-            if "responses" not in edges_response or 'aggregations' not in edges_response['responses'][0]:
-                return None
+            if (
+                "responses" not in edges_response or
+                'aggregations' not in edges_response['responses'][0]
+               ):
+                raise tornado.gen.Return(
+                    None
+                )
             print(edges_response)
             edges = edges_response["responses"][0]['aggregations']['Labels']['buckets']  # NOQA
             edge_names = []
             for edge in edges:
                 edge_names.append(edge['key'])
             raise tornado.gen.Return(
-                ic.get_mapping(index=self.index, doc_type=edge_names)
+                ic.get_mapping(index=self.index,
+                               doc_type=edge_names, request_timeout=60)
             )
 
         def _create_facets(mapping_response):
