@@ -6,7 +6,8 @@ import * as _ from 'underscore'
 
 
 import PropTypes from 'prop-types';
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
+import { createMuiTheme } from 'material-ui/styles';
 import { CircularProgress } from 'material-ui/Progress';
 import ReactJson from 'react-json-view-callback'
 
@@ -137,7 +138,7 @@ export class Table extends Component {
                         {item[property_name]}
                     </TableCell>
                   );
-                })                 
+                })
               )
             }
           </TableRow>
@@ -215,13 +216,15 @@ function mapStateToProps(state, own) {
   }
 }
 
-const styleSheet = createStyleSheet(theme => ({
+
+const theme = createMuiTheme();
+const styles = {
   paper: {
     width: '100%',
     marginTop: theme.spacing.unit * 3,
     overflowX: 'auto',
   },
-}));
+};
 
 
-export default connect(mapStateToProps)(withStyles(styleSheet)(Table));
+export default connect(mapStateToProps)(withStyles(styles)(Table));
