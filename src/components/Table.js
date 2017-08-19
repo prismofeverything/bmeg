@@ -6,7 +6,8 @@ import * as _ from 'underscore'
 
 
 import PropTypes from 'prop-types';
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
+import { createMuiTheme } from 'material-ui/styles';
 import { CircularProgress } from 'material-ui/Progress';
 import ReactJson from 'react-json-view-callback'
 
@@ -39,8 +40,12 @@ export class Table extends Component {
     // of the label/focus, we recreate the key here using the variable passed
     // from the viewer and our state
     const { dispatch } = this.props
+    let type = clickEvent.name
+    if ('FILTER_FOR_VALUE' === clickEvent.name) {
+      type = 'SELECTED_FACET'
+    }
     dispatch({
-      type: clickEvent.name,
+      type: type,
       label: this.props.label,
       focus: this.props.label,
       facet: {
@@ -137,7 +142,7 @@ export class Table extends Component {
                         {item[property_name]}
                     </TableCell>
                   );
-                })                 
+                })
               )
             }
           </TableRow>
@@ -215,13 +220,15 @@ function mapStateToProps(state, own) {
   }
 }
 
-const styleSheet = createStyleSheet(theme => ({
+
+const theme = createMuiTheme();
+const styles = {
   paper: {
     width: '100%',
     marginTop: theme.spacing.unit * 3,
     overflowX: 'auto',
   },
-}));
+};
 
 
-export default connect(mapStateToProps)(withStyles(styleSheet)(Table));
+export default connect(mapStateToProps)(withStyles(styles)(Table));

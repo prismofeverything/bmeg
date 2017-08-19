@@ -7,7 +7,8 @@ import * as _ from 'underscore'
 import SplitPane from 'react-flex-split-pane';
 import classnames from 'classnames';
 
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
+import { createMuiTheme } from 'material-ui/styles';
 import Button from 'material-ui/Button';
 import { CircularProgress } from 'material-ui/Progress';
 import Card, { CardContent, CardHeader, CardActions } from 'material-ui/Card';
@@ -109,7 +110,7 @@ export class Cohort extends Component {
   schemaBreadCrumb() {
     return _.map(this.props.path, function(pathItem,index,list) {
       return(pathItem.label)
-    }).join('/');
+    }).join(' > ');
   }
 
 
@@ -155,6 +156,12 @@ export class Cohort extends Component {
     // render main content, create a ref we can interrogate later
     // see https://facebook.github.io/react/docs/refs-and-the-dom.html
     //
+    var icon
+    if (_self.state.schemaOpen) {
+      icon = (<ExpandLessIcon />)
+    } else {
+      icon = (<ExpandMoreIcon />)
+    }
     const schemaContent = (
       <Card raised>
         <CardActions disableActionSpacing
@@ -163,14 +170,11 @@ export class Cohort extends Component {
           <CardHeader title={_self.schemaBreadCrumb()} />
           <div style={{flex: '1 1 auto'}} />
           <IconButton
-            className={classnames(classes.expand, {
-              [classes.expandOpen]: _self.state.schemaOpen,
-            })}
             onClick={_self.toggleSchema}
             aria-expanded={_self.state.schemaOpen}
             aria-label="Show more"
           >
-            <ExpandMoreIcon />
+            {icon}
           </IconButton>
         </CardActions>
         <Collapse in={_self.state.schemaOpen} transitionDuration="auto" unmountOnExit>
@@ -182,7 +186,7 @@ export class Cohort extends Component {
               <AddCircleOutlineIcon />
               <FolderOpenIcon />
               <SaveIcon />
-              <Dna />
+              <img color="contrast" src="/media/intersection.png" height="45" />
             </div>
           </CardContent>
         </Collapse>
@@ -310,14 +314,14 @@ function mapStateToProps(state, own) {
   }
 }
 
-
-const styleSheet = createStyleSheet(theme => ({
+const theme = createMuiTheme();
+const styles = {
   button: {
     margin: theme.spacing.unit,
   },
   input: {
     display: 'none',
   },
-}));
+};
 
-export default connect(mapStateToProps)(withStyles(styleSheet)(Cohort));
+export default connect(mapStateToProps)(withStyles(styles)(Cohort));

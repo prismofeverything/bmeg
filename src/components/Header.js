@@ -6,7 +6,7 @@ import { push } from 'react-router-redux'
 import Search from './Search'
 
 
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
@@ -93,29 +93,10 @@ export class Header extends Component {
         </Drawer>
       </div>
     );
-
-    // return (
-    //   <header className="mdl-layout__header">
-    //     <div className="mdl-layout__header-row">
-    //       <span className="mdl-layout-title">
-    //     <img src="/media/bmeg.png" height="45" onClick={ () => dispatch(push('/')) }/>
-    //       </span>
-    //       <div className="mdl-layout-spacer"></div>
-    //       <form action="#">
-    //         <div className="mdl-textfield mdl-js-textfield">
-    //           <div id="ophion-search">
-    //             <Search scope={this.props.scope} />
-    //           </div>
-    //         </div>
-    //       </form>
-    //       <div className="mdl-layout-spacer"></div>
-    //     </div>
-    //   </header>
-    // )
   }
 }
 
-const styleSheet = createStyleSheet({
+const styles = {
   root: {
     marginTop: 4,
     width: '100%',
@@ -123,6 +104,6 @@ const styleSheet = createStyleSheet({
   flex: {
     flex: 1,
   },
-});
+};
 
-export default connect() (withStyles(styleSheet) (Header));
+export default connect() (withStyles(styles) (Header));
