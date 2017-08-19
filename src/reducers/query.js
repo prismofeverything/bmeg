@@ -83,19 +83,6 @@ export function currentQuery(state = {name:'test' }, action) {
         }
       }
 
-    // case 'NEW_QUERY':
-    //   console.log('new query!')
-    //   const path = [{label: action.focus, facets: {}}]
-    //   return {
-    //     ...state,
-    //     [action.focus]: {
-    //       ...state[action.focus],
-    //       path: path,
-    //       results: [],
-    //       loading: false,
-    //     }
-    //   }
-
     case 'REFRESH_QUERY':
       const tableSelectedColumns = state[action.focus] && state[action.focus].tableSelectedColumns ? state[action.focus].tableSelectedColumns : {}
       return {
