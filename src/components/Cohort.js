@@ -25,8 +25,7 @@ import SaveIcon from 'material-ui-icons/Save';
 import Heart from 'mui-icons/cmdi/heart';
 import Dna from 'mui-icons/cmdi/Dna';
 
-
-
+import Path from '../query/path'
 import Schema from './Schema'
 import Facet from './Facet'
 import Table from './Table'
@@ -108,11 +107,19 @@ export class Cohort extends Component {
   // take paths and render a breadcrumb
   // TODO - turn into clickable breadcrumb or stepper
   schemaBreadCrumb() {
-    return _.map(this.props.path, function(pathItem,index,list) {
-      return(pathItem.label)
+    const nodes = _.reduce(this.props.path, function(nodes, node) {
+      const index = nodes.indexOf(node.label)
+      if (index > -1) {
+        nodes.splice(index, 1)
+      }
+      nodes.push(node.label)
+      return nodes
+    }, [])
+
+    return _.map(nodes, function(pathItem, index, list) {
+      return(pathItem)
     }).join(' > ');
   }
-
 
   // render all facets
   render() {
@@ -182,12 +189,7 @@ export class Cohort extends Component {
             <Schema width={1000}
                     height={400}
                     offset={this.state.sidebarSize} />
-            <div onClick={() => {alert('// TODO - as use case develops add actions here ( and make it its own component i.e. QueryStore)')}}>
-              <AddCircleOutlineIcon />
-              <FolderOpenIcon />
-              <SaveIcon />
-              <img color="contrast" src="/media/intersection.png" height="45" />
-            </div>
+            <QueryControls focus={this.props.label} />
           </CardContent>
         </Collapse>
       </Card>
@@ -322,6 +324,7 @@ const styles = {
   input: {
     display: 'none',
   },
+  options: {},
 };
 
 export default connect(mapStateToProps)(withStyles(styles)(Cohort));

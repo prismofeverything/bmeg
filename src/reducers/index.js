@@ -4,7 +4,7 @@ import { reducer as formReducer } from 'redux-form';
 import schema from './schema'
 import search from './search'
 import {queries, currentQuery} from './query'
-import path from './path'
+import {focus, path} from './path'
 import FacetReducers from './facets'
 
 // main reducers
@@ -13,6 +13,7 @@ export const reducers = combineReducers({
   form: formReducer,
   schema: schema,
   search: search,
+  focus: focus,
   path: path,
   selectedFacets: FacetReducers.selectedFacets,
   facets: FacetReducers.facets,

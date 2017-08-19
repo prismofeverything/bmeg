@@ -104,6 +104,7 @@ const styles = {
   flex: {
     flex: 1,
   },
+  options: {},
 };
 
 export default connect() (withStyles(styles) (Header));
