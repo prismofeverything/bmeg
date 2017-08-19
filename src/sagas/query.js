@@ -51,6 +51,18 @@ export function* search(action) {
   });
 }
 
+export function* newQuery(action) {
+  const state = yield select();
+  yield put({
+    type: 'REFRESH_QUERY',
+    label: action.focus,
+    focus: action.focus,
+    path: [{label: action.focus, facets: []}],
+    schema: state.schema,
+    selectedFacets: [],
+  })
+}
+
 export function* startup(action) {
   yield put({
     ...action,
