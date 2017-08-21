@@ -23,6 +23,7 @@ export function* pathQuery(action) {
   yield put({
     type: 'QUERY_RESULTS_SAVE',
     path: action.path,
+    query: query,
     focus: action.focus,
     results: results,
     currentQuery: action.currentQuery,

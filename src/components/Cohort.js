@@ -327,4 +327,4 @@ const styles = {
   options: {},
 };
 
-export default connect(mapStateToProps)(withStyles(styles)(Cohort));
+export default connect(mapStateToProps) (withStyles(styles)(Cohort));

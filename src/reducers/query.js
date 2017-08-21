@@ -102,7 +102,7 @@ export function currentQuery(state = {name:'test' }, action) {
       let defaultTableSelectedColumns = {}
       if (action.results && action.results.length > 0) {
         _.each(action.results[0].properties, function(value, key) {
-            this[`${action.focus}.${key}`] = true
+          this[`${action.focus}.${key}`] = true
         }, defaultTableSelectedColumns) ;
       }
       return {
@@ -110,10 +110,11 @@ export function currentQuery(state = {name:'test' }, action) {
         [action.focus]: {
           ...state[action.focus],
           path: action.path,
+          query: action.query,
           focus: action.focus,
           results: action.results,
           tableSelectedColumns: defaultTableSelectedColumns,
-          loading:false
+          loading: false
         }
       }
     default:
