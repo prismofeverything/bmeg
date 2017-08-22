@@ -27,7 +27,7 @@ export class Plot extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      open: false,
+      open: props.open,
     };
     this.toggleOpen = this.toggleOpen.bind(this);
   }
@@ -38,7 +38,7 @@ export class Plot extends Component {
 
 
   componentDidMount() {
-    // this.drawPlot()
+    this.drawPlot()
   }
 
   drawPlot() {
@@ -71,7 +71,7 @@ export class Plot extends Component {
         <CardActions disableActionSpacing
           onClick={_self.toggleOpen}
           >
-          <CardHeader title={'YYY Plot'} />
+          <CardHeader title={'Sample Plot'} />
           <div style={{flex: '1 1 auto'}} />
           <IconButton
             onClick={_self.toggleOpen}
