@@ -64,6 +64,37 @@ export function* newQuery(action) {
   })
 }
 
+export function* saveQuery(action) {
+  const queries = yield call(
+    Path.saveQuery,
+    action.query,
+    // action.user,
+    // action.key,
+    // action.focus,
+    // action.path,
+    // action.query,
+  )
+
+  yield put({
+    type: 'ALL_QUERIES',
+    queries: queries,
+  })
+}
+
+export function* loadQuery(action) {
+  const state = yield select();
+  const query = state.queries[action.focus][action.key]
+  console.log(query)
+}
+
+export function* allQueries(action) {
+  const queries = yield call(Path.allQueries)
+  yield put({
+    type: 'ALL_QUERIES',
+    queries: queries,
+  })
+}
+
 export function* startup(action) {
   yield put({
     ...action,
@@ -72,5 +103,9 @@ export function* startup(action) {
   yield put({
     ...action,
     type: 'FACETS_FETCH',
+  })
+  yield put({
+    ...action,
+    type: 'ALL_QUERIES_FETCH',
   })
 }

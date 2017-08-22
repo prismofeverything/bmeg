@@ -2,19 +2,6 @@ import * as _ from 'underscore'
 
 const defaultFocus = "Gene"
 
-export function focus(state = defaultFocus, action) {
-  switch (action.type) {
-    case 'STEP_ON_PATH':
-      return action.label
-
-    case 'NEW_QUERY':
-      return action.focus
-
-    default:
-      return state
-  }
-}
-
 export function path(state = [], action) {
   switch (action.type) {
     case 'STEP_ON_PATH':
@@ -32,7 +19,10 @@ export function path(state = [], action) {
       return travel
 
     case 'NEW_QUERY':
-      return [{label: action.focus, facets: {}}]
+      return [{
+        label: action.focus,
+        facets: {}
+      }]
 
     default:
       return state

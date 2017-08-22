@@ -16,7 +16,13 @@ import ClearIcon from 'material-ui-icons/Clear'
 import Toolbar from 'material-ui/Toolbar'
 import ToolbarGroup from 'material-ui/Toolbar'
 import ToolbarSeparator from 'material-ui/Toolbar'
-import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
+import List, {
+  ListSubheader,
+  ListItem,
+  ListItemIcon,
+  ListItemText
+} from 'material-ui/List';
+
 import TextField from 'material-ui/TextField';
 import Dialog, { DialogTitle, DialogContent, DialogActions } from 'material-ui/Dialog';
 import Button from 'material-ui/Button';
@@ -50,12 +56,14 @@ export class QueryControls extends Component {
       user: 'other',
       key: this.state.savingValue,
       focus: this.props.focus,
+      path: this.props.path,
       query: this.props.query,
     }
 
+    console.log(query)
     this.setState({saving: false})
+
     dispatch({type: 'SAVE_QUERY', query: query})
-    console.log(this.state.savingValue)
   }
 
   openLoadQuery() {
@@ -66,19 +74,38 @@ export class QueryControls extends Component {
     this.setState({loading: false})
   }
 
-  loadingChange(e) {
-    this.setState({loadingValue: e.target.value})
+  loadingChange(query) {
+    return function(e) {
+      console.log(e)
+      this.setState({loadingValue: e.target.value})
+    }
   }
 
-  loadQuery() {
-    const { dispatch } = this.props
-    console.log('load!')
+  loadQuery(query) {
+    return function(e) {
+      const { dispatch } = this.props
+      console.log('load!', query)
+      dispatch({type: 'LOAD_QUERY', query: query})
+    }
   }
 
   render() {
     const { dispatch } = this.props
     const focus = this.props.focus
     const self = this
+
+    const queriesList = _.map(_.keys(this.props.queries), function(label) {
+      const items = _.map(self.props.queries[label], function(query) {
+        return <ListItem key={query.key} onClick={self.loadQuery(query.key).bind(self)}>{query.key}</ListItem>
+      })
+
+      return (
+        <div key={label}>
+          <ListSubheader key={label}>{label}</ListSubheader>
+          {items}
+        </div>
+      )
+    })
 
     return (
       <div>
@@ -111,7 +138,7 @@ export class QueryControls extends Component {
       <Dialog open={this.state.loading} onRequestClose={this.closeLoadQuery.bind(this)}>
         <DialogTitle>{`Load ${focus} Cohort`}</DialogTitle>
         <DialogContent>
-        <TextField value={this.state.loadingValue} onChange={this.loadingChange.bind(this)} />
+        {queriesList}
         </DialogContent>
         <DialogActions>
           <Button onClick={this.closeLoadQuery.bind(this)}>Cancel</Button>
@@ -136,12 +163,17 @@ const styles = {
 
 function mapStateToProps(state, own) {
   const focus = own.focus
-  const query = state.currentQuery[focus].query
-  console.log(query)
+  var query = state.currentQuery[focus].query
+  query = query ? query.query : query
+  const queries = state.queries
+  console.log('query', query)
+  console.log('queries', queries)
   return {
     focus: focus,
     label: focus,
+    path: state.path,
     query: query,
+    queries: queries,
   }
 }
 export default connect(mapStateToProps) (withStyles(styles) (QueryControls))

@@ -14,6 +14,8 @@ export function query(state = {}, action) {
 
 export function queries(state = {}, action) {
   switch (action.type) {
+    case 'ALL_QUERIES':
+      return action.queries
     default:
       return state
   }
@@ -95,6 +97,11 @@ export function currentQuery(state = {name:'test' }, action) {
           tableSelectedColumns: tableSelectedColumns,
           loading: true
         }
+      }
+
+    case 'LOAD_QUERY':
+      return {
+        [action.query.focus]: action.query.query
       }
 
     case 'QUERY_RESULTS_SAVE':
