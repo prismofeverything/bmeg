@@ -40,6 +40,10 @@ module.exports = {
   },
   devServer: {
     contentBase: __dirname + '/public',
+    proxy: {
+      "/facets": "http://localhost:8080",
+      "/schema": "http://localhost:8080"      
+    }
   },
   plugins: [
     new CleanWebpackPlugin(['css/main.css', 'js/bundle.js'], {
