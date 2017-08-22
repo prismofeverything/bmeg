@@ -30,6 +30,7 @@ import Dna from 'mui-icons/cmdi/Dna';
 import Schema from './Schema'
 import Facet from './Facet'
 import Table from './Table'
+import Plot from './Plot'
 
 import List from 'material-ui/List';
 
@@ -256,6 +257,7 @@ export class Cohort extends Component {
                 </div>
                 <div>
                   {schemaContent}
+                  <Plot />
                   {resultsContent}
                 </div>
           </SplitPane>

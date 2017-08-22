@@ -6,6 +6,7 @@ import search from './search'
 import {queries, currentQuery} from './query'
 import path from './path'
 import FacetReducers from './facets'
+import plot from './plot'
 
 // main reducers
 export const reducers = combineReducers({
@@ -19,4 +20,5 @@ export const reducers = combineReducers({
   currentFacet: FacetReducers.currentFacet,
   queries: queries,
   currentQuery: currentQuery,
+  plot: plot,
 });
