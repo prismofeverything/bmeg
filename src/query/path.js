@@ -160,7 +160,7 @@ function translateQuery(schema, visited, focus, order, orderBy) {
 
     if (!_.isEmpty(subqueries)) {
       query.match(subqueries)
-      query.select('root')
+      query.select('root').dedup()
     }
 
     if (orderBy) {
@@ -173,8 +173,41 @@ function translateQuery(schema, visited, focus, order, orderBy) {
   }
 }
 
+function saveQuery(query) {
+  console.log('saving query', query)
+  return fetch('/query/save', {
+    method: "POST",
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(query)
+  }).then(function(response) {
+    console.log(response)
+    return response.json()
+  }).catch(function(response) {
+    console.log("error saving query", response)
+  })
+}
+
+function allQueries() {
+  return fetch('/query/all', {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    }
+  }).then(function(response) {
+    console.log(response)
+    return response.json()
+  }).catch(function(response) {
+    console.log("error fetching all queries", response)
+  })
+}
+
 const ni = nodesIn
 const tq = translateQuery
+const sq = saveQuery
+const aq = allQueries
 
 export default class Path {
   static nodesIn(schema, path) {
@@ -183,5 +216,13 @@ export default class Path {
 
   static translateQuery(schema, visited, focus, order, orderBy) {
     return tq(schema, visited, focus, order, orderBy)
+  }
+
+  static saveQuery(user, key, focus, query) {
+    return sq(user, key, focus, query)
+  }
+
+  static allQueries() {
+    return aq()
   }
 }
