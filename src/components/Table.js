@@ -59,17 +59,12 @@ export class Table extends Component {
   }
 
   handleRequestSort(property) {
-    //TODO - remove local sort once server returns sorted data
     const orderBy = property;
     let order = 'desc';
     if (this.state.orderBy === property && this.state.order === 'desc') {
       order = 'asc';
     }
-    const data = this.props.data.sort(
-      (a, b) => (order === 'desc' ? b[orderBy] > a[orderBy] : a[orderBy] > b[orderBy]),
-    );
-
-    this.setState({ data:data , order:order , orderBy:orderBy });
+    this.setState({ order:order , orderBy:orderBy });
     const { dispatch } = this.props
     const cq = this.props.currentQuery;
     const focus = this.props.label;
@@ -87,6 +82,10 @@ export class Table extends Component {
     })
 
   };
+
+  getStripedStyle(index) {
+    return { background: index % 2 ? '#fafafa' : 'white' };
+  }
 
 
   // render the table
@@ -116,7 +115,10 @@ export class Table extends Component {
 
       const rows = _.map(_self.props.data, function(item, index, list) {
         return (
-          <TableRow key={item.gid}>
+          <TableRow
+            key={item.gid}
+            style={_self.getStripedStyle(index)}
+            >
             {
               [<TableCell
                 key={`jsonView.${item.gid}`}>
