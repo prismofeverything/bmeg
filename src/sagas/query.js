@@ -1,5 +1,6 @@
 import { call, put, select } from 'redux-saga/effects'
 import { push } from 'react-router-redux'
+import * as _ from 'underscore'
 import OphionSearch from '../query/search.js'
 import Path from '../query/path.js'
 
@@ -19,16 +20,18 @@ export function* pathQuery(action) {
   console.log('path query saga')
   console.log(action.path)
 
-  const query = Path.translateQuery(action.schema, action.path, action.focus, action.order, action.orderBy).limit(10)
-  const results = yield OphionSearch.execute(query)
-  yield put({
-    type: 'QUERY_RESULTS_SAVE',
-    path: action.path,
-    query: query,
-    focus: action.focus,
-    results: results,
-    currentQuery: action.currentQuery,
-  })
+  if (!_.isEmpty(action.path)) {
+    const query = Path.translateQuery(action.schema, action.path, action.focus, action.order, action.orderBy).limit(10)
+    const results = yield OphionSearch.execute(query)
+    yield put({
+      type: 'QUERY_RESULTS_SAVE',
+      path: action.path,
+      query: query,
+      focus: action.focus,
+      results: results,
+      currentQuery: action.currentQuery,
+    })
+  }
 }
 
 export function* search(action) {
