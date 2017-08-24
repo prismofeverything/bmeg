@@ -15,7 +15,7 @@ export function query(state = {}, action) {
 export function queries(state = {}, action) {
   switch (action.type) {
     case 'ALL_QUERIES':
-      return action.queries
+      return action.queries || {}
     default:
       return state
   }
