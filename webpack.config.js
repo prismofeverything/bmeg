@@ -41,6 +41,7 @@ module.exports = {
   devServer: {
     contentBase: __dirname + '/public',
     proxy: {
+      "/query": "http://localhost:8080",
       "/facets": "http://localhost:8080",
       "/schema": "http://localhost:8080",
       "/vertex": "http://localhost:8080"

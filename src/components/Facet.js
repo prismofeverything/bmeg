@@ -265,6 +265,7 @@ const styles = {
   flexGrow: {
     flex: '1 1 auto',
   },
+  options: {},
 };
 
-export default connect(mapStateToProps)(withStyles(styles)(Facet));
+export default connect(mapStateToProps) (withStyles(styles)(Facet));

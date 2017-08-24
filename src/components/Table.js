@@ -222,7 +222,6 @@ function mapStateToProps(state, own) {
   }
 }
 
-
 const theme = createMuiTheme();
 const styles = {
   paper: {
@@ -230,7 +229,7 @@ const styles = {
     marginTop: theme.spacing.unit * 3,
     overflowX: 'auto',
   },
+  options: {},
 };
-
 
 export default connect(mapStateToProps)(withStyles(styles)(Table));

@@ -1,4 +1,6 @@
 import { call, put, select } from 'redux-saga/effects'
+import { push } from 'react-router-redux'
+import * as _ from 'underscore'
 import OphionSearch from '../query/search.js'
 import Path from '../query/path.js'
 
@@ -18,15 +20,18 @@ export function* pathQuery(action) {
   console.log('path query saga')
   console.log(action.path)
 
-  const query = Path.translateQuery(action.schema, action.path, action.focus, action.order, action.orderBy).limit(10)
-  const results = yield OphionSearch.execute(query)
-  yield put({
-    type: 'QUERY_RESULTS_SAVE',
-    path: action.path,
-    focus: action.focus,
-    results: results,
-    currentQuery: action.currentQuery,
-  })
+  if (!_.isEmpty(action.path)) {
+    const query = Path.translateQuery(action.schema, action.path, action.focus, action.order, action.orderBy).limit(10)
+    const results = yield OphionSearch.execute(query)
+    yield put({
+      type: 'QUERY_RESULTS_SAVE',
+      path: action.path,
+      query: query,
+      focus: action.focus,
+      results: results,
+      currentQuery: action.currentQuery,
+    })
+  }
 }
 
 export function* search(action) {
@@ -51,6 +56,58 @@ export function* search(action) {
   });
 }
 
+export function* newQuery(action) {
+  const state = yield select();
+  yield put({
+    type: 'REFRESH_QUERY',
+    label: action.focus,
+    focus: action.focus,
+    path: [{label: action.focus, facets: []}],
+    schema: state.schema,
+    selectedFacets: [],
+  })
+}
+
+export function* saveQuery(action) {
+  const queries = yield call(
+    Path.saveQuery,
+    action.query,
+    // action.user,
+    // action.key,
+    // action.focus,
+    // action.path,
+    // action.query,
+  )
+
+  yield put({
+    type: 'ALL_QUERIES',
+    queries: queries,
+  })
+}
+
+export function* loadQuery(action) {
+  const state = yield select();
+  console.log('load query saga', action.query)
+  yield put(push('/cohort/' + action.query.focus))
+  yield put({type: 'LOAD_QUERY', query: action.query})
+  yield put({
+    type: 'REFRESH_QUERY',
+    label: action.query.focus,
+    focus: action.query.focus,
+    path: action.query.path,
+    schema: state.schema,
+    selectedFacets: [],
+  })
+}
+
+export function* allQueries(action) {
+  const queries = yield call(Path.allQueries)
+  yield put({
+    type: 'ALL_QUERIES',
+    queries: queries,
+  })
+}
+
 export function* startup(action) {
   yield put({
     ...action,
@@ -59,5 +116,9 @@ export function* startup(action) {
   yield put({
     ...action,
     type: 'FACETS_FETCH',
+  })
+  yield put({
+    ...action,
+    type: 'ALL_QUERIES_FETCH',
   })
 }

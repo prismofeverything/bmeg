@@ -72,15 +72,15 @@ export class Header extends Component {
           onClick={this.handleToggle}
         >
           <List className={classes.listFull} disablePadding>
-            <ListItem button>
+            <ListItem button onClick={ () => dispatch({type: 'NEW_QUERY'}) }>
               <ListItemIcon><AddCircleOutlineIcon /></ListItemIcon>
               <ListItemText primary="New" />
             </ListItem>
-            <ListItem button>
+            <ListItem button onClick={ () => dispatch({type: 'OPEN_QUERY'}) }>
               <ListItemIcon><FolderOpenIcon /></ListItemIcon>
               <ListItemText primary="Open" />
             </ListItem>
-            <ListItem button>
+            <ListItem button onClick={ () => dispatch({type: 'SAVE_QUERY'}) }>
               <ListItemIcon><SaveIcon /></ListItemIcon>
               <ListItemText primary="Save" />
             </ListItem>
@@ -104,6 +104,7 @@ const styles = {
   flex: {
     flex: 1,
   },
+  options: {},
 };
 
 export default connect() (withStyles(styles) (Header));

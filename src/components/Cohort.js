@@ -25,12 +25,12 @@ import SaveIcon from 'material-ui-icons/Save';
 import Heart from 'mui-icons/cmdi/heart';
 import Dna from 'mui-icons/cmdi/Dna';
 
-
-
+import Path from '../query/path'
 import Schema from './Schema'
 import Facet from './Facet'
 import Table from './Table'
 import CohortChooser from './CohortChooser'
+import QueryControls from './QueryControls'
 
 import List from 'material-ui/List';
 
@@ -114,11 +114,19 @@ export class Cohort extends Component {
   // take paths and render a breadcrumb
   // TODO - turn into clickable breadcrumb or stepper
   schemaBreadCrumb() {
-    return _.map(this.props.path, function(pathItem,index,list) {
-      return(pathItem.label)
+    const nodes = _.reduce(this.props.path, function(nodes, node) {
+      const index = nodes.indexOf(node.label)
+      if (index > -1) {
+        nodes.splice(index, 1)
+      }
+      nodes.push(node.label)
+      return nodes
+    }, [])
+
+    return _.map(nodes, function(pathItem, index, list) {
+      return(pathItem)
     }).join(' > ');
   }
-
 
   // render all facets
   render() {
@@ -188,12 +196,7 @@ export class Cohort extends Component {
             <Schema width={1000}
                     height={400}
                     offset={this.state.sidebarSize} />
-            <div>
-              <AddCircleOutlineIcon onClick={() => {alert('// TODO - as use case develops add actions here ( and make it its own component i.e. QueryStore)')}} />
-              <FolderOpenIcon onClick={() => {alert('// TODO - as use case develops add actions here ( and make it its own component i.e. QueryStore)')}} />
-              <SaveIcon onClick={() => {alert('// TODO - as use case develops add actions here ( and make it its own component i.e. QueryStore)')}} />
-              <img color="contrast" src="/media/intersection.png" height="45" onClick={_self.toggleCohortChooser}/>
-            </div>
+            <QueryControls focus={this.props.label} toggleChooser={_self.toggleCohortChooser.bind(_self)} />
           </CardContent>
         </Collapse>
       </Card>
@@ -241,6 +244,7 @@ export class Cohort extends Component {
     if (this.state.cohortChooser) {
       cohortChooser = (<CohortChooser />)
     }
+
     return (
       <div>
         <style type="text/css">{`
@@ -333,6 +337,7 @@ const styles = {
   input: {
     display: 'none',
   },
+  options: {},
 };
 
-export default connect(mapStateToProps)(withStyles(styles)(Cohort));
+export default connect(mapStateToProps) (withStyles(styles)(Cohort));
