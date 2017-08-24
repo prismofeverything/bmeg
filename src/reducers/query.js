@@ -99,10 +99,11 @@ export function currentQuery(state = {name:'test' }, action) {
         }
       }
 
-    case 'LOAD_QUERY':
-      return {
-        [action.query.focus]: action.query.query
-      }
+    // case 'LOAD_QUERY':
+    //   console.log('load query reducer', action)
+    //   return {
+    //     [action.query.focus]: action.query
+    //   }
 
     case 'QUERY_RESULTS_SAVE':
       // determine default tableFacets see  TOGGLE_IN_TABLE above

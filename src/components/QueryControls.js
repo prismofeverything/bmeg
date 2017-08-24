@@ -84,8 +84,8 @@ export class QueryControls extends Component {
   loadQuery(query) {
     return function(e) {
       const { dispatch } = this.props
-      console.log('load!', query)
-      dispatch({type: 'LOAD_QUERY', query: query})
+      this.setState({loading: false})
+      dispatch({type: 'TRIGGER_LOAD_QUERY', query: query})
     }
   }
 
@@ -93,10 +93,10 @@ export class QueryControls extends Component {
     const { dispatch } = this.props
     const focus = this.props.focus
     const self = this
-
+    
     const queriesList = _.map(_.keys(this.props.queries), function(label) {
       const items = _.map(self.props.queries[label], function(query) {
-        return <ListItem key={query.key} onClick={self.loadQuery(query.key).bind(self)}>{query.key}</ListItem>
+        return <ListItem key={query.key} onClick={self.loadQuery(query).bind(self)}>{query.key}</ListItem>
       })
 
       return (
@@ -142,7 +142,7 @@ export class QueryControls extends Component {
         </DialogContent>
         <DialogActions>
           <Button onClick={this.closeLoadQuery.bind(this)}>Cancel</Button>
-          <Button onClick={this.loadQuery.bind(this)}>Load Cohort</Button>
+          <Button onClick={this.loadQuery(focus).bind(this)}>Load Cohort</Button>
         </DialogActions>
       </Dialog>
       </div>

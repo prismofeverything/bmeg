@@ -16,6 +16,7 @@ import { facetSearch } from './query'
 import { pathQuery } from './query'
 import { newQuery } from './query'
 import { saveQuery } from './query'
+import { loadQuery } from './query'
 import { allQueries } from './query'
 
 export function* sagas() {
@@ -32,6 +33,7 @@ export function* sagas() {
     fork(takeLatest, 'STARTUP', startup),
     fork(takeLatest, 'NEW_QUERY', newQuery),
     fork(takeLatest, 'SAVE_QUERY', saveQuery),
+    fork(takeLatest, 'TRIGGER_LOAD_QUERY', loadQuery),
     fork(takeLatest, 'ALL_QUERIES_FETCH', allQueries),
   ];
 }

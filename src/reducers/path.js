@@ -24,6 +24,10 @@ export function path(state = [], action) {
         facets: {}
       }]
 
+    case 'LOAD_QUERY':
+      console.log('load query reducer', action)
+      return action.query.path
+
     default:
       return state
   }

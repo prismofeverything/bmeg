@@ -1,4 +1,5 @@
 import { call, put, select } from 'redux-saga/effects'
+import { push } from 'react-router-redux'
 import OphionSearch from '../query/search.js'
 import Path from '../query/path.js'
 
@@ -83,8 +84,17 @@ export function* saveQuery(action) {
 
 export function* loadQuery(action) {
   const state = yield select();
-  const query = state.queries[action.focus][action.key]
-  console.log(query)
+  console.log('load query saga', action.query)
+  yield put(push('/cohort/' + action.query.focus))
+  yield put({type: 'LOAD_QUERY', query: action.query})
+  yield put({
+    type: 'REFRESH_QUERY',
+    label: action.query.focus,
+    focus: action.query.focus,
+    path: action.query.path,
+    schema: state.schema,
+    selectedFacets: [],
+  })
 }
 
 export function* allQueries(action) {
