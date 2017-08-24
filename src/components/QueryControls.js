@@ -142,7 +142,6 @@ export class QueryControls extends Component {
         </DialogContent>
         <DialogActions>
           <Button onClick={this.closeLoadQuery.bind(this)}>Cancel</Button>
-          <Button onClick={this.loadQuery(focus).bind(this)}>Load Cohort</Button>
         </DialogActions>
       </Dialog>
       </div>
@@ -193,3 +192,4 @@ export default connect(mapStateToProps) (withStyles(styles) (QueryControls))
 
 
           // <ListItem button onClick={() => dispatch({type: 'NAVIGATE_COMPARE', focus: focus})}>
+          // <Button onClick={this.loadQuery(focus).bind(this)}>Load Cohort</Button>
