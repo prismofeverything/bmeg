@@ -196,7 +196,7 @@ export class Cohort extends Component {
             <Schema width={1000}
                     height={400}
                     offset={this.state.sidebarSize} />
-            <QueryControls focus={this.props.label} toggleChoser={_self.toggleCohortChooser.bind(_self)} />
+            <QueryControls focus={this.props.label} toggleChooser={_self.toggleCohortChooser.bind(_self)} />
           </CardContent>
         </Collapse>
       </Card>
