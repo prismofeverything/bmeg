@@ -30,6 +30,7 @@ import Dna from 'mui-icons/cmdi/Dna';
 import Schema from './Schema'
 import Facet from './Facet'
 import Table from './Table'
+import CohortChooser from './CohortChooser'
 
 import List from 'material-ui/List';
 
@@ -44,6 +45,7 @@ export class Cohort extends Component {
                    sideBarOpen: true,
                    schemaOpen: true,
                    isSidebarResizing: false,
+                   cohortChooser: false,
                    isMainResizing: false  };
     //TODO - we shouldn't need to do these bindings
     // `() =>` syntax should remove the need for it
@@ -52,6 +54,7 @@ export class Cohort extends Component {
     this.onSidebarResizeEnd = this.onSidebarResizeEnd.bind(this)
     this.onSidebarChange = this.onSidebarChange.bind(this)
     this.toggleSchema = this.toggleSchema.bind(this)
+    this.toggleCohortChooser = this.toggleCohortChooser.bind(this)
     this.schemaBreadCrumb = this.schemaBreadCrumb.bind(this)
     if (this.props.label && _.isEmpty(this.props.path)) {
       this.props.dispatch({
@@ -91,6 +94,10 @@ export class Cohort extends Component {
         }
       }
     );
+  }
+
+  toggleCohortChooser() {
+    this.setState({cohortChooser: !this.state.cohortChooser})
   }
 
   // when user resizes splitters
@@ -181,11 +188,11 @@ export class Cohort extends Component {
             <Schema width={1000}
                     height={400}
                     offset={this.state.sidebarSize} />
-            <div onClick={() => {alert('// TODO - as use case develops add actions here ( and make it its own component i.e. QueryStore)')}}>
-              <AddCircleOutlineIcon />
-              <FolderOpenIcon />
-              <SaveIcon />
-              <img color="contrast" src="/media/intersection.png" height="45" />
+            <div>
+              <AddCircleOutlineIcon onClick={() => {alert('// TODO - as use case develops add actions here ( and make it its own component i.e. QueryStore)')}} />
+              <FolderOpenIcon onClick={() => {alert('// TODO - as use case develops add actions here ( and make it its own component i.e. QueryStore)')}} />
+              <SaveIcon onClick={() => {alert('// TODO - as use case develops add actions here ( and make it its own component i.e. QueryStore)')}} />
+              <img color="contrast" src="/media/intersection.png" height="45" onClick={_self.toggleCohortChooser}/>
             </div>
           </CardContent>
         </Collapse>
@@ -230,6 +237,10 @@ export class Cohort extends Component {
         sidebarContent = null
     }
 
+    var cohortChooser
+    if (this.state.cohortChooser) {
+      cohortChooser = (<CohortChooser />)
+    }
     return (
       <div>
         <style type="text/css">{`
@@ -256,6 +267,7 @@ export class Cohort extends Component {
                 </div>
                 <div>
                   {schemaContent}
+                  {cohortChooser}
                   {resultsContent}
                 </div>
           </SplitPane>

@@ -38,6 +38,9 @@ export class Facet extends Component {
 
   // when user (un)selects a value
   onFacetValuesSelected(key, values) {
+    if (!values) {
+      return
+    }
     const { dispatch } = this.props
     const type = this.props.facet.type;
     const property = key.split('.')[1]
@@ -82,7 +85,7 @@ export class Facet extends Component {
             <li key={bucket.key}
               onClick={ () => {
                   if (bucket.doc_count) {
-                    _self.onFacetValuesSelected(key, bucket.key)
+                    _self.setState({textInput: bucket.key })
                   } else {
                     _self.setState({numericInput:  bucket.value })
                   }
@@ -117,9 +120,9 @@ export class Facet extends Component {
              label="Value"
              helperText="Numeric"
              autoFocus
+             value={_self.state.numericInput || '' }
              className={classes.input}
              onChange={ (event) => {   _self.setState({numericInput:  event.target.value}) } }
-             value={_self.state.numericInput}
              onBlur = { (event) => { _self.onFacetValuesSelected(key, event.target.value) } }
              inputProps={{
                'aria-label': 'Description',
@@ -146,6 +149,24 @@ export class Facet extends Component {
           </VictoryChart>
         )
       } else if (value_accessor === 'doc_count') {
+
+        input = (
+          <TextField
+             margin="dense"
+             placeholder="ABC..."
+             label="Value"
+             helperText="Text"
+             autoFocus
+             value={_self.state.textInput || '' }
+             className={classes.input}
+             onChange={ (event) => {   _self.setState({textInput:  event.target.value}) } }
+             onBlur = { (event) => { _self.onFacetValuesSelected(key, event.target.value) } }
+             inputProps={{
+               'aria-label': 'Description',
+             }}
+           />
+        ) ;
+
         // terms aggregation
         chart = (
           <VictoryPie data={facet.buckets}
@@ -156,8 +177,7 @@ export class Facet extends Component {
                         target: "data",
                         eventHandlers: {
                           onClick: (evt, clickedProps) => {
-                            _self.onFacetValuesSelected(key,
-                              clickedProps.datum.x);
+                            _self.setState({textInput: clickedProps.datum.x })
                             },
                         }
                       }]}
