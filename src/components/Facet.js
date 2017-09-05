@@ -86,8 +86,10 @@ export class Facet extends Component {
               onClick={ () => {
                   if (bucket.doc_count) {
                     _self.setState({textInput: bucket.key })
+                    _self.onFacetValuesSelected(key, bucket.key)
                   } else {
                     _self.setState({numericInput:  bucket.value })
+                    _self.onFacetValuesSelected(key, bucket.value)
                   }
                 }
               }
