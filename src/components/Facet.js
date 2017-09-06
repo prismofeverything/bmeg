@@ -33,12 +33,12 @@ export class Facet extends Component {
       open: false,
     };
     this.toggleOpen = this.toggleOpen.bind(this)
-    this.onFacetValuesSelected = this.onFacetValuesSelected.bind(this)
+    this.onFacetValueSelected = this.onFacetValueSelected.bind(this)
   }
 
   // when user (un)selects a value
-  onFacetValuesSelected(key, values) {
-    if (!values) {
+  onFacetValueSelected(key, value) {
+    if (!value) {
       return
     }
     const { dispatch } = this.props
@@ -50,7 +50,7 @@ export class Facet extends Component {
         label: this.props.label,
         key: key,
         property: property,
-        values: values,
+        value: value,
         type: type,
       }
     })
@@ -86,10 +86,10 @@ export class Facet extends Component {
               onClick={ () => {
                   if (bucket.doc_count) {
                     _self.setState({textInput: bucket.key })
-                    _self.onFacetValuesSelected(key, bucket.key)
+                    _self.onFacetValueSelected(key, bucket.key)
                   } else {
                     _self.setState({numericInput:  bucket.value })
-                    _self.onFacetValuesSelected(key, bucket.value)
+                    _self.onFacetValueSelected(key, bucket.value)
                   }
                 }
               }
@@ -125,7 +125,7 @@ export class Facet extends Component {
              value={_self.state.numericInput || '' }
              className={classes.input}
              onChange={ (event) => {   _self.setState({numericInput:  event.target.value}) } }
-             onBlur = { (event) => { _self.onFacetValuesSelected(key, event.target.value) } }
+             onBlur = { (event) => { _self.onFacetValueSelected(key, event.target.value) } }
              inputProps={{
                'aria-label': 'Description',
              }}
@@ -162,7 +162,7 @@ export class Facet extends Component {
              value={_self.state.textInput || '' }
              className={classes.input}
              onChange={ (event) => {   _self.setState({textInput:  event.target.value}) } }
-             onBlur = { (event) => { _self.onFacetValuesSelected(key, event.target.value) } }
+             onBlur = { (event) => { _self.onFacetValueSelected(key, event.target.value) } }
              inputProps={{
                'aria-label': 'Description',
              }}
@@ -236,8 +236,8 @@ export class Facet extends Component {
 function mapStateToProps(state, own) {
   // are any of the selected facets me?
   const selectedFacets =
-    _.filter(state.selectedFacets, function(currentFacet) {
-      return currentFacet.key && currentFacet.key.startsWith(`${own.property}`);
+    _.filter(state.selectedFacets, function(facet) {
+      return facet.key && facet.key.startsWith(`${own.property}`);
     });
   // our state
   var selectedFacet;

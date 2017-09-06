@@ -17,15 +17,15 @@ export function* aggregateFacets(action) {
   const queryString = action.selectedFacets.map(function(selectedFacet){
     const property_name = selectedFacet.key.split('.')[1]
     if (selectedFacet.type === 'text') {
-      return `${property_name}:"${selectedFacet.values}"`;
+      return `${property_name}:"${selectedFacet.value}"`;
     }
-    return `${property_name}:${selectedFacet.values}`;
+    return `${property_name}:${selectedFacet.value}`;
   }).join(" AND ");
 
-  const aggregatedFacets = yield call(Facets.aggregateFacets, queryString);
+  const facets = yield call(Facets.aggregateFacets, queryString);
   // console.log('aggregatedFacets',aggregatedFacets);
   yield put({
-    type: 'AGGREGATED_FACETS_SAVE',
-    facets: aggregatedFacets,
+    type: 'FACETS_SAVE',
+    facets: facets,
   })
 }

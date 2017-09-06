@@ -22,7 +22,7 @@ export default class FacetReducers {
         );
 
         // unselect if existingFacet with same value
-        const unselect = existingFacet && (existingFacet.values === action.facet.values);
+        const unselect = existingFacet && (existingFacet.value === action.facet.value);
 
         // doesn't exist: add it
         if (!existingFacet) {
@@ -50,13 +50,11 @@ export default class FacetReducers {
   static facets(state = {}, action) {
     switch (action.type) {
       case 'REFRESH_QUERY':
-        return {...state, loading:true};
+        return {...state, loading: true};
       case 'FACETS_FETCH':
-        return {...state, loading:true};
-      case 'AGGREGATED_FACETS_SAVE':
-        return {...state, ...action.facets.facets, loading:false};
+        return {...state, loading: true};
       case 'FACETS_SAVE':
-        return {...state, ...action.facets.facets, loading:false}
+        return {...state, ...action.facets.facets, loading: false};
       default:
         return state
     }

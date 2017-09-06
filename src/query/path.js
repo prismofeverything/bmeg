@@ -24,7 +24,7 @@ function nodesIn(schema, path) {
 
 function applyFacets(query, facets) {
   return _.reduce(_.keys(facets), function(query, key) {
-    return query.has(facets[key].property, facets[key].values)
+    return query.has(facets[key].property, facets[key].value)
   }, query) || query
 }
 

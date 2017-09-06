@@ -51,7 +51,7 @@ export class Table extends Component {
       facet: {
         key: `${this.props.label}.${clickEvent.variable.name}`,
         property: clickEvent.variable.name,
-        values: clickEvent.variable.value,
+        value: clickEvent.variable.value,
         type: clickEvent.variable.type,
       }
     })

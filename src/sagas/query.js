@@ -119,6 +119,6 @@ export function* startup(action) {
   })
   yield put({
     ...action,
-    type: 'ALL_QUERIES_FETCH',
+    type: 'QUERIES_FETCH',
   })
 }

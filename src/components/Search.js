@@ -131,9 +131,9 @@ export class Search extends Component {
          }
          const type = props.facets[props.currentFacet.key].type;
          if (type === 'text') {
-           return `${props.currentFacet.key}:"${props.currentFacet.values}"`;
+           return `${props.currentFacet.key}:"${props.currentFacet.value}"`;
          }
-         return `${props.currentFacet.key}:${props.currentFacet.values}`;
+         return `${props.currentFacet.key}:${props.currentFacet.value}`;
      }
 
      // check that a real update happened
@@ -202,13 +202,14 @@ export class Search extends Component {
 }
 
 function mapStateToProps(state, own) {
-  return { search: state.search,
-           facets: state.facets,
-           selectedFacets: state.selectedFacets,
-           currentFacet: state.currentFacet,
-           schema: state.schema,
-           path: state.path,
-           currentQuery: state.currentQuery,
-         };
+  return {
+    search: state.search,
+    facets: state.facets,
+    selectedFacets: state.selectedFacets,
+    currentFacet: state.currentFacet,
+    schema: state.schema,
+    path: state.path,
+    currentQuery: state.currentQuery,
+  };
 }
 export default connect(mapStateToProps) (Search);

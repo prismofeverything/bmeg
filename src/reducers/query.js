@@ -1,12 +1,20 @@
 import * as _ from 'underscore'
 
 export function query(state = {}, action) {
-  const label = action.focus
+  const label = action.label || action.focus
   switch (action.type) {
+    case 'STEP_ON_PATH':
+      if (!state[label]) {
+        return {...state, [label]: {...state[label], state: 'stepped'}}      
+      } else {
+        return state
+      }
+    case 'SELECTED_FACET':
+    
     case 'QUERY_RESULTS_SAVE':
-      return {...state, [label]: {path: action.path, focus: action.focus, results: action.results, loading:false}}
+      return {...state, [label]: {path: action.path, focus: label, results: action.results, loading: false}}
     case 'REFRESH_QUERY':
-      return {...state, [label]: {loading:true} }
+      return {...state, [label]: {loading: true} }
     default:
       return state
   }

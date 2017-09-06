@@ -309,8 +309,8 @@ function mapStateToProps(state, own) {
 
   // are any of the selected facets ours?
   const selectedFacets =
-    _.filter(state.selectedFacets, function(currentFacet) {
-      return currentFacet.key && currentFacet.key.startsWith(`${own.params.label}.`);
+    _.filter(state.selectedFacets, function(facet) {
+      return facet.key && facet.key.startsWith(`${own.params.label}.`);
     });
 
   // are facets loading?

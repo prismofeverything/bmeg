@@ -21,19 +21,19 @@ import { allQueries } from './query'
 
 export function* sagas() {
   yield [
-    fork(takeLatest, 'SEARCH_ALL_SUBMIT', searchAll),
+    fork(takeLatest, 'STARTUP', startup),
     fork(takeLatest, 'SCHEMA_FETCH', fetchSchema),
-    fork(takeLatest, 'SCHEMA_TAP_VERTEX', navigateCohort),
-    fork(takeLatest, 'REFRESH_QUERY', pathQuery),
+    fork(takeLatest, 'FACETS_FETCH', fetchFacets),
+    fork(takeLatest, 'QUERIES_FETCH', allQueries),
     fork(takeLatest, 'VERTEX_FETCH', fetchVertex),
     fork(takeLatest, 'EDGE_FETCH', fetchEdge),
-    fork(takeLatest, 'FACETS_FETCH', fetchFacets),
+    fork(takeLatest, 'SCHEMA_TAP_VERTEX', navigateCohort),
+    fork(takeLatest, 'REFRESH_QUERY', pathQuery),
     fork(takeLatest, 'REFRESH_QUERY', aggregateFacets),
     fork(takeLatest, 'SEARCH', search),
-    fork(takeLatest, 'STARTUP', startup),
+    fork(takeLatest, 'SEARCH_ALL_SUBMIT', searchAll),
     fork(takeLatest, 'NEW_QUERY', newQuery),
     fork(takeLatest, 'SAVE_QUERY', saveQuery),
     fork(takeLatest, 'TRIGGER_LOAD_QUERY', loadQuery),
-    fork(takeLatest, 'ALL_QUERIES_FETCH', allQueries),
   ];
 }
