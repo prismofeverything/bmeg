@@ -1,20 +1,34 @@
 import * as _ from 'underscore'
+import Query from '../query/query'
 
 export function query(state = {}, action) {
-  const label = action.label || action.focus
   switch (action.type) {
     case 'STEP_ON_PATH':
-      if (!state[label]) {
-        return {...state, [label]: {...state[label], state: 'stepped'}}      
+      if (!state[action.label]) {
+        return {
+          ...state,
+          [action.label]: {
+            ...state[action.label],
+            state: 'stepped',
+            facets: {},
+          }
+        }
       } else {
         return state
       }
     case 'SELECTED_FACET':
-    
+      return {
+        ...state,
+        [action.label]: {
+          ...state[action.label],
+          facets: {
+            ...state[action.label].facets,
+            [action.property]: action.value,
+          }}}
     case 'QUERY_RESULTS_SAVE':
-      return {...state, [label]: {path: action.path, focus: label, results: action.results, loading: false}}
+      return {...state, [action.focus]: {path: action.path, focus: label, results: action.results, loading: false}}
     case 'REFRESH_QUERY':
-      return {...state, [label]: {loading: true} }
+      return {...state, [action.focus]: {loading: true} }
     default:
       return state
   }
