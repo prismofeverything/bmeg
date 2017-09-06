@@ -8,10 +8,13 @@ import * as _ from 'underscore'
 import { withStyles } from 'material-ui/styles';
 import { createMuiTheme } from 'material-ui/styles';
 
-import AddCircleIcon from 'material-ui-icons/AddCircle'
+import AddCircleOutlineIcon from 'material-ui-icons/AddCircleOutline';
+import FolderOpenIcon from 'material-ui-icons/FolderOpen';
+import SaveIcon from 'material-ui-icons/Save';
 import FileDownloadIcon from 'material-ui-icons/FileDownload'
 import PublishIcon from 'material-ui-icons/Publish'
 import ClearIcon from 'material-ui-icons/Clear'
+import Collapse from 'material-ui/transitions/Collapse';
 
 import Toolbar from 'material-ui/Toolbar'
 import ToolbarGroup from 'material-ui/Toolbar'
@@ -26,6 +29,11 @@ import List, {
 import TextField from 'material-ui/TextField';
 import Dialog, { DialogTitle, DialogContent, DialogActions } from 'material-ui/Dialog';
 import Button from 'material-ui/Button';
+import ReactTooltip from 'react-tooltip'
+
+import ExpandLess from 'material-ui-icons/ExpandLess';
+import ExpandMore from 'material-ui-icons/ExpandMore';
+import DatabaseIcon from 'mui-icons/fontawesome/database';
 
 export class QueryControls extends Component {
   constructor(props) {
@@ -35,6 +43,7 @@ export class QueryControls extends Component {
       savingValue: '',
       loading: false,
       loadingValue: '',
+      loadingSubmenuOpen: {}
     }
   }
 
@@ -89,21 +98,49 @@ export class QueryControls extends Component {
     }
   }
 
+  loadingOpenChange(label) {
+    return function(e) {
+      console.log(e)
+      let newLoadingSubmenuOpen = Object.assign({}, this.state.loadingSubmenuOpen);
+      newLoadingSubmenuOpen[label] = !newLoadingSubmenuOpen[label];
+      this.setState({loadingSubmenuOpen: newLoadingSubmenuOpen})
+    }
+  }
+
   render() {
     const { dispatch } = this.props
     const focus = this.props.focus
     const self = this
-    
+
     const queriesList = _.map(_.keys(this.props.queries), function(label) {
       const items = _.map(self.props.queries[label], function(query) {
-        return <ListItem key={query.key} onClick={self.loadQuery(query).bind(self)}>{query.key}</ListItem>
+        return (
+          <ListItem key={query.key}
+                    onClick={self.loadQuery(query).bind(self)}>
+            <ListItemIcon>
+               <DatabaseIcon/>
+            </ListItemIcon>
+            {query.key}
+          </ListItem>)
       })
 
       return (
-        <div key={label}>
-          <ListSubheader key={label}>{label}</ListSubheader>
-          {items}
-        </div>
+        <List key={label}
+              subheader={
+                <ListSubheader>
+                  <ListItemIcon>
+                     <FolderOpenIcon/>
+                  </ListItemIcon>
+                  {label}
+                  {self.state.loadingSubmenuOpen[label] ? <ExpandLess />: <ExpandMore /> }
+                </ListSubheader>
+              }
+              onClick={self.loadingOpenChange(label).bind(self)}
+              >
+          <Collapse in={self.state.loadingSubmenuOpen[label]} transitionDuration="auto" unmountOnExit>
+            {items}
+          </Collapse>
+        </List>
       )
     })
 
@@ -111,19 +148,40 @@ export class QueryControls extends Component {
       <div>
       <Toolbar id="query-controls" className="query-controls">
         <ToolbarGroup>
-          <ListItem button onClick={() => dispatch({type: 'NEW_QUERY', focus: focus})}>
-            <ListItemIcon><ClearIcon /></ListItemIcon>
+          <ListItem button
+                    onClick={() => dispatch({type: 'NEW_QUERY', focus: focus})}
+                    data-tip data-for='NEW_QUERY'>
+            <ListItemIcon><AddCircleOutlineIcon /></ListItemIcon>
           </ListItem>
-          <ListItem button onClick={this.openSaveQuery.bind(this)}>
-            <ListItemIcon><PublishIcon /></ListItemIcon>
+          <ListItem button
+                    onClick={this.openLoadQuery.bind(this)}
+                    data-tip data-for='LOAD_QUERY'>
+            <ListItemIcon><FolderOpenIcon /></ListItemIcon>
           </ListItem>
-          <ListItem button onClick={this.openLoadQuery.bind(this)}>
-            <ListItemIcon><FileDownloadIcon /></ListItemIcon>
+          <ListItem button
+                    onClick={this.openSaveQuery.bind(this)}
+                    data-tip data-for='SAVE_QUERY'>
+            <ListItemIcon><SaveIcon /></ListItemIcon>
           </ListItem>
-          <ListItem button onClick={this.props.toggleChooser}>
+          <ListItem button
+                    onClick={this.props.toggleChooser}
+                    data-tip data-for='INTERSECTON'>
             <ListItemIcon><img color="contrast" src="/media/intersection.png" height="45" /></ListItemIcon>
           </ListItem>
         </ToolbarGroup>
+        <ReactTooltip id='NEW_QUERY' type="info">
+          <span>Create a new query</span>
+        </ReactTooltip>
+        <ReactTooltip id='SAVE_QUERY' type="info">
+          <span>Save the current query</span>
+        </ReactTooltip>
+        <ReactTooltip id='LOAD_QUERY' type="info">
+          <span>Open a saved query</span>
+        </ReactTooltip>
+        <ReactTooltip id='INTERSECTON' type="info">
+          <span>Intersection of two saved queries</span>
+        </ReactTooltip>
+
       </Toolbar>
       <Dialog open={this.state.saving} onRequestClose={this.closeSaveQuery.bind(this)}>
         <DialogTitle>{`Save ${focus} Cohort`}</DialogTitle>
@@ -136,7 +194,7 @@ export class QueryControls extends Component {
         </DialogActions>
       </Dialog>
       <Dialog open={this.state.loading} onRequestClose={this.closeLoadQuery.bind(this)}>
-        <DialogTitle>{`Load ${focus} Cohort`}</DialogTitle>
+        <DialogTitle>{`Load Query`}</DialogTitle>
         <DialogContent>
         {queriesList}
         </DialogContent>
