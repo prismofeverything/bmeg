@@ -242,7 +242,7 @@ export class Cohort extends Component {
 
     var cohortChooser
     if (this.state.cohortChooser) {
-      cohortChooser = (<CohortChooser />)
+      cohortChooser = (<CohortChooser label={this.props.label} />)
     }
 
     return (

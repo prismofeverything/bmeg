@@ -234,20 +234,3 @@ function mapStateToProps(state, own) {
   }
 }
 export default connect(mapStateToProps) (withStyles(styles) (QueryControls))
-            //   <FolderOpenIcon />
-            //   <SaveIcon />
-            //   <img color="contrast" src="/media/intersection.png" height="45" />
- // ({type: 'SAVE_QUERY', focus: focus})}>
-        //<TextField hintText="cohort name" />
-// <<<<<<< HEAD
-//             <div>
-//               <AddCircleOutlineIcon onClick={() => {alert('// TODO - as use case develops add actions here ( and make it its own component i.e. QueryStore)')}} />
-//               <FolderOpenIcon onClick={() => {alert('// TODO - as use case develops add actions here ( and make it its own component i.e. QueryStore)')}} />
-//               <SaveIcon onClick={() => {alert('// TODO - as use case develops add actions here ( and make it its own component i.e. QueryStore)')}} />
-//               <img color="contrast" src="/media/intersection.png" height="45" onClick={_self.toggleCohortChooser}/>
-//             </div>
-// =======
-
-
-          // <ListItem button onClick={() => dispatch({type: 'NAVIGATE_COMPARE', focus: focus})}>
-          // <Button onClick={this.loadQuery(focus).bind(this)}>Load Cohort</Button>
