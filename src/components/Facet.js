@@ -21,7 +21,12 @@ import ListItemSecondaryAction from 'material-ui/List/ListItemSecondaryAction';
 import TextField from 'material-ui/TextField';
 
 
-import { VictoryPie,VictoryChart,VictoryBar,Bar } from 'victory';
+import {
+  VictoryPie,
+  VictoryChart,
+  VictoryBar,
+  Bar
+} from 'victory';
 
 // a `cohort` is a selection from a type/domain/label based on selected criteria
 export class Facet extends Component {
@@ -45,7 +50,7 @@ export class Facet extends Component {
     const type = this.props.facet.type;
     const property = key.split('.')[1]
     dispatch({
-      type: 'SELECTED_FACET',
+      type: 'SELECT_FACET',
       facet: {
         label: this.props.label,
         key: key,
