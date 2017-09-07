@@ -13,6 +13,7 @@ import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
 
 import Plot from './Plot'
+import Venn from './Venn'
 import QueryMenu from './QueryMenu'
 
 class CohortChooser extends Component {
@@ -96,7 +97,8 @@ class CohortChooser extends Component {
       options={options}
       chooseQuery={(query) => self.chooseQuery('b', query)}
         />
-          </div>
+        <Venn comparison={this.props.comparison} />
+      </div>
         </Paper>
         {plot}
       </div>
@@ -127,6 +129,7 @@ CohortChooser.propTypes = {
 
 function mapStateToProps(state, own) {
   return {
+    comparison: state.comparison,
     queries: state.queries,
   }
 }
