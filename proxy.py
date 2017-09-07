@@ -324,6 +324,8 @@ if __name__ == "__main__":
             dict(url="%s/query/save" % args.main)),
         (r"^/query/all", ProxyHandler,
             dict(url="%s/query/all" % args.main)),
+        (r"^/query/compare", ProxyHandler,
+            dict(url="%s/query/compare" % args.main)),
         (r"^/schema/protograph", ProxyHandler,
             dict(url="%s/schema/protograph" % args.main)),
         (r"^/vertex/find/(.*)", ProxyHandler,

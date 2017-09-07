@@ -1,8 +1,9 @@
 import { call, put, select } from 'redux-saga/effects'
 import { push } from 'react-router-redux'
 import * as _ from 'underscore'
-import OphionSearch from '../query/search.js'
-import Path from '../query/path.js'
+import OphionSearch from '../query/search'
+import Path from '../query/path'
+import Query from '../query/query'
 
 export function* searchAll(action) {
   const results = yield call(OphionSearch.search, action.scope, action.search)
@@ -69,18 +70,17 @@ export function* newQuery(action) {
 }
 
 export function* saveQuery(action) {
+  const query = action.query.query
   const queries = yield call(
     Path.saveQuery,
-    action.query,
-    // action.user,
-    // action.key,
-    // action.focus,
-    // action.path,
-    // action.query,
+    {
+      ...action.query,
+      query: query.slice(0, query.length - 1)
+    },
   )
 
   yield put({
-    type: 'ALL_QUERIES',
+    type: 'ALL_QUERIES_SAVE',
     queries: queries,
   })
 }
@@ -89,7 +89,7 @@ export function* loadQuery(action) {
   const state = yield select();
   console.log('load query saga', action.query)
   yield put(push('/cohort/' + action.query.focus))
-  yield put({type: 'LOAD_QUERY', query: action.query})
+  // yield put({type: 'LOAD_QUERY_SAVE', query: action.query})
   yield put({
     type: 'REFRESH_QUERY',
     label: action.query.focus,
@@ -103,8 +103,17 @@ export function* loadQuery(action) {
 export function* allQueries(action) {
   const queries = yield call(Path.allQueries)
   yield put({
-    type: 'ALL_QUERIES',
+    type: 'ALL_QUERIES_SAVE',
     queries: queries,
+  })
+}
+
+export function* queryComparison(action) {
+  const comparison = yield Query.queryComparison(action.queries)
+  console.log('COMPARISON', comparison)
+  yield put({
+    type: 'QUERY_COMPARISON_SAVE',
+    comparison: comparison,
   })
 }
 

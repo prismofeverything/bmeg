@@ -42,7 +42,7 @@ export class Table extends Component {
     const { dispatch } = this.props
     let type = clickEvent.name
     if ('FILTER_FOR_VALUE' === clickEvent.name) {
-      type = 'SELECTED_FACET'
+      type = 'SELECT_FACET'
     }
     dispatch({
       type: type,
@@ -194,12 +194,17 @@ function mapStateToProps(state, own) {
   }
 
 
+  console.log('FIRST FACET', _.keys(state.facets))
+  console.log(own.label)
+  console.log(currentQuery[own.label])
+
   // our facets
   const facets =
     _.pick(state.facets, function(value, key, object) {
       return key && key.startsWith(`${own.label}.`);
   });
 
+  console.log(_.keys(facets))
 
   // facets to display in table
   const tableFacets =
