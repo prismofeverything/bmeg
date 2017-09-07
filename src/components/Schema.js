@@ -17,21 +17,25 @@ function schemaToCytoscape(schema, path) {
 
     var nodes = Object.keys(schema['vertexes']).map(function(key) {
       var vertex = schema['vertexes'][key]
-      return {data:
-              {id: vertex.gid,
-               name: vertex.label,
-               active: !_.isEmpty(steps[vertex.label]),
-               focus: vertex.label === focus,
-              }
-             }
+      return {
+        data: {
+          id: vertex.gid,
+          name: vertex.label,
+          active: !_.isEmpty(steps[vertex.label]),
+          focus: vertex.label === focus,
+        }
+      }
     })
 
     var edges = _.flatten(Object.keys(schema['from']).map(function(key) {
       return schema['from'][key].map(function(edge) {
-        return {data:
-                {source: edge['from'],
-                 target: edge['to'],
-                 label: edge['label']}}
+        return {
+          data: {
+            source: edge['from'],
+            target: edge['to'],
+            label: edge['label'],
+          }
+        }
       })
     }))
 
