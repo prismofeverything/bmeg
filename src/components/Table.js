@@ -194,12 +194,17 @@ function mapStateToProps(state, own) {
   }
 
 
+  console.log('FIRST FACET', _.keys(state.facets))
+  console.log(own.label)
+  console.log(currentQuery[own.label])
+
   // our facets
   const facets =
     _.pick(state.facets, function(value, key, object) {
       return key && key.startsWith(`${own.label}.`);
   });
 
+  console.log(_.keys(facets))
 
   // facets to display in table
   const tableFacets =

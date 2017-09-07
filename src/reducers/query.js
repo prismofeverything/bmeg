@@ -162,7 +162,8 @@ export function currentQuery(state = {name: 'test'}, action) {
           query: action.query,
           focus: action.focus,
           results: action.results,
-          loading: false
+          loading: false,
+          tableSelectedColumns: defaultTableSelectedColumns,
         }
       }
     default:
