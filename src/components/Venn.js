@@ -4,25 +4,25 @@ import { connect } from "react-redux"
 import { push } from 'react-router-redux'
 import * as _ from 'underscore'
 
-import venn from 'venn.js'
+import { VennDiagram } from 'venn.js'
 
 export class Venn extends Component {
   constructor(props) {
     super(props)
-    this.venn = venn.VennDiagram()
+    this.venn = VennDiagram()
   }
 
   generateSets(comparison) {
-    const compare = {...comparison}
-    const intersection = compare['_intersection']
-    const keys = _.keys(compare)
-    delete compare['_intersection']
+    const intersection = comparison._intersection
+    const keys = _.filter(_.keys(comparison), function(key) {return key !== '_intersection'})
 
+    console.log('VENN COMPARISON', comparison, keys, intersection)
     const sets = _.map(keys, function(key) {
-      return {sets: [key], size: compare[key]}
+      return {sets: [key], size: comparison[key]}
     })
 
     sets.push({sets: keys, size: intersection})
+    console.log('SETS', sets)
     return sets
   }
 
@@ -32,7 +32,7 @@ export class Venn extends Component {
   }
 
   componentDidMount() {
-    if (this.props.comparison) {
+    if (!_.isEmpty(this.props.comparison)) {
       this.generateDiagram(this.props.comparison)
     }
   }
@@ -42,10 +42,14 @@ export class Venn extends Component {
   }
 
   componentWillReceiveProps(props) {
-    this.generateDiagram(props.comparison)
+    console.log('venn willreceiveprops', props)
+    if (!_.isEmpty(props.comparison)) {
+      this.generateDiagram(props.comparison)
+    }
   }
 
   componentDidReceiveProps(props) {
+    console.log('venn didreceiveprops', props)
     // this.cy.resize()
   }
 
@@ -54,13 +58,16 @@ export class Venn extends Component {
   }
 
   render() {
-    <div id="venn" ref={element => this.element = element} />
+    return (
+      <div id="venn" ref={element => this.element = element} />
+    )
   }
 }
 
 function mapStateToProps(state, own) {
+  console.log('venn comparison', own.comparison)
   return {
-    
+    comparison: own.comparison,
   }
 }
 export default connect(mapStateToProps) (Venn)
