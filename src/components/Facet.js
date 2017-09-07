@@ -62,6 +62,35 @@ export class Facet extends Component {
     });
   }
 
+  // support array input
+  updateTextInput(textInput) {
+    let v = this.state.textInput
+    if (!v) {
+      v = []
+    }
+    if (_.contains(v, textInput)) {
+      v = _.filter(v, function(s){ return s !== textInput; });
+    } else {
+      v.push(textInput)
+    }
+    this.setState({textInput: v})
+  }
+
+
+  // support array input
+  updateNumericInput(numericInput) {
+    let v = this.state.numericInput
+    if (!v) {
+      v = []
+    }
+    if (_.contains(v, numericInput)) {
+      v = _.filter(v, function(s){ return s !== numericInput; });
+    } else {
+      v.push(numericInput)
+    }
+    this.setState({numericInput: v})
+  }
+
   // render the facets
   render() {
 
@@ -85,10 +114,10 @@ export class Facet extends Component {
             <li key={bucket.key}
               onClick={ () => {
                   if (bucket.doc_count) {
-                    _self.setState({textInput: bucket.key })
+                    _self.updateTextInput(bucket.key)
                     _self.onFacetValueSelected(key, bucket.key)
                   } else {
-                    _self.setState({numericInput:  bucket.value })
+                    _self.updateNumericInput(bucket.value);
                     _self.onFacetValueSelected(key, bucket.value)
                   }
                 }
@@ -124,7 +153,7 @@ export class Facet extends Component {
              autoFocus
              value={_self.state.numericInput || '' }
              className={classes.input}
-             onChange={ (event) => {   _self.setState({numericInput:  event.target.value}) } }
+             onChange={ (event) => { _self.updateNumericInput(event.target.value) } }
              onBlur = { (event) => { _self.onFacetValueSelected(key, event.target.value) } }
              inputProps={{
                'aria-label': 'Description',
@@ -143,7 +172,7 @@ export class Facet extends Component {
                 target: "data",
                 eventHandlers: {
                   onClick: (evt, clickedProps) => {
-                    _self.setState({numericInput: clickedProps.datum.y })
+                    _self.updateNumericInput(clickedProps.datum.y)
                   },
                 }
               }]}
@@ -161,7 +190,7 @@ export class Facet extends Component {
              autoFocus
              value={_self.state.textInput || '' }
              className={classes.input}
-             onChange={ (event) => {   _self.setState({textInput:  event.target.value}) } }
+             onChange={ (event) => { _self.updateTextInput(event.target.value) }}
              onBlur = { (event) => { _self.onFacetValueSelected(key, event.target.value) } }
              inputProps={{
                'aria-label': 'Description',
@@ -179,7 +208,7 @@ export class Facet extends Component {
                         target: "data",
                         eventHandlers: {
                           onClick: (evt, clickedProps) => {
-                            _self.setState({textInput: clickedProps.datum.x })
+                            _self.updateTextInput(clickedProps.datum.x)
                             },
                         }
                       }]}
@@ -216,14 +245,10 @@ export class Facet extends Component {
         </ListItem>
         <Collapse in={_self.state.open} transitionDuration="auto" unmountOnExit>
           <div>
-            <Card>
-              <CardContent>
-                {chart}
-                {input}
-                {buckets}
-                {other}
-              </CardContent>
-            </Card>
+            {chart}
+            {input}
+            {buckets}
+            {other}
           </div>
         </Collapse>
       </div>
@@ -236,7 +261,7 @@ export class Facet extends Component {
 function mapStateToProps(state, own) {
   // are any of the selected facets me?
   const selectedFacets =
-    _.filter(state.selectedFacets, function(facet) {
+    _.filter(state.ç, function(facet) {
       return facet.key && facet.key.startsWith(`${own.property}`);
     });
   // our state
@@ -266,6 +291,9 @@ const styles = {
   },
   flexGrow: {
     flex: '1 1 auto',
+  },
+  input: {
+    width:'100%',
   },
   options: {},
 };
