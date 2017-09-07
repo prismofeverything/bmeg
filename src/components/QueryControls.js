@@ -94,7 +94,7 @@ export class QueryControls extends Component {
     return function(e) {
       const { dispatch } = this.props
       this.setState({loading: false})
-      dispatch({type: 'TRIGGER_LOAD_QUERY', query: query})
+      dispatch({type: 'LOAD_QUERY', query: query})
     }
   }
 
@@ -220,8 +220,7 @@ const styles = {
 
 function mapStateToProps(state, own) {
   const focus = own.focus
-  var query = state.currentQuery[focus].query
-  query = query ? query.query : query
+  var query = state.queryObject
   const queries = state.queries
   console.log('query', query)
   console.log('queries', queries)

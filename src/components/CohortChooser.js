@@ -21,6 +21,8 @@ class CohortChooser extends Component {
     super(props);
     this.state = {
       activeStep: 0,
+      a: undefined, // props.queries[0].key,
+      b: undefined, // props.queries[0].key,
     };
 
     //TODO - we shouldn't need to do these bindings
@@ -54,8 +56,20 @@ class CohortChooser extends Component {
     }
   }
 
+  chooseQuery(which, query) {
+    const { dispatch } = this.props
+    this.setState({[which]: query})
+
+    const { a, b } = this.state
+    if (a && b) {
+      dispatch({type: 'QUERY_COMPARISON', queries: [a, b]})
+    }
+  }
+
   render() {
+    const { dispatch } = this.props
     const classes = this.props.classes;
+    const self = this
     var plot
     if (this.state.activeStep==1) {
       plot = (<Plot open={true}/>)
@@ -72,8 +86,16 @@ class CohortChooser extends Component {
             <Typography type="headline" gutterBottom align="center">
               Compare
             </Typography>
-        <QueryMenu title={"First query"} options={options} />
-        <QueryMenu title={"Second query"} options={options} />
+        <QueryMenu
+      title={"First query"}
+      options={options}
+      chooseQuery={(query) => self.chooseQuery('a', query)}
+        />
+        <QueryMenu
+      title={"Second query"}
+      options={options}
+      chooseQuery={(query) => self.chooseQuery('b', query)}
+        />
           </div>
         </Paper>
         {plot}
@@ -84,6 +106,7 @@ class CohortChooser extends Component {
 
 const theme = createMuiTheme()
 const styles = {}
+
 // const styles = theme => ({
 //   root: {
 //     flexGrow: 1,

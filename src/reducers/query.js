@@ -34,9 +34,18 @@ export function query(state = {}, action) {
   }
 }
 
+export function comparison(state = {}, action) {
+  switch (action.type) {
+  case 'QUERY_COMPARISON_SAVE':
+    return action.comparison || {}
+  default:
+    return state
+  }  
+}
+
 export function queries(state = {}, action) {
   switch (action.type) {
-    case 'ALL_QUERIES':
+    case 'ALL_QUERIES_SAVE':
       return action.queries || {}
     default:
       return state
@@ -59,7 +68,16 @@ const currentQueryStructure = {
   }
 }
 
-export function currentQuery(state = {name:'test' }, action) {
+export function queryObject(state = [], action) {
+  switch (action.type) {
+  case 'QUERY_RESULTS_SAVE':
+    return action.query.query
+  default:
+    return state
+  }
+}
+
+export function currentQuery(state = {name: 'test'}, action) {
   switch (action.type) {
     case 'STEP_ON_PATH':
       // run default search when user selects vertex
@@ -68,7 +86,7 @@ export function currentQuery(state = {name:'test' }, action) {
         ...state,
         [action.label]: {
           ...state[action.label],
-          runSearch: !resultsPresent
+          runSearch: true, // !resultsPresent
         }
       }
 
@@ -78,7 +96,7 @@ export function currentQuery(state = {name:'test' }, action) {
         ...state,
         [action.focus]: {
           ...state[action.focus],
-          tableSelectedColumns:{
+          tableSelectedColumns: {
             ...state[action.focus].tableSelectedColumns,
             [action.facet.key]: toggle,
           }
@@ -112,6 +130,7 @@ export function currentQuery(state = {name:'test' }, action) {
       return {
         ...state,
         [action.focus]: {
+          ...state[action.focus],
           queryString: action.queryString,
           selectedFacets: action.selectedFacets,
           order: action.order,
@@ -143,7 +162,6 @@ export function currentQuery(state = {name:'test' }, action) {
           query: action.query,
           focus: action.focus,
           results: action.results,
-          tableSelectedColumns: defaultTableSelectedColumns,
           loading: false
         }
       }
