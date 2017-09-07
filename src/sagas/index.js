@@ -9,6 +9,7 @@ import { fetchEdge } from './schema'
 import { layoutComponents } from './schema'
 import { fetchFacets } from './facets'
 import { aggregateFacets } from './facets'
+import { selectFacet } from './facets'
 import { startup } from './query'
 import { search } from './query'
 import { searchAll } from './query'
@@ -17,6 +18,7 @@ import { pathQuery } from './query'
 import { newQuery } from './query'
 import { saveQuery } from './query'
 import { loadQuery } from './query'
+import { queryComparison } from './query'
 import { allQueries } from './query'
 
 export function* sagas() {
@@ -30,10 +32,12 @@ export function* sagas() {
     fork(takeLatest, 'SCHEMA_TAP_VERTEX', navigateCohort),
     fork(takeLatest, 'REFRESH_QUERY', pathQuery),
     fork(takeLatest, 'REFRESH_QUERY', aggregateFacets),
+    fork(takeLatest, 'SELECT_FACET', selectFacet),
     fork(takeLatest, 'SEARCH', search),
     fork(takeLatest, 'SEARCH_ALL_SUBMIT', searchAll),
     fork(takeLatest, 'NEW_QUERY', newQuery),
     fork(takeLatest, 'SAVE_QUERY', saveQuery),
-    fork(takeLatest, 'TRIGGER_LOAD_QUERY', loadQuery),
+    fork(takeLatest, 'LOAD_QUERY', loadQuery),
+    fork(takeLatest, 'QUERY_COMPARISON', queryComparison),
   ];
 }
