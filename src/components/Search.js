@@ -15,6 +15,10 @@ require('codemirror/mode/solr/solr');
 // require('codemirror/lib/codemirror.css');
 // require('codemirror/addon/hint/show-hint.css');
 
+
+import Parser from 'lucene-query-parser';
+
+
 export class Search extends Component {
   constructor(props) {
     super(props)
@@ -105,6 +109,8 @@ export class Search extends Component {
    onEnter(cm) {
        // if user clicked query icon or hit enter key,
        const { dispatch } = this.props
+       var results = Parser.parse(this.state.text);
+       console.log('parsed query', results);
        dispatch({
          type: 'SEARCH',
          queryString: this.state.text,
