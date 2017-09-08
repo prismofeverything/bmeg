@@ -31,6 +31,7 @@ function schemaToCytoscape(schema, path) {
       return schema['from'][key].map(function(edge) {
         return {
           data: {
+            id: edge['label'],
             source: edge['from'],
             target: edge['to'],
             label: edge['label'],
@@ -183,6 +184,15 @@ export class Schema extends Component {
       console.log('SCHEMA_TAP_VERTEX', label)
       dispatch({
         type: 'SCHEMA_TAP_VERTEX',
+        label: label,
+      })
+    })
+
+    this.cy.on('tap', 'edge', function(cy) {
+      const label = this.id()
+      console.log('SCHEMA_TAP_EDGE', label)
+      dispatch({
+        type: 'SCHEMA_TAP_EDGE',
         label: label,
       })
     })
