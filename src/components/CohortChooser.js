@@ -59,9 +59,11 @@ class CohortChooser extends Component {
 
   chooseQuery(which, query) {
     const { dispatch } = this.props
+    const chosen = _.pick(this.state, ['a', 'b'])
+    chosen[which] = query
     this.setState({[which]: query})
 
-    const { a, b } = this.state
+    const { a, b } = chosen
     if (a && b) {
       dispatch({type: 'QUERY_COMPARISON', queries: [a, b]})
     }
