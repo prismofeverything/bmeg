@@ -46,7 +46,7 @@ export class Search extends Component {
       dispatch({
         type: 'SEARCH_ALL_SUBMIT',
         scope: scope,
-        search: value,
+        queryString: value,
         parsedQuery: parsedQuery,
         callbackError: (error) => {
           reject({_error: error});

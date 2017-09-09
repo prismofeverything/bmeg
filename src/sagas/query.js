@@ -7,6 +7,7 @@ import Query from '../query/query'
 
 export function* searchAll(action) {
   const results = yield call(OphionSearch.search, action.scope, action.search)
+  const state = yield select();
   yield put({
     type: 'SEARCH_RESULTS_SAVE',
     search: {
@@ -14,6 +15,8 @@ export function* searchAll(action) {
       scope: action.scope,
       parsedQuery: action.parsedQuery,
       results: results,
+      queryString: action.queryString ? action.queryString : state.search.queryString,
+      parsedQuery: action.parsedQuery ? action.parsedQuery : state.search.parsedQuery,
     }
   })
 }
@@ -47,15 +50,17 @@ export function* search(action) {
     path: state.path,
     schema: state.schema,
     currentQuery: state.currentQuery,
-    queryString: action.queryString ? action.queryString : state.queryString,
-    parsedQuery: action.parsedQuery ? action.parsedQuery : state.parsedQuery,
+    queryString: action.queryString ? action.queryString : state.search.queryString,
+    parsedQuery: action.parsedQuery ? action.parsedQuery : state.search.parsedQuery,
   })
-  // get updated data
+  // get updated data //TODO - is anyone catching this?
   yield put({
     type: 'FACETS_SEARCH',
     selectedFacets: state.selectedFacets,
     label: action.label,
     focus: action.label,
+    queryString: action.queryString ? action.queryString : state.search.queryString,
+    parsedQuery: action.parsedQuery ? action.parsedQuery : state.search.parsedQuery,
   });
 }
 
