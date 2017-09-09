@@ -402,5 +402,21 @@ h1 {
   height: auto !important ;
   // margin: auto 0 auto 0;
   width: 100%;
+}
 
+.CodeMirror-error {
+  padding: 0 3px 0 5px;
+  min-width: 8px;
+  text-align: right;
+  color: #999;
+  background-color: #EF9A9A; /*red200*/
+  white-space: nowrap;
+}
+.CodeMirror-ok {
+  padding: 0 3px 0 5px;
+  min-width: 8px;
+  text-align: right;
+  color: #999;
+  background-color: #A5D6A7; /*green200*/
+  white-space: nowrap;
 }

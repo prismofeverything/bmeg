@@ -36,6 +36,7 @@ export class Facet extends Component {
     /* initial state */
     this.state = {
       open: false,
+      values: []
     };
     this.toggleOpen = this.toggleOpen.bind(this)
     this.onFacetValueSelected = this.onFacetValueSelected.bind(this)
@@ -49,16 +50,26 @@ export class Facet extends Component {
     const { dispatch } = this.props
     const type = this.props.facet.type;
     const property = key.split('.')[1]
-    dispatch({
-      type: 'SELECT_FACET',
-      facet: {
-        label: this.props.label,
-        key: key,
-        property: property,
-        value: value,
-        type: type,
-      }
-    })
+    var newValues = this.state.values
+    if (newValues.includes(value)) {
+      newValues = _.without(newValues, value)
+    } else {
+      newValues = newValues.concat(value)
+    }
+    this.setState({
+      values: newValues
+    },() => {
+      dispatch({
+        type: 'SELECT_FACET',
+        facet: {
+          label: this.props.label,
+          key: key,
+          property: property,
+          value: this.state.values,
+          type: type,
+        }
+      })
+    });
   }
 
   toggleOpen() {
@@ -67,33 +78,13 @@ export class Facet extends Component {
     });
   }
 
-  // support array input
   updateTextInput(textInput) {
-    let v = this.state.textInput
-    if (!v) {
-      v = []
-    }
-    if (_.contains(v, textInput)) {
-      v = _.filter(v, function(s){ return s !== textInput; });
-    } else {
-      v.push(textInput)
-    }
-    this.setState({textInput: v})
+    this.setState({textInput: textInput})
   }
 
 
-  // support array input
   updateNumericInput(numericInput) {
-    let v = this.state.numericInput
-    if (!v) {
-      v = []
-    }
-    if (_.contains(v, numericInput)) {
-      v = _.filter(v, function(s){ return s !== numericInput; });
-    } else {
-      v.push(numericInput)
-    }
-    this.setState({numericInput: v})
+    this.setState({numericInput: numericInput})
   }
 
   // render the facets
@@ -159,7 +150,6 @@ export class Facet extends Component {
              value={_self.state.numericInput || '' }
              className={classes.input}
              onChange={ (event) => { _self.updateNumericInput(event.target.value) } }
-             onBlur = { (event) => { _self.onFacetValueSelected(key, event.target.value) } }
              inputProps={{
                'aria-label': 'Description',
              }}
@@ -177,7 +167,7 @@ export class Facet extends Component {
                 target: "data",
                 eventHandlers: {
                   onClick: (evt, clickedProps) => {
-                    _self.updateNumericInput(clickedProps.datum.y)
+                    _self.onFacetValueSelected(key,clickedProps.datum.y)
                   },
                 }
               }]}
@@ -196,7 +186,6 @@ export class Facet extends Component {
              value={_self.state.textInput || '' }
              className={classes.input}
              onChange={ (event) => { _self.updateTextInput(event.target.value) }}
-             onBlur = { (event) => { _self.onFacetValueSelected(key, event.target.value) } }
              inputProps={{
                'aria-label': 'Description',
              }}
@@ -213,7 +202,7 @@ export class Facet extends Component {
                         target: "data",
                         eventHandlers: {
                           onClick: (evt, clickedProps) => {
-                            _self.updateTextInput(clickedProps.datum.x)
+                            _self.onFacetValueSelected(key,clickedProps.datum.x)
                             },
                         }
                       }]}
@@ -265,8 +254,9 @@ export class Facet extends Component {
 
 function mapStateToProps(state, own) {
   // are any of the selected facets me?
+
   const selectedFacets =
-    _.filter(state.ç, function(facet) {
+    _.filter(state.facets, function(facet) {
       return facet.key && facet.key.startsWith(`${own.property}`);
     });
   // our state

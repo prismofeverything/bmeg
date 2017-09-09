@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { render } from 'react-dom'
 import { connect } from "react-redux";
 
-// import SearchBar from 'material-ui-search-bar'
 
 import Paper from 'material-ui/Paper'
 import IconButton from 'material-ui/IconButton'
@@ -12,33 +11,43 @@ import { grey } from 'material-ui/colors'
 import CodeMirror from 'react-codemirror'
 require('codemirror/mode/solr/solr');
 // see main.scss for inclusion and overrides
-// require('codemirror/lib/codemirror.css');
-// require('codemirror/addon/hint/show-hint.css');
 
-
+import ReactTooltip from 'react-tooltip'
 import Parser from 'lucene-query-parser';
-
+import * as _ from 'underscore'
 
 export class Search extends Component {
+
   constructor(props) {
     super(props)
     this.state = {
       text: "",
-      timeout: null
+      timeout: null,
+      dirty: false,
+      lastFacet: null,
     }
     this.debounceInterval = 500;
     this.autocomplete = this.autocomplete.bind(this);
     this.get_hints  = this.get_hints.bind(this);
     this.onEnter = this.onEnter.bind(this);
+    this.showParserError = this.showParserError.bind(this);
   }
 
-  triggerSearch(value) {
+  triggerSearch(value, parsedQuery) {
     const {dispatch, scope} = this.props;
+
+    // var results = Parser.parse(this.state.text);
+    // console.log('parsed query', results);
+    // console.log('reformulated query', this.stringifyQuery(results));
+
+    const _self = this;
+    _self.setState({dirty:false})
     return new Promise((resolve, reject) => {
       dispatch({
         type: 'SEARCH_ALL_SUBMIT',
         scope: scope,
         search: value,
+        parsedQuery: parsedQuery,
         callbackError: (error) => {
           reject({_error: error});
         },
@@ -57,19 +66,48 @@ export class Search extends Component {
     }
 
     var self = this;
-    var timeout = setTimeout(function() {self.triggerSearch(value)}, this.debounceInterval)
-    this.setState({text: value, timeout: timeout})
+    var timeout;
+    var isDirty = true;
+    var newQuery = value
+    var parserError = undefined
+    var parsedQuery;
+    try {
+      parsedQuery = Parser.parse(value)
+      newQuery = this.stringifyQuery(parsedQuery)
+    } catch (e) {
+      parserError = e
+    }
+    if (!this.state.dirty && !parserError) {
+      timeout = setTimeout(function() {self.triggerSearch(newQuery, parsedQuery)}, this.debounceInterval)
+    }
+    this.setState({text: newQuery, timeout: timeout, dirty:isDirty, parserError:parserError})
+    console.log('handleChange', value , parserError , parsedQuery)
   }
 
+  onEnter(cm) {
+      // if user clicked query icon or hit enter key,
+      this.triggerSearch(this.state.text);
+  }
+
+  showParserError() {
+    alert(this.state.parserError)
+  }
 
   // set up our call back, etc for autocompletion
   componentDidMount() {
     const { dispatch, page, query } = this.props;
 
-       // see CodeMirror's anyword-hint for background
-       let cm = this.refs['editor'].getCodeMirrorInstance();
-       let showHint = require('./show_hint');
 
+       let cm = this.refs['editor'].getCodeMirrorInstance();
+       // set gutterClick
+       let editor = this.refs['editor'].getCodeMirror();
+       const _self = this;
+       editor.on("gutterClick", function(cm, n) {
+         _self.showParserError()
+       });
+
+       // see CodeMirror's anyword-hint for background
+       let showHint = require('./show_hint');
        showHint(cm);
        // when auto suggesting, look for words that include . _
        var WORD = /([\u4e00-\u9fa5]|[a-zA-Z]|[\._])+/;
@@ -106,20 +144,6 @@ export class Search extends Component {
        codeMirror.showHint(cm, codeMirror.hint.tag);
    }
 
-   onEnter(cm) {
-       // if user clicked query icon or hit enter key,
-       const { dispatch } = this.props
-       var results = Parser.parse(this.state.text);
-       console.log('parsed query', results);
-       dispatch({
-         type: 'SEARCH',
-         queryString: this.state.text,
-         label: this.props.focus,
-         focus: this.props.focus,
-       });
-
-   }
-
    get_hints() {
      const {resources} = this.props;
      return this.props.facets;
@@ -128,6 +152,7 @@ export class Search extends Component {
    // if a facet is selected ...
    componentWillReceiveProps(nextProps) {
      const props = nextProps;
+     const _self = this ;
      const currentFacetString = function()  {
          if (!props.currentFacet) {
            return
@@ -135,21 +160,57 @@ export class Search extends Component {
          if (!props.facets[props.currentFacet.key]) {
            return
          }
-         const type = props.facets[props.currentFacet.key].type;
-         if (type === 'text') {
-           return `${props.currentFacet.key}:"${props.currentFacet.value}"`;
+         if (_self.state.lastFacet ===  props.currentFacet.key) {
+           return
          }
-         return `${props.currentFacet.key}:${props.currentFacet.value}`;
+         const type = props.facets[props.currentFacet.key].type;
+         var str
+         if (type === 'text') {
+           str = `${props.currentFacet.key}:"${props.currentFacet.value}"`;
+         } else {
+           str =`${props.currentFacet.key}:${props.currentFacet.value}`;
+         }
+         return _self.stringifyQuery(Parser.parse(str))
      }
-
      // check that a real update happened
-     const cf = currentFacetString();
-     if (cf && !( cf && this.state.text && this.state.text.indexOf(cf) > -1)) {
-       // just update search bar, don't update state or re-render
-       this.insertTextAtCursor(` AND ${cf} `);
+     var facetChanged = false;
+     if (props.currentFacet.key) {
+       if (_self.state.lastFacet !==  props.currentFacet.key) {
+         facetChanged = true;
+       }
+       if (_self.state.lastFacetValue !==  props.currentFacet.value) {
+         facetChanged = true;
+       }
      }
-
+     if (facetChanged) {
+       var parserError;
+       var parsedQuery;
+       try {
+         var currentParsedQuery = Parser.parse(this.state.text || '')
+         const replaced = this.replaceTerm(currentParsedQuery, props.currentFacet.key, props.currentFacet.value)
+         var newQueryText;
+         if (!replaced) {
+            const cf = currentFacetString();
+            newQueryText = this.insertTextAtCursor(` ${cf} `);
+         } else {
+            newQueryText = this.stringifyQuery(currentParsedQuery);
+         }
+         parsedQuery = this.stringifyQuery(Parser.parse(newQueryText))
+         this.replaceText(parsedQuery)
+         console.log('componentWillReceiveProps', newQueryText, parsedQuery)
+       } catch (e) {
+         parserError = e
+         parsedQuery = newQueryText
+         console.log('componentWillReceiveProps error', newQueryText,e)
+       }
+       this.setState({text:parsedQuery,
+                      parserError:parserError,
+                      lastFacet: props.currentFacet.key,
+                      lastFacetValue: props.currentFacet.value,
+                     })
+     }
    }
+
    // ... insert it into the search bar at the current cursor
    insertTextAtCursor(text) {
      if (!text) { return }
@@ -158,12 +219,107 @@ export class Search extends Component {
      var doc = editor.getDoc();
      var cursor = doc.getCursor();
      doc.replaceRange(text, cursor);
+     return editor.getValue()
+   }
+
+   // ... replace search bar, place cursor at end
+   replaceText(text) {
+     if (!text) { return }
+     if (!this.refs['editor'])  { return }
+     let editor = this.refs['editor'].getCodeMirror();
+     var doc = editor.getDoc();
+     var oldCursor = doc.getCursor();
+     editor.setValue(text);
+     editor.setCursor({line: 1, ch: text.length})
+     var cursor = doc.getCursor();
+     console.log('replaceText',editor.getValue(), oldCursor, cursor)
+     return editor.getValue()
    }
 
 
+   // PreOrderTraversal parsed query, replace field term , return true on replace
+   replaceTerm(root, field, term) {
+    // hack: replace an existing vector with a term, see stringify array handling
+    if (root.field === field) {
+      root.term = term;
+      delete root.left
+      delete root.right
+      return true
+    }
+    var replaced = false ;
+    if (root.left) {
+      replaced = this.replaceTerm(root.left, field, term);
+    }
+    if (!replaced && root.right) {
+      replaced = this.replaceTerm(root.right, field, term);
+    }
+    return replaced;
+   }
+
+   // PreOrderTraversal parsed query, recreate query string
+   stringifyQuery(root,str = '') {
+
+     var quote = (s) => {
+       const specialChars = [ ':', ' ', '-', '+']
+       const found = _.find(specialChars, (c) => {return s.indexOf(c) > -1})
+       if (found) {
+         return `"${s}" `
+       }
+       return `${s} `
+     }
+     // simple field
+     if (root.field && root.field !== '<implicit>') {
+       str = str.concat(`${root.field}:`)
+     }
+     // simple term, quote if it has blanks or embedded colon
+     if (root.term) {
+       if (Array.isArray(root.term)) {
+         str = str.concat(['(',
+                          _.map(root.term, (t) => { return quote(t) }).join(' ')
+                          , ')'].join(''))
+       } else {
+         str = str.concat(quote(root.term))
+       }
+     }
+     // explicit operator, surround with parenthesis
+     if (root.operator && root.operator !== '<implicit>') {
+       str = str.concat(`(`)
+     }
+     // vector start, surround with parenthesis
+     if (root.field && root.field !== '<implicit>' && root.operator && root.left && root.operator === '<implicit>') {
+       str = str.concat(`(`)
+     }
+     // recurse left tree
+     if (root.left) {
+       str =   this.stringifyQuery(root.left,str)
+     }
+     // explicit operator
+     if (root.operator && root.operator !== '<implicit>') {
+       str = str.concat(` ${root.operator} `)
+     }
+     // recurse right tree
+     if (root.right) {
+       str = this.stringifyQuery(root.right,str);
+     }
+     // vector end, terminate parenthesis
+     if (root.field && root.field !== '<implicit>' && root.operator && root.left && root.operator === '<implicit>') {
+       str = str.concat(`)`)
+     }
+     // explicit operator end, terminate parenthesis
+     if (root.operator && root.operator !== '<implicit>') {
+       str = str.concat(`)`)
+     }
+     return str
+   }
 
   render() {
     const props = this.props;
+
+    // display error if parse error, see showParserError()
+    var gutters = ['CodeMirror-ok'];
+    if (this.state.parserError) {
+      gutters = ['CodeMirror-error']
+    }
 
     var options = {
       mode: 'solr',
@@ -173,7 +329,8 @@ export class Search extends Component {
          'Ctrl-Space': this.autocomplete,
          'Tab': false,
        },
-      hints: this.get_hints
+      hints: this.get_hints,
+      gutters: gutters
     };
 
 
