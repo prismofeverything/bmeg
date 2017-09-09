@@ -8,11 +8,11 @@ function edgesFor(schema, label) {
 }
 
 function nodesIn(schema, path) {
-  console.log('nodesIn')
+  // console.log('nodesIn')
   return _.reduce(path, function(nodes, step) {
     var existing = nodes[step.label]
     if (existing) {
-      console.log('existing', existing, 'step', step)
+      // console.log('existing', existing, 'step', step)
       existing.facets = {...existing.facets, ...step.facets}
     } else {
       nodes[step.label] = {...step, edges: edgesFor(schema, step.label)}
@@ -42,7 +42,7 @@ function findDuplicates(objects, f) {
     return outcome
   }, {map: {}, dup: {}})
 
-  console.log('duplicates outcome', outcome)
+  // console.log('duplicates outcome', outcome)
 
   var labels = _.filter(_.keys(outcome.dup), function(key) {return outcome.dup[key] > 1})
   return _.map(labels, function(key) {return outcome.map[key]})
@@ -57,7 +57,7 @@ function otherEnd(edge, label) {
 }
 
 function addToPaths(paths, labels, edges) {
-  console.log('addToPaths', paths, labels, edges)
+  // console.log('addToPaths', paths, labels, edges)
   return _.reduce(labels, function(paths, label) {
     var edge = _.find(edges, function(edge) {
       return edgeFor(edge, label) && paths[otherEnd(edge, label)]
@@ -72,21 +72,21 @@ function arrayEq(a, b) {
 }
 
 function findPaths(focus, labels, edges) {
-  console.log('findPaths', focus, labels, edges)
+  // console.log('findPaths', focus, labels, edges)
   var paths = {}
   paths[focus] = {label: 'everything'} // {from: focus, to: focus, label: 'everything'}
   var previous = []
   var remaining = _.reject(labels, function(label) {return label === focus})
 
   while(!_.isEmpty(remaining) && !arrayEq(previous, remaining)) {
-    console.log('paths', paths)
-    console.log('remaining', remaining)
+    // console.log('paths', paths)
+    // console.log('remaining', remaining)
     previous = remaining
     paths = addToPaths(paths, remaining, edges)
     remaining = _.reject(labels, function(label) {return paths[label]})
   }
 
-  console.log('paths', paths)
+  // console.log('paths', paths)
 
   return {
     paths: paths,
@@ -99,10 +99,10 @@ function compress(d) {
 }
 
 function followPaths(paths, edges, label) {
-  console.log('followPaths', paths, edges, label)
+  // console.log('followPaths', paths, edges, label)
   var here = _.filter(edges, function(edge) {return edgeFor(edge, label)})
   var there = _.reject(edges, function(edge) {return edgeFor(edge, label)})
-  console.log('here', here, 'there', there)
+  // console.log('here', here, 'there', there)
 
   if (_.isEmpty(here)) {
     return [[label]]
@@ -121,7 +121,7 @@ function followPaths(paths, edges, label) {
       })
     })
 
-    console.log('trees', trees)
+    // console.log('trees', trees)
     return trees
   }
 }
@@ -131,7 +131,7 @@ function identity(i) {return i}
 function translateQuery(schema, visited, focus, order, orderBy) {
   var nodes = nodesIn(schema, visited)
   var focal = nodes[focus]
-  console.log('translate query', focus, visited, focal, nodes, order, orderBy)
+  // console.log('translate query', focus, visited, focal, nodes, order, orderBy)
 
   if (focal) {
     var O = Ophion()
@@ -146,7 +146,7 @@ function translateQuery(schema, visited, focus, order, orderBy) {
     var journeys = _.map(followPaths(paths.paths, _.filter(_.values(paths.paths), identity), focus), compress)
     var relevant = _.filter(journeys, function(journey) {return journey.length > 1})
     var subqueries = _.map(relevant, function(journey) {
-      console.log('journey', journey)
+      // console.log('journey', journey)
       return _.reduce(journey.slice(1), function(subquery, step) {
         if (step['label']) {
           // it is an edge
@@ -168,13 +168,13 @@ function translateQuery(schema, visited, focus, order, orderBy) {
       query.order(orderBy, ascending)
     }
 
-    console.log('query', JSON.stringify(query.query))
+    // console.log('query', JSON.stringify(query.query))
     return query
   }
 }
 
 function saveQuery(query) {
-  console.log('saving query', query)
+  // console.log('saving query', query)
   return fetch('/query/save', {
     method: "POST",
     headers: {
@@ -183,7 +183,7 @@ function saveQuery(query) {
     },
     body: JSON.stringify(query)
   }).then(function(response) {
-    console.log(response)
+    // console.log(response)
     return response.json()
   }).catch(function(response) {
     console.log("error saving query", response)
@@ -197,7 +197,7 @@ function allQueries() {
       'Content-Type': 'application/json',
     }
   }).then(function(response) {
-    console.log(response)
+    // console.log(response)
     return response.json()
   }).catch(function(response) {
     console.log("error fetching all queries", response)

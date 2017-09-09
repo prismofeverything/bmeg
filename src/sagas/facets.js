@@ -12,7 +12,7 @@ export function* fetchFacets(action) {
 }
 
 export function* aggregateFacets(action) {
-  // console.log('aggregateFacets.action',action);
+  console.log('aggregateFacets.action',action);
   // render a `query` of what's been selected
   const queryString = action.selectedFacets.map(function(selectedFacet){
     const property_name = selectedFacet.key.split('.')[1]
@@ -31,15 +31,15 @@ export function* aggregateFacets(action) {
 }
 
 export function* selectFacet(action) {
-  console.log(action)
+  // console.log(action)
   yield put({...action, type: 'SELECTED_FACET'})
-  const state = yield select();
-  yield put({
-    type: 'REFRESH_QUERY',
-    label: action.facet.label,
-    focus: action.facet.label,
-    path: state.path,
-    schema: state.schema,
-    selectedFacets: state.selectedFacets,
-  })
+  // const state = yield select();
+  // yield put({
+  //   type: 'REFRESH_QUERY',
+  //   label: action.facet.label,
+  //   focus: action.facet.label,
+  //   path: state.path,
+  //   schema: state.schema,
+  //   selectedFacets: state.selectedFacets,
+  // })
 }

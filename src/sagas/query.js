@@ -12,14 +12,15 @@ export function* searchAll(action) {
     search: {
       search: action.search,
       scope: action.scope,
+      parsedQuery: action.parsedQuery,
       results: results,
     }
   })
 }
 
 export function* pathQuery(action) {
-  console.log('path query saga')
-  console.log(action.path)
+  // console.log('path query saga')
+  // console.log(action.path)
 
   if (!_.isEmpty(action.path)) {
     const query = Path.translateQuery(action.schema, action.path, action.focus, action.order, action.orderBy).limit(10)
@@ -47,6 +48,7 @@ export function* search(action) {
     schema: state.schema,
     currentQuery: state.currentQuery,
     queryString: action.queryString ? action.queryString : state.queryString,
+    parsedQuery: action.parsedQuery ? action.parsedQuery : state.parsedQuery,
   })
   // get updated data
   yield put({
