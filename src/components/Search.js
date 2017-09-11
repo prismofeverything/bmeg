@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import Paper from 'material-ui/Paper'
 import IconButton from 'material-ui/IconButton'
 import SearchIcon from 'material-ui-icons/Search'
-import { grey } from 'material-ui/colors'
+import { grey, yellow, green, red } from 'material-ui/colors'
 
 import CodeMirror from 'react-codemirror'
 require('codemirror/mode/solr/solr');
@@ -21,7 +21,6 @@ export class Search extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      text: "",
       timeout: null,
       dirty: false,
       lastFacet: null,
@@ -34,7 +33,7 @@ export class Search extends Component {
   }
 
   triggerSearch(value, parsedQuery) {
-    const {dispatch, scope} = this.props;
+    const {dispatch, search} = this.props;
 
     // var results = Parser.parse(this.state.text);
     // console.log('parsed query', results);
@@ -45,7 +44,7 @@ export class Search extends Component {
     return new Promise((resolve, reject) => {
       dispatch({
         type: 'SEARCH_ALL_SUBMIT',
-        scope: scope,
+        scope: search.scope,
         queryString: value,
         parsedQuery: parsedQuery,
         callbackError: (error) => {
@@ -80,8 +79,11 @@ export class Search extends Component {
     if (!this.state.dirty && !parserError) {
       timeout = setTimeout(function() {self.triggerSearch(newQuery, parsedQuery)}, this.debounceInterval)
     }
-    this.setState({text: newQuery, timeout: timeout, dirty:isDirty, parserError:parserError})
-    console.log('handleChange', value , parserError , parsedQuery)
+    this.setState({text: newQuery,
+                   timeout: timeout,
+                   dirty:isDirty,
+                   parsedQuery: parsedQuery,
+                   parserError:parserError})
   }
 
   onEnter(cm) {
@@ -149,46 +151,58 @@ export class Search extends Component {
      return this.props.facets;
    }
 
-   // if a facet is selected ...
+
    componentWillReceiveProps(nextProps) {
-     const props = nextProps;
      const _self = this ;
      const currentFacetString = function()  {
-         if (!props.currentFacet) {
+         if (!nextProps.currentFacet) {
            return
          }
-         if (!props.facets[props.currentFacet.key]) {
+         if (!nextProps.facets[nextProps.currentFacet.key]) {
            return
          }
-         if (_self.state.lastFacet ===  props.currentFacet.key) {
+         if (_self.state.lastFacet ===  nextProps.currentFacet.key) {
            return
          }
-         const type = props.facets[props.currentFacet.key].type;
+         const type = nextProps.facets[nextProps.currentFacet.key].type;
          var str
          if (type === 'text') {
-           str = `${props.currentFacet.key}:"${props.currentFacet.value}"`;
+           str = `${nextProps.currentFacet.key}:"${nextProps.currentFacet.value}"`;
          } else {
-           str =`${props.currentFacet.key}:${props.currentFacet.value}`;
+           str =`${nextProps.currentFacet.key}:${nextProps.currentFacet.value}`;
          }
          return _self.stringifyQuery(Parser.parse(str))
      }
+
+
+
      // check that a real update happened
      var facetChanged = false;
-     if (props.currentFacet.key) {
-       if (_self.state.lastFacet !==  props.currentFacet.key) {
+     var scopeChanged = false;
+     var newQueryText;
+     var parserError;
+     var parsedQuery;
+     if (nextProps.currentFacet.key) {
+       if (_self.state.lastFacetKey !==  nextProps.currentFacet.key) {
          facetChanged = true;
        }
-       if (_self.state.lastFacetValue !==  props.currentFacet.value) {
+       if (_self.state.lastFacetValue !==  nextProps.currentFacet.value) {
          facetChanged = true;
        }
      }
-     if (facetChanged) {
-       var parserError;
-       var parsedQuery;
+     if (nextProps.search && _self.props.search && (nextProps.search.scope !== _self.props.search.scope)) {
+       facetChanged = true;
+       scopeChanged = true;
+     }
+
+     if (scopeChanged) {
+       parsedQuery = nextProps.currentQuery[nextProps.search.scope].queryString || ''
+       this.replaceText(parsedQuery)
+       this.handleChange(parsedQuery)
+     } else if (facetChanged) {
        try {
-         var currentParsedQuery = Parser.parse(this.state.text || '')
-         const replaced = this.replaceTerm(currentParsedQuery, props.currentFacet.key, props.currentFacet.value)
-         var newQueryText;
+         var currentParsedQuery = Parser.parse(_self.props.text || '')
+         const replaced = this.replaceTerm(currentParsedQuery, nextProps.currentFacet.key, nextProps.currentFacet.value)
          if (!replaced) {
             const cf = currentFacetString();
             newQueryText = this.insertTextAtCursor(` ${cf} `);
@@ -197,23 +211,25 @@ export class Search extends Component {
          }
          parsedQuery = this.stringifyQuery(Parser.parse(newQueryText))
          this.replaceText(parsedQuery)
-         console.log('componentWillReceiveProps', newQueryText, parsedQuery)
+         this.handleChange(parsedQuery)
        } catch (e) {
          parserError = e
          parsedQuery = newQueryText
          console.log('componentWillReceiveProps error', newQueryText,e)
        }
-       this.setState({text:parsedQuery,
-                      parserError:parserError,
-                      lastFacet: props.currentFacet.key,
-                      lastFacetValue: props.currentFacet.value,
-                     })
      }
+     this.setState({text:parsedQuery,
+                    parserError:parserError,
+                    lastFacetKey: nextProps.currentFacet.key,
+                    lastFacetValue: nextProps.currentFacet.value,
+                   })
+
+
    }
 
    // ... insert it into the search bar at the current cursor
    insertTextAtCursor(text) {
-     if (!text) { return }
+    //  if (!text) { return }
      if (!this.refs['editor'])  { return }
      let editor = this.refs['editor'].getCodeMirror();
      var doc = editor.getDoc();
@@ -224,7 +240,7 @@ export class Search extends Component {
 
    // ... replace search bar, place cursor at end
    replaceText(text) {
-     if (!text) { return }
+    //  if (!text) { return }
      if (!this.refs['editor'])  { return }
      let editor = this.refs['editor'].getCodeMirror();
      var doc = editor.getDoc();
@@ -232,9 +248,16 @@ export class Search extends Component {
      editor.setValue(text);
      editor.setCursor({line: 1, ch: text.length})
      var cursor = doc.getCursor();
-     console.log('replaceText',editor.getValue(), oldCursor, cursor)
      return editor.getValue()
    }
+
+   // ... get search bar text
+   getText() {
+     if (!this.refs['editor'])  { return }
+     let editor = this.refs['editor'].getCodeMirror();
+     return editor.getValue()
+   }
+
 
 
    // PreOrderTraversal parsed query, replace field term , return true on replace
@@ -314,7 +337,7 @@ export class Search extends Component {
 
   render() {
     const props = this.props;
-
+    const _self = this;
     // display error if parse error, see showParserError()
     var gutters = ['CodeMirror-ok'];
     if (this.state.parserError) {
@@ -330,9 +353,18 @@ export class Search extends Component {
          'Tab': false,
        },
       hints: this.get_hints,
-      gutters: gutters
+      // gutters: gutters
     };
 
+    var iconColor
+    var iconTooltip
+    if (this.state.parserError) {
+      iconColor = 'red'
+      iconTooltip = this.state.parserError.message
+    } else {
+      iconColor = _self.state.dirty ? 'yellow' : 'green'
+      iconTooltip = _self.state.dirty ? 'Refresh Needed' : 'Query OK'
+    }
 
     return (
         <Paper
@@ -345,34 +377,48 @@ export class Search extends Component {
           <div style={{ margin: 'auto 8px', width: '100%' }}>
             <CodeMirror ref="editor"
                         name="editor"
-                        value={this.state.text}
+                        value={this.props.text}
                         onChange={this.handleChange.bind(this)}
                         options={options}
                         />
           </div>
           <IconButton style={{
               transition: 'transform 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-              backgroundColor: 'lightgrey',
               borderRadius: 'inherit',
+              backgroundColor: 'lightgrey'
             }}
             onTouchTap={this.onEnter}
+            data-tip
+            data-for='DIRTY_QUERY'
             >
-            <SearchIcon color={grey} />
+            <SearchIcon style={{color:iconColor}} />
           </IconButton>
+          <ReactTooltip id='DIRTY_QUERY' type="info">
+            <span>{iconTooltip}</span>
+          </ReactTooltip>
         </Paper>
     )
   }
 }
 
 function mapStateToProps(state, own) {
+  const currentScope = state.currentQuery[state.search.scope]
+  var text = own.text, currentFacet = {}, selectedFacets = []
+  if (currentScope) {
+    text = currentScope.queryString ? currentScope.queryString : '' ;
+    currentFacet = currentScope.currentFacet ? currentScope.currentFacet : {};
+    selectedFacets = currentScope.selectedFacets ? currentScope.selectedFacets : [];
+  }
+
   return {
     search: state.search,
     facets: state.facets,
-    selectedFacets: state.selectedFacets,
-    currentFacet: state.currentFacet,
+    selectedFacets: selectedFacets,
+    currentFacet: currentFacet,
     schema: state.schema,
     path: state.path,
     currentQuery: state.currentQuery,
+    text: text,
   };
 }
 export default connect(mapStateToProps) (Search);

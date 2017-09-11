@@ -185,9 +185,15 @@ function mapStateToProps(state, own) {
 
   var data;
   const currentQuery = state.currentQuery;
-  if(currentQuery && currentQuery[own.label] && !currentQuery[own.label].loading) {
-    data = currentQuery[own.label].results ? currentQuery[own.label].results.map(function(result) {return {...result.properties, gid: result.gid}}) : []
-  }
+    if(currentQuery && currentQuery[own.label] && !currentQuery[own.label].loading) {
+      try {
+        data = currentQuery[own.label].results ? currentQuery[own.label].results.map(function(result) {return {...result.properties, gid: result.gid}}) : []
+      } catch (e) {
+        console.log(JSON.stringify(currentQuery[own.label].results))
+      }
+
+    }
+
   var loading = false;
   if(currentQuery && currentQuery[own.label] && currentQuery[own.label].loading) {
     loading = true;

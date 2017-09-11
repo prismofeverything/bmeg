@@ -12,20 +12,10 @@ export function* fetchFacets(action) {
 }
 
 export function* aggregateFacets(action) {
-  console.log('aggregateFacets.action',action);
-  // // render a `query` of what's been selected
-  // const queryString = action.selectedFacets.map(function(selectedFacet){
-  //   const property_name = selectedFacet.key.split('.')[1]
-  //   if (selectedFacet.type === 'text') {
-  //     return `${property_name}:"${selectedFacet.value}"`;
-  //   }
-  //   return `${property_name}:${selectedFacet.value}`;
-  // }).join(" AND ");
-  //
+  // ES names do _not_ have `Type.` prefix, stip it out
   var queryString = (action.queryString || '*')
-  var re = /(\w+).(\w+):(\w+)/g;
-  queryString = queryString.replace(re, '$2:$3');
-  console.log('aggregateFacets', queryString); 
+  var re = /(\w+).(\w+):/g
+  queryString = queryString.replace(re, '$2:');
   const facets = yield call(Facets.aggregateFacets, queryString);
   // console.log('aggregatedFacets',aggregatedFacets);
   yield put({
