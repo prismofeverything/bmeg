@@ -40,7 +40,7 @@ export function comparison(state = {}, action) {
     return action.comparison || {}
   default:
     return state
-  }  
+  }
 }
 
 export function queries(state = {}, action) {
@@ -57,7 +57,8 @@ const currentQueryStructure = {
     results: [],
     order: 'asc',
     orderBy: 'field',
-    queryString: 'asdf;lkj',
+    queryString: '*',
+    parsedQuery: {},
     loading: false,
     selectedFacets: {
       ['facet.key']: {}
@@ -77,8 +78,35 @@ export function queryObject(state = [], action) {
   }
 }
 
-export function currentQuery(state = {name: 'test'}, action) {
+export function currentQuery(state = {name: 'test' }, action) {
   switch (action.type) {
+
+
+    case 'SEARCH':
+      return {
+        ...state,
+        [action.scope]: {
+          ...state[action.scope],
+          queryString: action.queryString,
+          parsedQuery: action.parsedQuery,
+        }
+      }
+
+
+    case 'SELECTED_FACET':
+      var selectedFacets = state[action.facet.label] ? state[action.facet.label].selectedFacets  : []
+      selectedFacets = selectedFacets ? selectedFacets  : []
+      selectedFacets = _.filter(selectedFacets, (f) => {return f.key != action.facet.key} )
+      selectedFacets.push(action.facet)
+      return {
+        ...state,
+        [action.facet.label]: {
+          ...state[action.facet.label],
+          currentFacet: action.facet,
+          selectedFacets: selectedFacets
+        }
+      }
+
     case 'STEP_ON_PATH':
       // run default search when user selects vertex
       const resultsPresent = state[action.label] && state[action.label].results && state[action.label].results.length > 1
@@ -131,20 +159,9 @@ export function currentQuery(state = {name: 'test'}, action) {
         ...state,
         [action.focus]: {
           ...state[action.focus],
-          queryString: action.queryString,
-          selectedFacets: action.selectedFacets,
-          order: action.order,
-          orderBy: action.orderBy,
-          tableSelectedColumns: tableSelectedColumns,
           loading: true
         }
       }
-
-    // case 'LOAD_QUERY':
-    //   console.log('load query reducer', action)
-    //   return {
-    //     [action.query.focus]: action.query
-    //   }
 
     case 'QUERY_RESULTS_SAVE':
       // determine default tableFacets see  TOGGLE_IN_TABLE above

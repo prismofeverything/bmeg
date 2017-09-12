@@ -68,6 +68,7 @@ export class Table extends Component {
     const { dispatch } = this.props
     const cq = this.props.currentQuery;
     const focus = this.props.label;
+    console.log('handleRequestSort REFRESH_QUERY')     
     dispatch({
       type: 'REFRESH_QUERY',
       selectedFacets: cq[focus].selectedFacets,
@@ -185,9 +186,15 @@ function mapStateToProps(state, own) {
 
   var data;
   const currentQuery = state.currentQuery;
-  if(currentQuery && currentQuery[own.label] && !currentQuery[own.label].loading) {
-    data = currentQuery[own.label].results ? currentQuery[own.label].results.map(function(result) {return {...result.properties, gid: result.gid}}) : []
-  }
+    if(currentQuery && currentQuery[own.label] && !currentQuery[own.label].loading) {
+      try {
+        data = currentQuery[own.label].results ? currentQuery[own.label].results.map(function(result) {return {...result.properties, gid: result.gid}}) : []
+      } catch (e) {
+        console.log(JSON.stringify(currentQuery[own.label].results))
+      }
+
+    }
+
   var loading = false;
   if(currentQuery && currentQuery[own.label] && currentQuery[own.label].loading) {
     loading = true;

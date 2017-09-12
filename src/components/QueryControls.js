@@ -222,8 +222,6 @@ function mapStateToProps(state, own) {
   const focus = own.focus
   var query = state.queryObject
   const queries = state.queries
-  console.log('query', query)
-  console.log('queries', queries)
   return {
     focus: focus,
     label: focus,
