@@ -13,7 +13,7 @@ function schemaToCytoscape(schema, path) {
     var steps = Path.nodesIn(schema, path)
     var tail = _.last(path)
     var focus = tail ? tail.label : null
-    console.log('PATH SCHEMA STEPS', focus, path, steps)
+    // console.log('PATH SCHEMA STEPS', focus, path, steps)
 
     var nodes = Object.keys(schema['vertexes']).map(function(key) {
       var vertex = schema['vertexes'][key]
@@ -181,7 +181,7 @@ export class Schema extends Component {
 
     this.cy.on('tap', 'node', function(cy) {
       const label = this.id()
-      console.log('SCHEMA_TAP_VERTEX', label)
+      // console.log('SCHEMA_TAP_VERTEX', label)
       dispatch({
         type: 'SCHEMA_TAP_VERTEX',
         label: label,
@@ -216,7 +216,7 @@ export class Schema extends Component {
   }
 
   generateSchema(schema, path) {
-    console.log('rendering schema')
+    // console.log('rendering schema')
     var next = schemaToCytoscape(schema, path)
     if (false) { // (this.cy) {
       this.cy.json(next)

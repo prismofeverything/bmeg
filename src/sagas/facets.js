@@ -12,18 +12,14 @@ export function* fetchFacets(action) {
 }
 
 export function* aggregateFacets(action) {
-  // console.log('aggregateFacets.action',action);
-  // render a `query` of what's been selected
-  const queryString = action.selectedFacets.map(function(selectedFacet){
-    const property_name = selectedFacet.key.split('.')[1]
-    if (selectedFacet.type === 'text') {
-      return `${property_name}:"${selectedFacet.value}"`;
-    }
-    return `${property_name}:${selectedFacet.value}`;
-  }).join(" AND ");
-
+  if (action.supressFacetAggregation) {
+    return
+  }
+  // ES names do _not_ have `Type.` prefix, stip it out
+  var queryString = (action.queryString || '*')
+  var re = /(\w+).(\w+):/g
+  queryString = queryString.replace(re, '$2:');
   const facets = yield call(Facets.aggregateFacets, queryString);
-  // console.log('aggregatedFacets',aggregatedFacets);
   yield put({
     type: 'FACETS_SAVE',
     facets: facets,
@@ -31,15 +27,15 @@ export function* aggregateFacets(action) {
 }
 
 export function* selectFacet(action) {
-  console.log(action)
+  // console.log(action)
   yield put({...action, type: 'SELECTED_FACET'})
-  const state = yield select();
-  yield put({
-    type: 'REFRESH_QUERY',
-    label: action.facet.label,
-    focus: action.facet.label,
-    path: state.path,
-    schema: state.schema,
-    selectedFacets: state.selectedFacets,
-  })
+  // const state = yield select();
+  // yield put({
+  //   type: 'REFRESH_QUERY',
+  //   label: action.facet.label,
+  //   focus: action.facet.label,
+  //   path: state.path,
+  //   schema: state.schema,
+  //   selectedFacets: state.selectedFacets,
+  // })
 }

@@ -7,7 +7,7 @@ export function path(state = [], action) {
     case 'STEP_ON_PATH':
       var step = {label: action.label, facets: {}}
       var travel = [...state, step]
-      console.log('PATH - STEP_ON_PATH')
+      // console.log('PATH - STEP_ON_PATH')
       return travel
 
     case 'SELECTED_FACET':
@@ -15,7 +15,7 @@ export function path(state = [], action) {
       const facets = {...step.facets, [action.facet.property]: action.facet}
       const onward = {...step, facets: facets}
       var travel = [...state.slice(0, -1), onward]
-      console.log('PATH - SELECTED_FACET')
+      // console.log('PATH - SELECTED_FACET')
       return travel
 
     case 'NEW_QUERY':

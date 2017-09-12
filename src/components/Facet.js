@@ -33,9 +33,10 @@ export class Facet extends Component {
 
   constructor(props) {
     super(props);
-    /* initial state */
+    /* initial state, open if values selected */
     this.state = {
-      open: false,
+      open: props.open,
+      values: props.values,
     };
     this.toggleOpen = this.toggleOpen.bind(this)
     this.onFacetValueSelected = this.onFacetValueSelected.bind(this)
@@ -49,22 +50,41 @@ export class Facet extends Component {
     const { dispatch } = this.props
     const type = this.props.facet.type;
     const property = key.split('.')[1]
-    dispatch({
-      type: 'SELECT_FACET',
-      facet: {
-        label: this.props.label,
-        key: key,
-        property: property,
-        value: value,
-        type: type,
-      }
-    })
+    var newValues = this.state.values
+    if (newValues.includes(value)) {
+      newValues = _.without(newValues, value)
+    } else {
+      newValues = newValues.concat(value)
+    }
+    this.setState({
+      values: newValues
+    },() => {
+      dispatch({
+        type: 'SELECT_FACET',
+        facet: {
+          label: this.props.label,
+          key: key,
+          property: property,
+          value: this.state.values,
+          type: type,
+        }
+      })
+    });
   }
 
   toggleOpen() {
     this.setState({
       open: !this.state.open
     });
+  }
+
+  updateTextInput(textInput) {
+    this.setState({textInput: textInput})
+  }
+
+
+  updateNumericInput(numericInput) {
+    this.setState({numericInput: numericInput})
   }
 
   // render the facets
@@ -90,10 +110,10 @@ export class Facet extends Component {
             <li key={bucket.key}
               onClick={ () => {
                   if (bucket.doc_count) {
-                    _self.setState({textInput: bucket.key })
+                    _self.updateTextInput(bucket.key)
                     _self.onFacetValueSelected(key, bucket.key)
                   } else {
-                    _self.setState({numericInput:  bucket.value })
+                    _self.updateNumericInput(bucket.value);
                     _self.onFacetValueSelected(key, bucket.value)
                   }
                 }
@@ -129,8 +149,7 @@ export class Facet extends Component {
              autoFocus
              value={_self.state.numericInput || '' }
              className={classes.input}
-             onChange={ (event) => {   _self.setState({numericInput:  event.target.value}) } }
-             onBlur = { (event) => { _self.onFacetValueSelected(key, event.target.value) } }
+             onChange={ (event) => { _self.updateNumericInput(event.target.value) } }
              inputProps={{
                'aria-label': 'Description',
              }}
@@ -148,7 +167,7 @@ export class Facet extends Component {
                 target: "data",
                 eventHandlers: {
                   onClick: (evt, clickedProps) => {
-                    _self.setState({numericInput: clickedProps.datum.y })
+                    _self.onFacetValueSelected(key,clickedProps.datum.y)
                   },
                 }
               }]}
@@ -166,8 +185,7 @@ export class Facet extends Component {
              autoFocus
              value={_self.state.textInput || '' }
              className={classes.input}
-             onChange={ (event) => {   _self.setState({textInput:  event.target.value}) } }
-             onBlur = { (event) => { _self.onFacetValueSelected(key, event.target.value) } }
+             onChange={ (event) => { _self.updateTextInput(event.target.value) }}
              inputProps={{
                'aria-label': 'Description',
              }}
@@ -184,7 +202,7 @@ export class Facet extends Component {
                         target: "data",
                         eventHandlers: {
                           onClick: (evt, clickedProps) => {
-                            _self.setState({textInput: clickedProps.datum.x })
+                            _self.onFacetValueSelected(key,clickedProps.datum.x)
                             },
                         }
                       }]}
@@ -221,14 +239,10 @@ export class Facet extends Component {
         </ListItem>
         <Collapse in={_self.state.open} transitionDuration="auto" unmountOnExit>
           <div>
-            <Card>
-              <CardContent>
-                {chart}
-                {input}
-                {buckets}
-                {other}
-              </CardContent>
-            </Card>
+            {chart}
+            {input}
+            {buckets}
+            {other}
           </div>
         </Collapse>
       </div>
@@ -239,19 +253,26 @@ export class Facet extends Component {
 }
 
 function mapStateToProps(state, own) {
-  // are any of the selected facets me?
-  const selectedFacets =
-    _.filter(state.selectedFacets, function(facet) {
-      return facet.key && facet.key.startsWith(`${own.property}`);
-    });
   // our state
-  var selectedFacet;
-  if (selectedFacets.length === 1) {
-    selectedFacet = selectedFacets[0];
+  var selectedFacet = state.facets[own.property];
+  var open = false ;
+  var values = [];
+  const scope = own.property.split('.')[0]
+  if (state.currentQuery[scope]) {
+    const currentFacets = _.filter(state.currentQuery[scope].selectedFacets,(f) => {return f.value && f.key === own.property })
+    open = currentFacets.length === 1
+    if (open) {
+      values = currentFacets[0].value ;
+      if (!Array.isArray(values)) {
+        values = [values]
+      }
+    }
   }
+
   return {
-    selectedFacets: state.selectedFacets,
     selectedFacet: selectedFacet,
+    open: open,
+    values: values
   }
 }
 
@@ -271,6 +292,9 @@ const styles = {
   },
   flexGrow: {
     flex: '1 1 auto',
+  },
+  input: {
+    width:'100%',
   },
   options: {},
 };
