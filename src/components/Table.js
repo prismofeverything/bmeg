@@ -200,13 +200,11 @@ function mapStateToProps(state, own) {
     loading = true;
   }
 
-
   // our facets
   const facets =
     _.pick(state.facets, function(value, key, object) {
       return key && key.startsWith(`${own.label}.`);
   });
-
 
   // facets to display in table
   const tableFacets =
@@ -216,8 +214,6 @@ function mapStateToProps(state, own) {
           && currentQuery[own.label].tableSelectedColumns
           && currentQuery[own.label].tableSelectedColumns[key];
   });
-
-
 
   return {
     data: data,
