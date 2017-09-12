@@ -36,8 +36,7 @@ export class Facet extends Component {
     /* initial state, open if values selected */
     this.state = {
       open: props.open,
-      values: [],
-      textInput: props.textInput
+      values: props.values,
     };
     this.toggleOpen = this.toggleOpen.bind(this)
     this.onFacetValueSelected = this.onFacetValueSelected.bind(this)
@@ -257,20 +256,23 @@ function mapStateToProps(state, own) {
   // our state
   var selectedFacet = state.facets[own.property];
   var open = false ;
-  var textInput;
+  var values = [];
   const scope = own.property.split('.')[0]
   if (state.currentQuery[scope]) {
-    const currentFacet = _.filter(state.currentQuery[scope].selectedFacets,(f) => {return f.value && f.key === own.property })
-    open = currentFacet.length === 1
+    const currentFacets = _.filter(state.currentQuery[scope].selectedFacets,(f) => {return f.value && f.key === own.property })
+    open = currentFacets.length === 1
     if (open) {
-      textInput = currentFacet.value ;
+      values = currentFacets[0].value ;
+      if (!Array.isArray(values)) {
+        values = [values]
+      }
     }
   }
 
   return {
     selectedFacet: selectedFacet,
     open: open,
-    textInput: textInput
+    values: values
   }
 }
 
