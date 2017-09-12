@@ -6,7 +6,7 @@ import Path from '../query/path'
 import Query from '../query/query'
 
 export function* searchAll(action) {
-  const results = yield call(OphionSearch.search, action.scope, action.search)
+  const results = yield call(OphionSearch.search, action.scope, action.queryString)
   const state = yield select();
   yield put({
     type: 'SEARCH_RESULTS_SAVE',
@@ -22,9 +22,6 @@ export function* searchAll(action) {
 }
 
 export function* pathQuery(action) {
-  // console.log('path query saga')
-  // console.log(action.path)
-
   if (!_.isEmpty(action.path)) {
     const query = Path.translateQuery(action.schema, action.path, action.focus, action.order, action.orderBy).limit(10)
     const results = yield OphionSearch.execute(query)
@@ -45,6 +42,7 @@ export function* search(action) {
   yield put({
     type: 'REFRESH_QUERY',
     selectedFacets: state.selectedFacets,
+    supressFacetAggregation: action.supressFacetAggregation,
     label: action.label,
     focus: action.label,
     path: state.path,
@@ -53,15 +51,6 @@ export function* search(action) {
     queryString: action.queryString ? action.queryString : state.search.queryString,
     parsedQuery: action.parsedQuery ? action.parsedQuery : state.search.parsedQuery,
   })
-  // get updated data //TODO - is anyone catching this?
-  yield put({
-    type: 'FACETS_SEARCH',
-    selectedFacets: state.selectedFacets,
-    label: action.label,
-    focus: action.label,
-    queryString: action.queryString ? action.queryString : state.search.queryString,
-    parsedQuery: action.parsedQuery ? action.parsedQuery : state.search.parsedQuery,
-  });
 }
 
 export function* newQuery(action) {
@@ -70,6 +59,7 @@ export function* newQuery(action) {
     type: 'REFRESH_QUERY',
     label: action.focus,
     focus: action.focus,
+    supressFacetAggregation: action.supressFacetAggregation,
     path: [{label: action.focus, facets: []}],
     schema: state.schema,
     selectedFacets: [],
@@ -94,11 +84,11 @@ export function* saveQuery(action) {
 
 export function* loadQuery(action) {
   const state = yield select();
-  console.log('load query saga', action.query)
   yield put(push('/cohort/' + action.query.focus))
   // yield put({type: 'LOAD_QUERY_SAVE', query: action.query})
   yield put({
     type: 'REFRESH_QUERY',
+    supressFacetAggregation: action.supressFacetAggregation,
     label: action.query.focus,
     focus: action.query.focus,
     path: action.query.path,

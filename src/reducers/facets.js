@@ -49,8 +49,6 @@ export default class FacetReducers {
 
   static facets(state = {}, action) {
     switch (action.type) {
-      case 'REFRESH_QUERY':
-        return {...state, loading: true};
       case 'FACETS_FETCH':
         return {...state, loading: true};
       case 'FACETS_SAVE':

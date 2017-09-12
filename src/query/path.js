@@ -1,5 +1,6 @@
 import * as _ from 'underscore';
 import { Ophion } from 'ophion';
+const O = Ophion()
 
 function edgesFor(schema, label) {
   var from = schema.from[label] || []
@@ -24,7 +25,12 @@ function nodesIn(schema, path) {
 
 function applyFacets(query, facets) {
   return _.reduce(_.keys(facets), function(query, key) {
-    return query.has(facets[key].property, facets[key].value)
+    //TODO - handle single element arrays as a `has`
+    if (facets[key].value.length > 1) {
+      return query.has(facets[key].property, O.within(facets[key].value))
+    } else {
+      return query.has(facets[key].property, facets[key].value[0])      
+    }
   }, query) || query
 }
 

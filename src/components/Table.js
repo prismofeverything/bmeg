@@ -68,6 +68,7 @@ export class Table extends Component {
     const { dispatch } = this.props
     const cq = this.props.currentQuery;
     const focus = this.props.label;
+    console.log('handleRequestSort REFRESH_QUERY')     
     dispatch({
       type: 'REFRESH_QUERY',
       selectedFacets: cq[focus].selectedFacets,

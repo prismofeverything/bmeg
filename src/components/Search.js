@@ -24,29 +24,34 @@ export class Search extends Component {
       timeout: null,
       dirty: false,
       lastFacet: null,
+      componentLoading:true
     }
     this.debounceInterval = 500;
     this.autocomplete = this.autocomplete.bind(this);
     this.get_hints  = this.get_hints.bind(this);
     this.onEnter = this.onEnter.bind(this);
     this.showParserError = this.showParserError.bind(this);
+    this.lastQueryString = null;
   }
 
-  triggerSearch(value, parsedQuery) {
+  triggerSearch(value, parsedQuery, supressFacetAggregation=true) {
     const {dispatch, search} = this.props;
 
-    // var results = Parser.parse(this.state.text);
-    // console.log('parsed query', results);
-    // console.log('reformulated query', this.stringifyQuery(results));
+    if (this.lastQueryString === value) {
+      return
+    }
+    this.lastQueryString = value;
 
     const _self = this;
     _self.setState({dirty:false})
     return new Promise((resolve, reject) => {
       dispatch({
-        type: 'SEARCH_ALL_SUBMIT',
+        type: 'SEARCH',
         scope: search.scope,
+        label: search.scope,
         queryString: value,
         parsedQuery: parsedQuery,
+        supressFacetAggregation: supressFacetAggregation,
         callbackError: (error) => {
           reject({_error: error});
         },
@@ -77,7 +82,7 @@ export class Search extends Component {
       parserError = e
     }
     if (!this.state.dirty && !parserError) {
-      timeout = setTimeout(function() {self.triggerSearch(newQuery, parsedQuery)}, this.debounceInterval)
+      timeout = setTimeout(function() {self.triggerSearch(newQuery, parsedQuery, true)}, this.debounceInterval)
     }
     this.setState({text: newQuery,
                    timeout: timeout,
@@ -87,8 +92,8 @@ export class Search extends Component {
   }
 
   onEnter(cm) {
-      // if user clicked query icon or hit enter key,
-      this.triggerSearch(this.state.text);
+      // if user clicked query icon or hit enter key, update facets too
+      this.triggerSearch(this.state.text, null, false);
   }
 
   showParserError() {
@@ -154,6 +159,10 @@ export class Search extends Component {
 
    componentWillReceiveProps(nextProps) {
      const _self = this ;
+     if (this.state.componentLoading) {
+       this.setState({componentLoading:false})
+       return
+     }
      const currentFacetString = function()  {
          if (!nextProps.currentFacet) {
            return
@@ -281,7 +290,7 @@ export class Search extends Component {
 
    // PreOrderTraversal parsed query, recreate query string
    stringifyQuery(root,str = '') {
-
+     // util funcs
      var quote = (s) => {
        const specialChars = [ ':', ' ', '-', '+']
        const found = _.find(specialChars, (c) => {return s.indexOf(c) > -1})
@@ -290,13 +299,18 @@ export class Search extends Component {
        }
        return `${s} `
      }
+     var isEmptyArray = (t) => {
+       return (Array.isArray(t) && t.length === 0)
+     }
+
+     // process tree
      // simple field
-     if (root.field && root.field !== '<implicit>') {
+     if (root.field && root.field !== '<implicit>' && !isEmptyArray(root.term) ) {
        str = str.concat(`${root.field}:`)
      }
      // simple term, quote if it has blanks or embedded colon
      if (root.term) {
-       if (Array.isArray(root.term)) {
+       if (Array.isArray(root.term) && !isEmptyArray(root.term) ) {
          str = str.concat(['(',
                           _.map(root.term, (t) => { return quote(t) }).join(' ')
                           , ')'].join(''))

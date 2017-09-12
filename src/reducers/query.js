@@ -81,6 +81,18 @@ export function queryObject(state = [], action) {
 export function currentQuery(state = {name: 'test' }, action) {
   switch (action.type) {
 
+
+    case 'SEARCH':
+      return {
+        ...state,
+        [action.scope]: {
+          ...state[action.scope],
+          queryString: action.queryString,
+          parsedQuery: action.parsedQuery,
+        }
+      }
+
+
     case 'SELECTED_FACET':
       var selectedFacets = state[action.facet.label] ? state[action.facet.label].selectedFacets  : []
       selectedFacets = selectedFacets ? selectedFacets  : []
@@ -147,29 +159,9 @@ export function currentQuery(state = {name: 'test' }, action) {
         ...state,
         [action.focus]: {
           ...state[action.focus],
-          // queryString: action.queryString,
-          // parsedQuery: action.parsedQuery,
-          // order: action.order,
-          // orderBy: action.orderBy,
-          // tableSelectedColumns: tableSelectedColumns,
           loading: true
         }
       }
-
-    case 'SEARCH_RESULTS_SAVE':
-      return {...state,
-        [action.search.scope]: {
-          ...state[action.search.scope],
-          ...action.search,
-        }
-      }
-
-
-    // case 'LOAD_QUERY':
-    //   console.log('load query reducer', action)
-    //   return {
-    //     [action.query.focus]: action.query
-    //   }
 
     case 'QUERY_RESULTS_SAVE':
       // determine default tableFacets see  TOGGLE_IN_TABLE above

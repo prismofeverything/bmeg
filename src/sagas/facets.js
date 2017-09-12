@@ -12,12 +12,14 @@ export function* fetchFacets(action) {
 }
 
 export function* aggregateFacets(action) {
+  if (action.supressFacetAggregation) {
+    return
+  }
   // ES names do _not_ have `Type.` prefix, stip it out
   var queryString = (action.queryString || '*')
   var re = /(\w+).(\w+):/g
   queryString = queryString.replace(re, '$2:');
   const facets = yield call(Facets.aggregateFacets, queryString);
-  // console.log('aggregatedFacets',aggregatedFacets);
   yield put({
     type: 'FACETS_SAVE',
     facets: facets,
