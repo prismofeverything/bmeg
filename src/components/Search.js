@@ -81,9 +81,10 @@ export class Search extends Component {
     } catch (e) {
       parserError = e
     }
-    if (!this.state.dirty && !parserError) {
-      timeout = setTimeout(function() {self.triggerSearch(newQuery, parsedQuery, true)}, this.debounceInterval)
-    }
+    // if (!this.state.dirty && !parserError) {
+    //   timeout = setTimeout(function() {self.triggerSearch(newQuery, parsedQuery, true)}, this.debounceInterval)
+    // }
+    console.log('handleChange',newQuery)
     this.setState({text: newQuery,
                    timeout: timeout,
                    dirty:isDirty,
@@ -94,7 +95,7 @@ export class Search extends Component {
 
   onEnter(cm) {
       // if user clicked query icon or hit enter key, update facets too
-      this.triggerSearch(this.props.text, null, false);
+      this.triggerSearch(this.state.text, null, false);
   }
 
   showParserError() {
@@ -217,15 +218,18 @@ export class Search extends Component {
        parsedQuery = nextProps.currentQuery[nextProps.search.scope].queryString || ''
        this.replaceText(parsedQuery)
        this.triggerSearch(parsedQuery, Parser.parse(parsedQuery))
+       console.log('componentWillReceiveProps scopeChanged parsedQuery', parsedQuery)                   
      } else if (facetChanged) {
        try {
-         var currentParsedQuery = Parser.parse(nextProps.text || '')
+         var currentParsedQuery = Parser.parse(_self.getText() || nextProps.text || '')
          const replaced = this.replaceTerm(currentParsedQuery, nextProps.currentFacet.key, nextProps.currentFacet.value)
          if (!replaced) {
             const cf = currentFacetString();
             newQueryText = this.insertTextAtCursor(` ${cf} `);
+            console.log('componentWillReceiveProps !replaced newQueryText', newQueryText)
          } else {
             newQueryText = this.stringifyQuery(currentParsedQuery);
+            console.log('componentWillReceiveProps replaced newQueryText', newQueryText)
          }
          parsedQuery = this.stringifyQuery(Parser.parse(newQueryText))
          this.replaceText(parsedQuery)
@@ -236,11 +240,14 @@ export class Search extends Component {
          console.log('componentWillReceiveProps error', newQueryText,e)
        }
      }
-     this.setState({text:parsedQuery,
-                    parserError:parserError,
-                    lastFacetKey: nextProps.currentFacet.key,
-                    lastFacetValue: nextProps.currentFacet.value,
-                   })
+     if (parsedQuery) {
+       console.log('componentWillReceiveProps parsedQuery', parsedQuery)
+       this.setState({text:parsedQuery,
+                      parserError:parserError,
+                      lastFacetKey: nextProps.currentFacet.key,
+                      lastFacetValue: nextProps.currentFacet.value,
+                     })
+     }
 
 
    }
@@ -400,7 +407,7 @@ export class Search extends Component {
           <div style={{ margin: 'auto 8px', width: '100%' }}>
             <CodeMirror ref="editor"
                         name="editor"
-                        value={this.props.text}
+                        value={this.state.text}
                         onChange={this.handleChange.bind(this)}
                         options={options}
                         />
