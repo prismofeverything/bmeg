@@ -8,8 +8,13 @@ export default class Facets {
     )
   }
 
-  static aggregateFacets(query) {
-    return fetch(`/facets?q=${query}`)
+  static aggregateFacets(query,field=undefined) {
+    if (field) {
+      field = `&f=${field}`
+    } else {
+      field = ''
+    }
+    return fetch(`/facets?q=${query}${field}`)
       .then(function(response) {
         return response.json()
       }

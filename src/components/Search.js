@@ -37,7 +37,7 @@ export class Search extends Component {
   triggerSearch(value, parsedQuery, supressFacetAggregation=true) {
     const {dispatch, search} = this.props;
 
-    if (this.lastQueryString === value) {
+    if (this.lastQueryString === value && supressFacetAggregation) {
       return
     }
     this.lastQueryString = value;
@@ -89,11 +89,12 @@ export class Search extends Component {
                    dirty:isDirty,
                    parsedQuery: parsedQuery,
                    parserError:parserError})
+
   }
 
   onEnter(cm) {
       // if user clicked query icon or hit enter key, update facets too
-      this.triggerSearch(this.state.text, null, false);
+      this.triggerSearch(this.props.text, null, false);
   }
 
   showParserError() {
@@ -191,6 +192,10 @@ export class Search extends Component {
      var newQueryText;
      var parserError;
      var parsedQuery;
+
+     if (!nextProps.schema.vertexes) {
+       return
+     }
      if (nextProps.currentFacet.key) {
        if (_self.state.lastFacetKey !==  nextProps.currentFacet.key) {
          facetChanged = true;
@@ -199,6 +204,10 @@ export class Search extends Component {
          facetChanged = true;
        }
      }
+     if (_self.getText() !== nextProps.currentQuery[nextProps.search.scope].queryString) {
+        facetChanged = true;
+     }
+
      if (nextProps.search && _self.props.search && (nextProps.search.scope !== _self.props.search.scope)) {
        facetChanged = true;
        scopeChanged = true;
@@ -207,10 +216,10 @@ export class Search extends Component {
      if (scopeChanged) {
        parsedQuery = nextProps.currentQuery[nextProps.search.scope].queryString || ''
        this.replaceText(parsedQuery)
-       this.handleChange(parsedQuery)
+       this.triggerSearch(parsedQuery, Parser.parse(parsedQuery))
      } else if (facetChanged) {
        try {
-         var currentParsedQuery = Parser.parse(_self.props.text || '')
+         var currentParsedQuery = Parser.parse(nextProps.text || '')
          const replaced = this.replaceTerm(currentParsedQuery, nextProps.currentFacet.key, nextProps.currentFacet.value)
          if (!replaced) {
             const cf = currentFacetString();
@@ -220,7 +229,7 @@ export class Search extends Component {
          }
          parsedQuery = this.stringifyQuery(Parser.parse(newQueryText))
          this.replaceText(parsedQuery)
-         this.handleChange(parsedQuery)
+         this.triggerSearch(parsedQuery, Parser.parse(parsedQuery))
        } catch (e) {
          parserError = e
          parsedQuery = newQueryText

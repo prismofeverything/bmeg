@@ -11,6 +11,20 @@ export default class FacetReducers {
     }
   }
 
+  static autocomplete(state = {}, action) {
+    switch (action.type) {
+      case 'AUTOCOMPLETE_SAVE':
+        return {
+          ...state,
+          ...action.facets.facets,
+        }
+      default:
+        return state
+    }
+
+  }
+
+
 
   static selectedFacets(state = [], action) {
     switch (action.type) {

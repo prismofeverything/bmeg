@@ -20,6 +20,7 @@ import ListItemText from 'material-ui/List/ListItemText';
 import ListItemSecondaryAction from 'material-ui/List/ListItemSecondaryAction';
 import TextField from 'material-ui/TextField';
 
+import FacetAutosuggest from './FacetAutosuggest'
 
 import {
   VictoryPie,
@@ -176,21 +177,28 @@ export class Facet extends Component {
         )
       } else if (value_accessor === 'doc_count') {
 
+        // input = (
+        //   <TextField
+        //      margin="dense"
+        //      placeholder="ABC..."
+        //      label="Value"
+        //      helperText="Text"
+        //      autoFocus
+        //      value={_self.state.textInput || '' }
+        //      className={classes.input}
+        //      onChange={ (event) => { _self.updateTextInput(event.target.value) }}
+        //      inputProps={{
+        //        'aria-label': 'Description',
+        //      }}
+        //    />
+        // ) ;
+
         input = (
-          <TextField
-             margin="dense"
-             placeholder="ABC..."
-             label="Value"
-             helperText="Text"
-             autoFocus
-             value={_self.state.textInput || '' }
-             className={classes.input}
-             onChange={ (event) => { _self.updateTextInput(event.target.value) }}
-             inputProps={{
-               'aria-label': 'Description',
-             }}
-           />
+          <FacetAutosuggest
+            property={_self.props.property}
+            onSelect= {(v) => {_self.onFacetValueSelected(key,v)}}  />
         ) ;
+
 
         // terms aggregation
         chart = (

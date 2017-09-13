@@ -20,6 +20,7 @@ import { saveQuery } from './query'
 import { loadQuery } from './query'
 import { queryComparison } from './query'
 import { allQueries } from './query'
+import { autocomplete } from './autocomplete'
 
 export function* sagas() {
   yield [
@@ -39,5 +40,6 @@ export function* sagas() {
     fork(takeLatest, 'SAVE_QUERY', saveQuery),
     fork(takeLatest, 'LOAD_QUERY', loadQuery),
     fork(takeLatest, 'QUERY_COMPARISON', queryComparison),
+    fork(takeLatest, 'AUTOCOMPLETE', autocomplete),
   ];
 }

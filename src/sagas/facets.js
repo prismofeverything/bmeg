@@ -13,6 +13,7 @@ export function* fetchFacets(action) {
 
 export function* aggregateFacets(action) {
   if (action.supressFacetAggregation) {
+    console.log('action.supressFacetAggregation' , action)
     return
   }
   // ES names do _not_ have `Type.` prefix, stip it out
