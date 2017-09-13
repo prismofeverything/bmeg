@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import { render } from 'react-dom'
-import { connect } from "react-redux";
+import { connect } from 'react-redux'
 import cytoscape from 'cytoscape'
 import * as _ from 'underscore'
 
 import Path from '../query/path.js'
+import { getIn, assocIn, mergeIn, updateIn } from '../state/state'
 
 function schemaToCytoscape(schema, path) {
   if (_.isEmpty(schema)) {
