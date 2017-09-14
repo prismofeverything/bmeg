@@ -32,6 +32,7 @@
   "author": "Ryan Spangler, Brian Walsh, Kyle Elrott",
   "license": "MIT",
   "dependencies": {
+    "autosuggest-highlight": "^3.1.0",
     "chai": "^3.5.0",
     "coveralls": "^2.13.1",
     "cytoscape": "^3.1.4",
@@ -45,6 +46,7 @@
     "nyc": "^10.3.2",
     "ophion": "0.0.28",
     "react": "^15.4.2",
+    "react-autosuggest": "^9.3.2",
     "react-codemirror": "^1.0.0",
     "react-dom": "^15.4.2",
     "react-flex-split-pane": "github:instea/react-flex-split-pane",
