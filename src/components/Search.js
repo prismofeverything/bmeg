@@ -260,8 +260,6 @@ export class Search extends Component {
        focusChanged = true;
      }
 
-     console.log('search will receive props', nextProps)
-
      if (focusChanged) {
        queryText = nextProps.currentQuery[nextProps.focus].queryString || ''
        this.replaceText(queryText)
