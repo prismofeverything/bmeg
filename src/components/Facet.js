@@ -26,7 +26,8 @@ import {
   VictoryPie,
   VictoryChart,
   VictoryBar,
-  Bar
+  Bar,
+  VictoryLabel
 } from 'victory';
 
 // a `cohort` is a selection from a type/domain/label based on selected criteria
@@ -206,6 +207,10 @@ export class Facet extends Component {
                       x="key"
                       y={value_accessor}
                       colorScale='warm'
+                      style={{ parent: { overflow: "visible" } }}
+                      startAngle={45}
+              				endAngle={-315}
+                      padding={70}                 
                       events={[{
                         target: "data",
                         eventHandlers: {
