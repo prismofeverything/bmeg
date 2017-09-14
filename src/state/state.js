@@ -1,3 +1,11 @@
+function getValue(x, d) {
+  if (x === undefined || x === null) {
+    return d
+  } else {
+    return x
+  }
+}
+
 export function getIn(m, path) {
   if (path.length === 0) {
     return m
@@ -10,7 +18,8 @@ export function assocIn(m, path, x) {
   if (path.length === 0) {
     return x
   } else {
-    const down = assocIn(m[path[0]] || {}, path.slice(1), x)
+    const value = getValue(m[path[0]], {})
+    const down = assocIn(value, path.slice(1), x)
     return {
       ...m,
       [path[0]]: down,
@@ -25,7 +34,8 @@ export function mergeIn(m, path, d) {
       ...d,
     }
   } else {
-    const down = mergeIn(m[path[0]] || {}, path.slice(1), d)
+    const value = getValue(m[path[0]], {})
+    const down = mergeIn(value, path.slice(1), d)
     return {
       ...m,
       [path[0]]: down,
@@ -37,7 +47,8 @@ export function updateIn(m, path, f) {
   if (path.length === 0) {
     return f(m)
   } else {
-    const down = updateIn(m[path[0]] || {}, path.slice(1), f)
+    const value = getValue(m[path[0]], {})
+    const down = updateIn(value, path.slice(1), f)
     return {
       ...m,
       [path[0]]: down,

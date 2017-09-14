@@ -135,59 +135,59 @@ export class Search extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
 
-       let cm = this.refs['editor'].getCodeMirrorInstance();
-       let editor = this.refs['editor'].getCodeMirror();
-       const _self = this;
+    let cm = this.refs['editor'].getCodeMirrorInstance();
+    let editor = this.refs['editor'].getCodeMirror();
+    const _self = this;
 
-      // // set gutterClick
-      //  editor.on("gutterClick", function(cm, n) {
-      //    _self.showParserError()
-      //  });
+    // // set gutterClick
+    //  editor.on("gutterClick", function(cm, n) {
+    //    _self.showParserError()
+    //  });
 
-       // see CodeMirror's anyword-hint for background
-       let showHint = require('./show_hint');
-       showHint(cm);
-       // when auto suggesting, look for words that include . _
-       var WORD = /([\u4e00-\u9fa5]|[a-zA-Z]|[\._])+/;
-       cm.registerHelper("hint", "tag", function (editor, options) {
-           var word = options && (options.word || WORD);
-           // var range = options && (options.range || RANGE);
-           var cur = editor.getCursor(), curLine = editor.getLine(cur.line);
-           var end = cur.ch, start = end;
-           while (start && word.test(curLine.charAt(start - 1)))--start;
-           var curWord = start !== end && curLine.slice(start, end);
+    // see CodeMirror's anyword-hint for background
+    let showHint = require('./show_hint');
+    showHint(cm);
+    // when auto suggesting, look for words that include . _
+    var WORD = /([\u4e00-\u9fa5]|[a-zA-Z]|[\._])+/;
+    cm.registerHelper("hint", "tag", function (editor, options) {
+      var word = options && (options.word || WORD);
+      // var range = options && (options.range || RANGE);
+      var cur = editor.getCursor(), curLine = editor.getLine(cur.line);
+      var end = cur.ch, start = end;
+      while (start && word.test(curLine.charAt(start - 1)))--start;
+      var curWord = start !== end && curLine.slice(start, end);
 
-           var list = []
-           var data = editor.options.hints(); // set in render, grab from current responses
-           for (var k in data){
-               if (data.hasOwnProperty(k) ) {
-                 if (!curWord) {
-                   list.push(k);
-                   list.push(data[k]);
-                 } else if (k.startsWith(curWord)) {
-                   list.push(k);
-                 }
-                //  else if (data[k].startsWith(curWord)) {
-                //    list.push(data[k]);
-                //  }
-               }
-           }
-           list.sort()
-           return { list: list, from: cm.Pos(cur.line, start), to: cm.Pos(cur.line, end) };
-       });
-     }
+      var list = []
+      var data = editor.options.hints(); // set in render, grab from current responses
+      for (var k in data){
+        if (data.hasOwnProperty(k) ) {
+          if (!curWord) {
+            list.push(k);
+            list.push(data[k]);
+          } else if (k.startsWith(curWord)) {
+            list.push(k);
+          }
+          //  else if (data[k].startsWith(curWord)) {
+          //    list.push(data[k]);
+          //  }
+        }
+      }
+      list.sort()
+      return { list: list, from: cm.Pos(cur.line, start), to: cm.Pos(cur.line, end) };
+    });
+  }
 
-   // when user hits 'Ctrl-Space'
-   autocomplete(cm) {
-       let codeMirror = this.refs['editor'].getCodeMirrorInstance();
-       codeMirror.showHint(cm, codeMirror.hint.tag);
-   }
+  // when user hits 'Ctrl-Space'
+  autocomplete(cm) {
+    let codeMirror = this.refs['editor'].getCodeMirrorInstance();
+    codeMirror.showHint(cm, codeMirror.hint.tag);
+  }
 
-   // hints used by codeMirror autocomplete
-   getHints() {
-     const {resources} = this.props;
-     return this.props.facets;
-   }
+  // hints used by codeMirror autocomplete
+  getHints() {
+    const {resources} = this.props;
+    return this.props.facets;
+  }
 
   //  // click event from codemirror gutter
   //  showParserError() {
@@ -205,129 +205,129 @@ export class Search extends Component {
   // this is a bit tweaky, but we manage state of codemirror
   // and its interaction with facets here, not in mapStateToProps
   // this allows us to maintain cursor position, etc.
-   componentWillReceiveProps(nextProps) {
-     const _self = this ;
-     if (this.state.componentLoading) {
-       this.setState({componentLoading:false})
-       return
-     }
-     const currentFacetString = function()  {
-         if (!nextProps.currentFacet) {
-           return
-         }
-         if (!nextProps.facets[nextProps.currentFacet.key]) {
-           return
-         }
-         if (_self.state.lastFacet ===  nextProps.currentFacet.key) {
-           return
-         }
-         const type = nextProps.facets[nextProps.currentFacet.key].type;
-         var str
-         if (type === 'text') {
-           str = `${nextProps.currentFacet.key}:"${nextProps.currentFacet.value}"`;
-         } else {
-           str =`${nextProps.currentFacet.key}:${nextProps.currentFacet.value}`;
-         }
-         return _self.stringifyQuery(Parser.parse(str))
-     }
+  componentWillReceiveProps(nextProps) {
+    const _self = this ;
+    if (this.state.componentLoading) {
+      this.setState({componentLoading:false})
+      return
+    }
+    const currentFacetString = function()  {
+      if (!nextProps.currentFacet) {
+        return
+      }
+      if (!nextProps.facets[nextProps.currentFacet.key]) {
+        return
+      }
+      if (_self.state.lastFacet ===  nextProps.currentFacet.key) {
+        return
+      }
+      const type = nextProps.facets[nextProps.currentFacet.key].type;
+      var str
+      if (type === 'text') {
+        str = `${nextProps.currentFacet.key}:"${nextProps.currentFacet.value}"`;
+      } else {
+        str =`${nextProps.currentFacet.key}:${nextProps.currentFacet.value}`;
+      }
+      return _self.stringifyQuery(Parser.parse(str))
+    }
 
-     // check that a real update happened
-     var facetChanged = false;
-     var focusChanged = false;
-     var stringChanged = false;
-     var queryText;
-     var parserError;
-     var parsedQuery;
+    // check that a real update happened
+    var facetChanged = false;
+    var focusChanged = false;
+    var stringChanged = false;
+    var queryText;
+    var parserError;
+    var parsedQuery;
 
-     if (!nextProps.schema.vertexes) {
-       return
-     }
-     if (nextProps.currentFacet.key) {
-       if (_self.state.lastFacetKey !==  nextProps.currentFacet.key) {
-         facetChanged = true;
-       }
-       if (_self.state.lastFacetValue !==  nextProps.currentFacet.value) {
-         facetChanged = true;
-       }
-     }
-     if (_self.getText() !== nextProps.currentQuery[nextProps.focus].queryString) {
+    if (!nextProps.schema.vertexes) {
+      return
+    }
+    if (nextProps.currentFacet.key) {
+      if (_self.state.lastFacetKey !==  nextProps.currentFacet.key) {
         facetChanged = true;
-        stringChanged = true;
-     }
+      }
+      if (_self.state.lastFacetValue !==  nextProps.currentFacet.value) {
+        facetChanged = true;
+      }
+    }
+    if (_self.getText() !== nextProps.currentQuery[nextProps.focus].queryString) {
+      facetChanged = true;
+      stringChanged = true;
+    }
 
-     if (nextProps.focus !== _self.props.focus) {
-       facetChanged = true;
-       focusChanged = true;
-     }
+    if (nextProps.focus !== _self.props.focus) {
+      facetChanged = true;
+      focusChanged = true;
+    }
 
-     if (focusChanged) {
-       queryText = nextProps.currentQuery[nextProps.focus].queryString || ''
-       this.replaceText(queryText)
-       this.triggerSearch(queryText, Parser.parse(queryText), false, nextProps.focus)
-       console.log('focusChanged', queryText)
-     } else if (facetChanged) {
-       try {
-         var currentParsedQuery = Parser.parse(_self.getText() || nextProps.text || '')
-         const replaced = this.replaceTerm(currentParsedQuery, nextProps.currentFacet.key, nextProps.currentFacet.value)
-         if (!replaced) {
-            const cf = currentFacetString();
-            queryText = this.insertTextAtCursor(` ${cf} `);
-         } else {
-            queryText = this.stringifyQuery(currentParsedQuery);
-         }
-         currentParsedQuery = Parser.parse(queryText)
-         queryText = this.stringifyQuery(currentParsedQuery)
-         this.replaceText(queryText)
-         this.triggerSearch(queryText, currentParsedQuery)
-       } catch (e) {
-         parserError = e
-         queryText = queryText
-       }
-     }
-     if (queryText) {
-       this.setState({text:queryText,
-                      parsedQuery: currentParsedQuery,
-                      parserError:parserError,
-                      lastFacetKey: nextProps.currentFacet.key,
-                      lastFacetValue: nextProps.currentFacet.value,
-                     })
-     }
-   }
+    if (focusChanged) {
+      queryText = nextProps.currentQuery[nextProps.focus].queryString || ''
+      this.replaceText(queryText)
+      this.triggerSearch(queryText, Parser.parse(queryText), false, nextProps.focus)
+      console.log('focusChanged', queryText)
+    } else if (facetChanged) {
+      try {
+        var currentParsedQuery = Parser.parse(_self.getText() || nextProps.text || '')
+        const replaced = this.replaceTerm(currentParsedQuery, nextProps.currentFacet.key, nextProps.currentFacet.value)
+        if (!replaced) {
+          const cf = currentFacetString();
+          queryText = this.insertTextAtCursor(` ${cf} `);
+        } else {
+          queryText = this.stringifyQuery(currentParsedQuery);
+        }
+        currentParsedQuery = Parser.parse(queryText)
+        queryText = this.stringifyQuery(currentParsedQuery)
+        this.replaceText(queryText)
+        this.triggerSearch(queryText, currentParsedQuery)
+      } catch (e) {
+        parserError = e
+        queryText = queryText
+      }
+    }
+    if (queryText) {
+      this.setState({text:queryText,
+                     parsedQuery: currentParsedQuery,
+                     parserError:parserError,
+                     lastFacetKey: nextProps.currentFacet.key,
+                     lastFacetValue: nextProps.currentFacet.value,
+                    })
+    }
+  }
 
 
 
-   // codemirror util: ... insert it into the search bar at the current cursor
-   insertTextAtCursor(text) {
+  // codemirror util: ... insert it into the search bar at the current cursor
+  insertTextAtCursor(text) {
     //  if (!text) { return }
-     if (!this.refs['editor'])  { return }
-     let editor = this.refs['editor'].getCodeMirror();
-     var doc = editor.getDoc();
-     var cursor = doc.getCursor();
-     doc.replaceRange(text, cursor);
-     return editor.getValue()
-   }
+    if (!this.refs['editor'])  { return }
+    let editor = this.refs['editor'].getCodeMirror();
+    var doc = editor.getDoc();
+    var cursor = doc.getCursor();
+    doc.replaceRange(text, cursor);
+    return editor.getValue()
+  }
 
-   // codemirror util: ... replace search bar, place cursor at end
-   replaceText(text) {
-     if (!this.refs['editor'])  { return }
-     let editor = this.refs['editor'].getCodeMirror();
-     var doc = editor.getDoc();
-     var oldCursor = doc.getCursor();
-     editor.setValue(text);
-     editor.setCursor({line: 1, ch: text.length})
-     var cursor = doc.getCursor();
-     return editor.getValue()
-   }
+  // codemirror util: ... replace search bar, place cursor at end
+  replaceText(text) {
+    if (!this.refs['editor'])  { return }
+    let editor = this.refs['editor'].getCodeMirror();
+    var doc = editor.getDoc();
+    var oldCursor = doc.getCursor();
+    editor.setValue(text);
+    editor.setCursor({line: 1, ch: text.length})
+    var cursor = doc.getCursor();
+    return editor.getValue()
+  }
 
-   // codemirror util: ... get search bar text
-   getText() {
-     if (!this.refs['editor'])  { return }
-     let editor = this.refs['editor'].getCodeMirror();
-     return editor.getValue()
-   }
+  // codemirror util: ... get search bar text
+  getText() {
+    if (!this.refs['editor'])  { return }
+    let editor = this.refs['editor'].getCodeMirror();
+    return editor.getValue()
+  }
 
-   // lucene query util: PreOrderTraversal parsed query, replace field term , return true on replace
-   replaceTerm(root, field, term) {
+  // lucene query util: PreOrderTraversal parsed query, replace field term , return true on replace
+  replaceTerm(root, field, term) {
     // hack: replace an existing vector with a term, see stringify array handling
     if (root.field === field) {
       root.term = term;
@@ -343,10 +343,10 @@ export class Search extends Component {
       replaced = this.replaceTerm(root.right, field, term);
     }
     return replaced;
-   }
+  }
 
-   // lucene query util: PreOrderTraversal parsed query, return field term
-   getTerm(root, field, memo = []) {
+  // lucene query util: PreOrderTraversal parsed query, return field term
+  getTerm(root, field, memo = []) {
     if (root.field === field) {
       return  this.getTermContent(root, memo)
     }
@@ -358,10 +358,10 @@ export class Search extends Component {
       memo = this.getTerm(root.right, field, memo);
     }
     return memo;
-   }
+  }
 
-   // lucene query util: get all the terms under this element
-   getTermContent(root, memo) {
+  // lucene query util: get all the terms under this element
+  getTermContent(root, memo) {
     if (root.term) {
       return memo.concat([root.term])
     }
@@ -372,10 +372,10 @@ export class Search extends Component {
       memo = this.getTermContent(root.right, memo);
     }
     return memo;
-   }
+  }
 
-   // lucene query util: return all the fields in the query
-   getFields(root, memo=[]) {
+  // lucene query util: return all the fields in the query
+  getFields(root, memo=[]) {
     if (root.field) {
       return memo.concat([root.field])
     }
@@ -386,15 +386,15 @@ export class Search extends Component {
       memo = this.getFields(root.right, memo);
     }
     return memo;
-   }
+  }
 
-   // lucene query util: return all the fields in the query, with associated terms
-   getFieldsAndTerms(root, memo=[]) {
+  // lucene query util: return all the fields in the query, with associated terms
+  getFieldsAndTerms(root, memo=[]) {
     const fields = this.getFields(root);
     return fields.map((f) => {
-     return { key:f, term: this.getTerm(root,f) }
+      return { key:f, term: this.getTerm(root,f) }
     }) ;
-   }
+  }
 
    // lucene query util: PreOrderTraversal parsed query, recreate query string
    stringifyQuery(root,str = '') {

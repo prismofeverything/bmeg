@@ -12,6 +12,7 @@ export function query(state = {}, action) {
       }
     case 'SELECTED_FACET':
       return assocIn(state, [action.label, 'facets', action.property], action.value)
+
     case 'QUERY_RESULTS_SAVE':
       return assocIn(state, [action.focus], {
         path: action.path,
@@ -102,7 +103,22 @@ export function currentQuery(state = {name: 'test' }, action) {
     case 'TOGGLE_IN_TABLE':
       const toggle = function(bit) {return !bit}
       const tableKey = [action.focus, 'tableSelectedColumns', action.facet.key]
-      return updateIn(state, tableKey, toggle)
+      const update = updateIn(state, tableKey, toggle)
+      return update
+
+
+      // const toggle = !state[action.focus].tableSelectedColumns[action.facet.key]
+      // return {
+      //   ...state,
+      //   [action.focus]: {
+      //     ...state[action.focus],
+      //     tableSelectedColumns: {
+      //       ...state[action.focus].tableSelectedColumns,
+      //       [action.facet.key]: toggle,
+      //     }
+      //   }
+      // }
+
 
     case 'FILTER_FOR_VALUE':
       return assocIn(state, [action.focus, 'selectedFacets', action.facet.key], action.facet)
