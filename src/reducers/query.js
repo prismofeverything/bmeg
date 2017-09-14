@@ -103,9 +103,7 @@ export function currentQuery(state = {name: 'test' }, action) {
     case 'TOGGLE_IN_TABLE':
       const toggle = function(bit) {return !bit}
       const tableKey = [action.focus, 'tableSelectedColumns', action.facet.key]
-      const update = updateIn(state, tableKey, toggle)
-      return update
-
+      return updateIn(state, tableKey, toggle)
 
       // const toggle = !state[action.focus].tableSelectedColumns[action.facet.key]
       // return {
