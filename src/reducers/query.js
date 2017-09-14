@@ -79,15 +79,6 @@ export function currentQuery(state = {name: 'test' }, action) {
         parsedQuery: action.parsedQuery,
       })
 
-      // return {
-      //   ...state,
-      //   [action.scope]: {
-      //     ...state[action.scope],
-      //     queryString: action.queryString,
-      //     parsedQuery: action.parsedQuery,
-      //   }
-      // }
-
     case 'SELECTED_FACET':
       var selectedFacets = state[action.facet.label] ? state[action.facet.label].selectedFacets  : []
       selectedFacets = selectedFacets ? selectedFacets  : []
@@ -99,83 +90,26 @@ export function currentQuery(state = {name: 'test' }, action) {
         selectedFacets: selectedFacets
       })
 
-      // return {
-      //   ...state,
-      //   [action.facet.label]: {
-      //     ...state[action.facet.label],
-      //     currentFacet: action.facet,
-      //     selectedFacets: selectedFacets
-      //   }
-      // }
-
     case 'STEP_ON_PATH':
       // run default search when user selects vertex
       const resultsPresent = state[action.label] && state[action.label].results && state[action.label].results.length > 1
 
       return assocIn(state, [action.label, 'runSearch'], true)
 
-      // return {
-      //   ...state,
-      //   [action.label]: {
-      //     ...state[action.label],
-      //     runSearch: true, // !resultsPresent
-      //   }
-      // }
-
     case 'TOGGLE_IN_TABLE':
       const toggle = function(bit) {return !bit}
       const tableKey = [action.focus, 'tableSelectedColumns', action.facet.key]
       return updateIn(state, tableKey, toggle)
 
-      // const toggle = !state[action.focus].tableSelectedColumns[action.facet.key]
-      // return {
-      //   ...state,
-      //   [action.focus]: {
-      //     ...state[action.focus],
-      //     tableSelectedColumns: {
-      //       ...state[action.focus].tableSelectedColumns,
-      //       [action.facet.key]: toggle,
-      //     }
-      //   }
-      // }
-
     case 'FILTER_FOR_VALUE':
       return assocIn(state, [action.focus, 'selectedFacets', action.facet.key], action.facet)
-
-      // return {
-      //   ...state,
-      //   [action.focus]: {
-      //     ...state[action.focus],
-      //     selectedFacets: {
-      //       ...state[action.focus].selectedFacets,
-      //       [action.facet.key]: action.facet
-      //     }
-      //   }
-      // }
 
     case 'FILTER_OUT_VALUE':
       const filteredFacets = _.omit(state[action.focus].selectedFacets, action.facet.key)
       return assocIn(state, [action.focus, 'selectedFacets'], filteredFacets)
 
-      // return {
-      //   ...state,
-      //   [action.focus]: {
-      //     ...state[action.focus],
-      //     selectedFacets:filteredFacets
-      //   }
-      // }
-
     case 'REFRESH_QUERY':
       return assocIn(state, [action.focus, 'loading'], true)
-
-      // const tableSelectedColumns = state[action.focus] && state[action.focus].tableSelectedColumns ? state[action.focus].tableSelectedColumns : {}
-      // return {
-      //   ...state,
-      //   [action.focus]: {
-      //     ...state[action.focus],
-      //     loading: true
-      //   }
-      // }
 
     case 'QUERY_RESULTS_SAVE':
       // determine default tableFacets see  TOGGLE_IN_TABLE above
@@ -191,19 +125,6 @@ export function currentQuery(state = {name: 'test' }, action) {
         loading: false,
         tableSelectedColumns: defaultTableSelectedColumns
       })
-
-      // return {
-      //   ...state,
-      //   [action.focus]: {
-      //     ...state[action.focus],
-      //     path: action.path,
-      //     query: action.query,
-      //     focus: action.focus,
-      //     results: action.results,
-      //     loading: false,
-      //     tableSelectedColumns: defaultTableSelectedColumns,
-      //   }
-      // }
 
     default:
       return state
