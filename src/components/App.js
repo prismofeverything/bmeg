@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import Header from "./Header"
 import "../stylesheets/main.scss";
 
-import createMuiTheme from 'material-ui/styles/theme';
+import createMuiTheme from 'material-ui/styles/createMuiTheme';
 import { MuiThemeProvider } from 'material-ui/styles';
 
 // Needed for onTouchTap
