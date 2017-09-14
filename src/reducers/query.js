@@ -79,6 +79,15 @@ export function currentQuery(state = {name: 'test' }, action) {
         parsedQuery: action.parsedQuery,
       })
 
+    // case 'STEP_ON_PATH':
+    //   // init current query
+    //   const currentQuery = state[action.label] || {}
+    //   return {
+    //     ...state,
+    //     scope: action.label,
+    //     [action.label]: currentQuery
+    //   }
+
     case 'SELECTED_FACET':
       var selectedFacets = state[action.facet.label] ? state[action.facet.label].selectedFacets  : []
       selectedFacets = selectedFacets ? selectedFacets  : []
@@ -92,9 +101,11 @@ export function currentQuery(state = {name: 'test' }, action) {
 
     case 'STEP_ON_PATH':
       // run default search when user selects vertex
-      const resultsPresent = state[action.label] && state[action.label].results && state[action.label].results.length > 1
+      // const resultsPresent = state[action.label] && state[action.label].results && state[action.label].results.length > 1
+      // return assocIn(state, [action.label, 'runSearch'], true)
 
-      return assocIn(state, [action.label, 'runSearch'], true)
+      const currentQuery = state[action.label] || {}
+      return assocIn(state, [action.label], currentQuery)
 
     case 'TOGGLE_IN_TABLE':
       const toggle = function(bit) {return !bit}

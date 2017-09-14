@@ -36,8 +36,8 @@ export class Search extends Component {
 
 
   // fire search event, if it has changed
-  triggerSearch(value, parsedQuery, supressFacetAggregation=true) {
-    const {dispatch, search} = this.props;
+  triggerSearch(value, parsedQuery, supressFacetAggregation=true, scope=this.props.scope) {
+    const {dispatch} = this.props;
     if (this.lastQueryString === value && supressFacetAggregation) {
       return
     }
@@ -47,8 +47,8 @@ export class Search extends Component {
     return new Promise((resolve, reject) => {
       dispatch({
         type: 'SEARCH',
-        scope: search.scope,
-        label: search.scope,
+        scope: scope,
+        label: scope,
         queryString: value,
         parsedQuery: parsedQuery,
         supressFacetAggregation: supressFacetAggregation,
@@ -103,8 +103,9 @@ export class Search extends Component {
 
   // check if facets need updating
   updateFacets() {
+    const {scope} = this.props;
     const fieldsAndTerms = this.getFieldsAndTerms(this.state.parsedQuery)
-    const selectedFacets = this.props.currentQuery[this.props.search.scope].selectedFacets || []
+    const selectedFacets = this.props.currentQuery[scope].selectedFacets || []
     const facetsNeedUpdate = _.filter(fieldsAndTerms, (fieldTerm) => {
       return  _.find(selectedFacets, (f) => {
         return f.key === fieldTerm.key && !_.isEqual(f.value, fieldTerm.term)
@@ -249,20 +250,21 @@ export class Search extends Component {
          facetChanged = true;
        }
      }
-     if (_self.getText() !== nextProps.currentQuery[nextProps.search.scope].queryString) {
+     if (_self.getText() !== nextProps.currentQuery[nextProps.scope].queryString) {
         facetChanged = true;
         stringChanged = true;
      }
 
-     if (nextProps.search && _self.props.search && (nextProps.search.scope !== _self.props.search.scope)) {
+     if (nextProps.scope !== _self.props.scope) {
        facetChanged = true;
        scopeChanged = true;
      }
 
      if (scopeChanged) {
-       queryText = nextProps.currentQuery[nextProps.search.scope].queryString || ''
+       queryText = nextProps.currentQuery[nextProps.scope].queryString || ''
        this.replaceText(queryText)
-       this.triggerSearch(queryText, Parser.parse(queryText))
+       this.triggerSearch(queryText, Parser.parse(queryText), false, nextProps.scope)
+       console.log('scopeChanged', queryText)
      } else if (facetChanged) {
        try {
          var currentParsedQuery = Parser.parse(_self.getText() || nextProps.text || '')
@@ -522,7 +524,9 @@ export class Search extends Component {
 }
 
 function mapStateToProps(state, own) {
-  const currentScope = state.currentQuery[state.search.scope]
+
+  console.log('state.currentQuery',state.currentQuery)
+  const currentScope = state.currentQuery[state.currentQuery.scope]
   var text = own.text, currentFacet = {}, selectedFacets = []
   if (currentScope) {
     text = currentScope.queryString ? currentScope.queryString : '' ;
@@ -531,7 +535,7 @@ function mapStateToProps(state, own) {
   }
 
   return {
-    search: state.search,
+    scope: state.currentQuery.scope,
     facets: state.facets,
     selectedFacets: selectedFacets,
     currentFacet: currentFacet,

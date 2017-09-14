@@ -11,12 +11,11 @@ export function* searchAll(action) {
   yield put({
     type: 'SEARCH_RESULTS_SAVE',
     search: {
-      search: action.search,
       scope: action.scope,
       parsedQuery: action.parsedQuery,
       results: results,
-      queryString: action.queryString ? action.queryString : state.search.queryString,
-      parsedQuery: action.parsedQuery ? action.parsedQuery : state.search.parsedQuery,
+      queryString: action.queryString ,
+      parsedQuery: action.parsedQuery ,
     }
   })
 }
@@ -48,8 +47,8 @@ export function* search(action) {
     path: state.path,
     schema: state.schema,
     currentQuery: state.currentQuery,
-    queryString: action.queryString ? action.queryString : state.search.queryString,
-    parsedQuery: action.parsedQuery ? action.parsedQuery : state.search.parsedQuery,
+    queryString: action.queryString,
+    parsedQuery: action.parsedQuery,
   })
 }
 
