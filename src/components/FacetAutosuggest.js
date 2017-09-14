@@ -124,23 +124,26 @@ function getSuggestionValue(suggestion) {
 const styles = theme => ({
   container: {
     flexGrow: 1,
-    position: 'relative',
-    height: 200,
+    position: 'absolute',
+    zIndex: 100
   },
   suggestionsContainerOpen: {
     position: 'absolute',
     marginTop: theme.spacing.unit,
     marginBottom: theme.spacing.unit * 3,
+    backgroundColor: 'lightgrey',
     left: 0,
     right: 0,
+
   },
   suggestion: {
-    display: 'block',
+    display: 'block'
   },
   suggestionsList: {
     margin: 0,
     padding: 0,
     listStyleType: 'none',
+    overflow: 'visible'
   },
   textField: {
     width: '100%',
@@ -166,19 +169,11 @@ class FacetAutosuggest extends React.Component {
     const {dispatch} = this.props;
     const _self = this;
     this.setState({loading:true})
-    return new Promise((resolve, reject) => {
-      dispatch({
-        type: 'AUTOCOMPLETE',
-        label: _self.props.property,
-        value: value,
-        callbackError: (error) => {
-          reject({_error: error});
-        },
-        callbackSuccess: () => {
-          resolve();
-        }
-      });
-    });
+    dispatch({
+      type: 'AUTOCOMPLETE',
+      label: _self.props.property,
+      value: value
+    })
   };
 
   handleSuggestionsClearRequested() {
@@ -192,17 +187,15 @@ class FacetAutosuggest extends React.Component {
       value: newValue,
     });
     if (method !== 'type') {
-      this.props.onSelect(newValue)      
+      this.props.onSelect(newValue)
     }
   };
 
   render() {
     const { classes } = this.props;
-    const status = (this.props.loading ? 'Loading...' : '' );
     const placeholder = `Search ${this.props.property}`
     return (
-      <div>
-        {status}
+      <div style={{marginBottom: 50}}>
         <Autosuggest
           theme={{
             container: classes.container,
@@ -236,14 +229,11 @@ FacetAutosuggest.propTypes = {
 
 function mapStateToProps(state, own) {
   var suggestions = []
-  var loading =  false
   if (state.autocomplete && state.autocomplete[own.property]) {
     suggestions =  state.autocomplete[own.property].buckets || []
-    loading = state.autocomplete[own.property].loading || false
   }
   return {
     suggestions: suggestions,
-    loading: loading,
   }
 }
 

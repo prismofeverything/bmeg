@@ -5,13 +5,23 @@ import Facets from '../query/facets'
 
 
 export function* autocomplete(action) {
-  // ES names do _not_ have `Type.` prefix, stip it out
-  var queryString = action.label.split('.')[1] + ':' + action.value + '*'
-  var field = action.label
 
-  const facets = yield call(Facets.aggregateFacets, queryString, field);
-  yield put({
-    type: 'AUTOCOMPLETE_SAVE',
-    facets: facets,
-  })
+  try {
+    // ES names do _not_ have `Type.` prefix, stip it out
+    var queryString = action.label.split('.')[1] + ':' + action.value + '*'
+    var field = action.label
+
+    const facets = yield call(Facets.aggregateFacets, queryString, field);
+    yield put({
+      type: 'AUTOCOMPLETE_SAVE',
+      facets: facets,
+    })
+  } catch (error) {
+    console.log('autocomplete', error)
+    yield put({
+      type: 'ERROR',
+      error: error
+    })
+  }
+
 }

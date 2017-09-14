@@ -61,7 +61,7 @@ export class Facet extends Component {
       values: newValues
     },() => {
       dispatch({
-        type: 'SELECT_FACET',
+        type: 'SELECTED_FACET',
         facet: {
           label: this.props.label,
           key: key,
@@ -245,7 +245,7 @@ export class Facet extends Component {
             </IconButton>
           </ListItemSecondaryAction>
         </ListItem>
-        <Collapse in={_self.state.open} transitionDuration="auto" unmountOnExit>
+        <Collapse in={_self.state.open} transitionDuration="auto" unmountOnExit >
           <div>
             {chart}
             {input}
