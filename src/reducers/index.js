@@ -2,7 +2,6 @@ import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux';
 import { reducer as formReducer } from 'redux-form';
 import schema from './schema'
-import search from './search'
 import {queries, currentQuery, queryObject, comparison} from './query'
 import {path} from './path'
 import FacetReducers from './facets'
@@ -13,7 +12,6 @@ export const reducers = combineReducers({
   routing: routerReducer,
   form: formReducer,
   schema: schema,
-  search: search,
   path: path,
   facets: FacetReducers.facets,
   queries: queries,

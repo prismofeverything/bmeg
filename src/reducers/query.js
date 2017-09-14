@@ -81,6 +81,14 @@ export function queryObject(state = [], action) {
 export function currentQuery(state = {name: 'test' }, action) {
   switch (action.type) {
 
+    case 'STEP_ON_PATH':
+      // init current query
+      const currentQuery = state[action.label] || {}
+      return {
+        ...state,
+        scope: action.label,
+        [action.label]: currentQuery
+      }
 
     case 'SEARCH':
       return {
@@ -91,7 +99,6 @@ export function currentQuery(state = {name: 'test' }, action) {
           parsedQuery: action.parsedQuery,
         }
       }
-
 
     case 'SELECTED_FACET':
       var selectedFacets = state[action.facet.label] ? state[action.facet.label].selectedFacets  : []
