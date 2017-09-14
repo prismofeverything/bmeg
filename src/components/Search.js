@@ -264,7 +264,6 @@ export class Search extends Component {
       queryText = nextProps.currentQuery[nextProps.focus].queryString || ''
       this.replaceText(queryText)
       this.triggerSearch(queryText, Parser.parse(queryText), false, nextProps.focus)
-      console.log('focusChanged', queryText)
     } else if (facetChanged) {
       try {
         var currentParsedQuery = Parser.parse(_self.getText() || nextProps.text || '')
@@ -524,8 +523,6 @@ export class Search extends Component {
 }
 
 function mapStateToProps(state, own) {
-
-  console.log('state.currentQuery',state.currentQuery)
   const currentFocus = state.currentQuery[state.currentQuery.focus]
   var text = own.text, currentFacet = {}, selectedFacets = []
   if (currentFocus) {
