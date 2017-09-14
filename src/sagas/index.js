@@ -30,6 +30,7 @@ export function* sagas() {
     fork(takeLatest, 'VERTEX_FETCH', fetchVertex),
     fork(takeLatest, 'EDGE_FETCH', fetchEdge),
     fork(takeLatest, 'SCHEMA_TAP_VERTEX', navigateCohort),
+    fork(takeLatest, 'SCHEMA_TAP_EDGE', navigateCohort),
     fork(takeLatest, 'REFRESH_QUERY', pathQuery),
     fork(takeLatest, 'REFRESH_QUERY', aggregateFacets),
     fork(takeLatest, 'SEARCH', search),

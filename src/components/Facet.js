@@ -270,9 +270,9 @@ function mapStateToProps(state, own) {
   var selectedFacet = state.facets[own.property];
   var open = false ;
   var values = [];
-  const scope = own.property.split('.')[0]
-  if (state.currentQuery[scope]) {
-    const currentFacets = _.filter(state.currentQuery[scope].selectedFacets,(f) => {return f.value && f.key === own.property })
+  const focus = own.property.split('.')[0]
+  if (state.currentQuery[focus]) {
+    const currentFacets = _.filter(state.currentQuery[focus].selectedFacets,(f) => {return f.value && f.key === own.property })
     open = currentFacets.length === 1
     if (open) {
       values = currentFacets[0].value ;

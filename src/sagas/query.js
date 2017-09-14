@@ -6,17 +6,16 @@ import Path from '../query/path'
 import Query from '../query/query'
 
 export function* searchAll(action) {
-  const results = yield call(OphionSearch.search, action.scope, action.queryString)
+  const results = yield call(OphionSearch.search, action.focus, action.queryString)
   const state = yield select();
   yield put({
     type: 'SEARCH_RESULTS_SAVE',
     search: {
-      search: action.search,
-      scope: action.scope,
+      focus: action.focus,
       parsedQuery: action.parsedQuery,
       results: results,
-      queryString: action.queryString ? action.queryString : state.search.queryString,
-      parsedQuery: action.parsedQuery ? action.parsedQuery : state.search.parsedQuery,
+      queryString: action.queryString ,
+      parsedQuery: action.parsedQuery ,
     }
   })
 }
@@ -48,8 +47,8 @@ export function* search(action) {
     path: state.path,
     schema: state.schema,
     currentQuery: state.currentQuery,
-    queryString: action.queryString ? action.queryString : state.search.queryString,
-    parsedQuery: action.parsedQuery ? action.parsedQuery : state.search.parsedQuery,
+    queryString: action.queryString,
+    parsedQuery: action.parsedQuery,
   })
 }
 

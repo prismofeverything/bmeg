@@ -50,12 +50,9 @@ export class Venn extends Component {
 
   componentDidReceiveProps(props) {
     console.log('venn didreceiveprops', props)
-    // this.cy.resize()
   }
 
-  componentWillUnmount() {
-    // this.cy.destroy()
-  }
+  componentWillUnmount() {}
 
   render() {
     return (

@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import { render } from 'react-dom'
-import { connect } from "react-redux";
+import { connect } from 'react-redux'
 import cytoscape from 'cytoscape'
 import * as _ from 'underscore'
 
 import Path from '../query/path.js'
+import { getIn, assocIn, mergeIn, updateIn } from '../state/state'
 
 function schemaToCytoscape(schema, path) {
   if (_.isEmpty(schema)) {
@@ -31,6 +32,7 @@ function schemaToCytoscape(schema, path) {
       return schema['from'][key].map(function(edge) {
         return {
           data: {
+            id: edge['label'],
             source: edge['from'],
             target: edge['to'],
             label: edge['label'],
@@ -183,6 +185,15 @@ export class Schema extends Component {
       // console.log('SCHEMA_TAP_VERTEX', label)
       dispatch({
         type: 'SCHEMA_TAP_VERTEX',
+        label: label,
+      })
+    })
+
+    this.cy.on('tap', 'edge', function(cy) {
+      const label = this.id()
+      console.log('SCHEMA_TAP_EDGE', label)
+      dispatch({
+        type: 'SCHEMA_TAP_EDGE',
         label: label,
       })
     })
