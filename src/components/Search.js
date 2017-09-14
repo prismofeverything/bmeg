@@ -28,20 +28,20 @@ export class Search extends Component {
     }
     this.debounceInterval = 500;
     this.autocomplete = this.autocomplete.bind(this);
-    this.get_hints  = this.get_hints.bind(this);
+    this.getHints  = this.getHints.bind(this);
     this.onEnter = this.onEnter.bind(this);
-    this.showParserError = this.showParserError.bind(this);
+    // this.showParserError = this.showParserError.bind(this);
     this.lastQueryString = null;
   }
 
+
+  // fire search event, if it has changed
   triggerSearch(value, parsedQuery, supressFacetAggregation=true) {
     const {dispatch, search} = this.props;
-
-    if (this.lastQueryString === value) {
+    if (this.lastQueryString === value && supressFacetAggregation) {
       return
     }
     this.lastQueryString = value;
-
     const _self = this;
     _self.setState({dirty:false})
     return new Promise((resolve, reject) => {
@@ -62,7 +62,7 @@ export class Search extends Component {
     });
   }
 
-  // update state when search updated
+  // update state when search updated by typing
   handleChange(value) {
     if (this.state.timeout) {
       clearTimeout(this.state.timeout);
@@ -81,9 +81,9 @@ export class Search extends Component {
     } catch (e) {
       parserError = e
     }
-    if (!this.state.dirty && !parserError) {
-      timeout = setTimeout(function() {self.triggerSearch(newQuery, parsedQuery, true)}, this.debounceInterval)
-    }
+    // if (!this.state.dirty && !parserError) {
+    //   timeout = setTimeout(function() {self.triggerSearch(newQuery, parsedQuery, true)}, this.debounceInterval)
+    // }
     this.setState({text: newQuery,
                    timeout: timeout,
                    dirty:isDirty,
@@ -91,27 +91,57 @@ export class Search extends Component {
                    parserError:parserError})
   }
 
+  // if user clicked query icon or hit enter key, update facets too
   onEnter(cm) {
-      // if user clicked query icon or hit enter key, update facets too
-      this.triggerSearch(this.state.text, null, false);
+    if (this.state.parserError) {
+      alert('Please correct query!')
+      return
+    }
+    this.updateFacets()
+    this.triggerSearch(this.state.text, this.state.parsedQuery, false);
   }
 
-  showParserError() {
-    alert(this.state.parserError)
+  // check if facets need updating
+  updateFacets() {
+    const fieldsAndTerms = this.getFieldsAndTerms(this.state.parsedQuery)
+    const selectedFacets = this.props.currentQuery[this.props.search.scope].selectedFacets || []
+    const facetsNeedUpdate = _.filter(fieldsAndTerms, (fieldTerm) => {
+      return  _.find(selectedFacets, (f) => {
+        return f.key === fieldTerm.key && !_.isEqual(f.value, fieldTerm.term)
+      })
+    })
+    const { dispatch } = this.props;
+    var updatedFacets = []
+    _.each(facetsNeedUpdate, (fieldTerm) => {
+      _.each(selectedFacets, (f) => {
+        if (f.key === fieldTerm.key) {
+          updatedFacets.push({
+            ...f,
+            value: fieldTerm.term,
+          })
+        }
+      })
+    })
+    _.each(updatedFacets, (f) => {
+      dispatch({
+        type: 'SELECTED_FACET',
+        facet: f
+      })
+    })
   }
 
-  // set up our call back, etc for autocompletion
+  // set up our call back, etc for autocompletion of CodeMirror component
   componentDidMount() {
-    const { dispatch, page, query } = this.props;
-
+    const { dispatch } = this.props;
 
        let cm = this.refs['editor'].getCodeMirrorInstance();
-       // set gutterClick
        let editor = this.refs['editor'].getCodeMirror();
        const _self = this;
-       editor.on("gutterClick", function(cm, n) {
-         _self.showParserError()
-       });
+
+      // // set gutterClick
+      //  editor.on("gutterClick", function(cm, n) {
+      //    _self.showParserError()
+      //  });
 
        // see CodeMirror's anyword-hint for background
        let showHint = require('./show_hint');
@@ -146,17 +176,34 @@ export class Search extends Component {
        });
      }
 
+   // when user hits 'Ctrl-Space'
    autocomplete(cm) {
        let codeMirror = this.refs['editor'].getCodeMirrorInstance();
        codeMirror.showHint(cm, codeMirror.hint.tag);
    }
 
-   get_hints() {
+   // hints used by codeMirror autocomplete
+   getHints() {
      const {resources} = this.props;
      return this.props.facets;
    }
 
+  //  // click event from codemirror gutter
+  //  showParserError() {
+  //    alert(this.state.parserError)
+  //  }
 
+  // this is a bit tweaky, but we manage state of codemirror
+  // and its interaction with facets here, not in mapStateToProps
+  // this allows us to maintain cursor position, etc.
+  //  // click event from codemirror gutter
+  //  showParserError() {
+  //    alert(this.state.parserError)
+  //  }
+
+  // this is a bit tweaky, but we manage state of codemirror
+  // and its interaction with facets here, not in mapStateToProps
+  // this allows us to maintain cursor position, etc.
    componentWillReceiveProps(nextProps) {
      const _self = this ;
      if (this.state.componentLoading) {
@@ -183,14 +230,17 @@ export class Search extends Component {
          return _self.stringifyQuery(Parser.parse(str))
      }
 
-
-
      // check that a real update happened
      var facetChanged = false;
      var scopeChanged = false;
-     var newQueryText;
+     var stringChanged = false;
+     var queryText;
      var parserError;
      var parsedQuery;
+
+     if (!nextProps.schema.vertexes) {
+       return
+     }
      if (nextProps.currentFacet.key) {
        if (_self.state.lastFacetKey !==  nextProps.currentFacet.key) {
          facetChanged = true;
@@ -199,44 +249,52 @@ export class Search extends Component {
          facetChanged = true;
        }
      }
+     if (_self.getText() !== nextProps.currentQuery[nextProps.search.scope].queryString) {
+        facetChanged = true;
+        stringChanged = true;
+     }
+
      if (nextProps.search && _self.props.search && (nextProps.search.scope !== _self.props.search.scope)) {
        facetChanged = true;
        scopeChanged = true;
      }
 
      if (scopeChanged) {
-       parsedQuery = nextProps.currentQuery[nextProps.search.scope].queryString || ''
-       this.replaceText(parsedQuery)
-       this.handleChange(parsedQuery)
+       queryText = nextProps.currentQuery[nextProps.search.scope].queryString || ''
+       this.replaceText(queryText)
+       this.triggerSearch(queryText, Parser.parse(queryText))
      } else if (facetChanged) {
        try {
-         var currentParsedQuery = Parser.parse(_self.props.text || '')
+         var currentParsedQuery = Parser.parse(_self.getText() || nextProps.text || '')
          const replaced = this.replaceTerm(currentParsedQuery, nextProps.currentFacet.key, nextProps.currentFacet.value)
          if (!replaced) {
             const cf = currentFacetString();
-            newQueryText = this.insertTextAtCursor(` ${cf} `);
+            queryText = this.insertTextAtCursor(` ${cf} `);
          } else {
-            newQueryText = this.stringifyQuery(currentParsedQuery);
+            queryText = this.stringifyQuery(currentParsedQuery);
          }
-         parsedQuery = this.stringifyQuery(Parser.parse(newQueryText))
-         this.replaceText(parsedQuery)
-         this.handleChange(parsedQuery)
+         currentParsedQuery = Parser.parse(queryText)
+         queryText = this.stringifyQuery(currentParsedQuery)
+         this.replaceText(queryText)
+         this.triggerSearch(queryText, currentParsedQuery)
        } catch (e) {
          parserError = e
-         parsedQuery = newQueryText
-         console.log('componentWillReceiveProps error', newQueryText,e)
+         queryText = queryText
        }
      }
-     this.setState({text:parsedQuery,
-                    parserError:parserError,
-                    lastFacetKey: nextProps.currentFacet.key,
-                    lastFacetValue: nextProps.currentFacet.value,
-                   })
-
-
+     if (queryText) {
+       this.setState({text:queryText,
+                      parsedQuery: currentParsedQuery,
+                      parserError:parserError,
+                      lastFacetKey: nextProps.currentFacet.key,
+                      lastFacetValue: nextProps.currentFacet.value,
+                     })
+     }
    }
 
-   // ... insert it into the search bar at the current cursor
+
+
+   // codemirror util: ... insert it into the search bar at the current cursor
    insertTextAtCursor(text) {
     //  if (!text) { return }
      if (!this.refs['editor'])  { return }
@@ -247,9 +305,8 @@ export class Search extends Component {
      return editor.getValue()
    }
 
-   // ... replace search bar, place cursor at end
+   // codemirror util: ... replace search bar, place cursor at end
    replaceText(text) {
-    //  if (!text) { return }
      if (!this.refs['editor'])  { return }
      let editor = this.refs['editor'].getCodeMirror();
      var doc = editor.getDoc();
@@ -260,16 +317,14 @@ export class Search extends Component {
      return editor.getValue()
    }
 
-   // ... get search bar text
+   // codemirror util: ... get search bar text
    getText() {
      if (!this.refs['editor'])  { return }
      let editor = this.refs['editor'].getCodeMirror();
      return editor.getValue()
    }
 
-
-
-   // PreOrderTraversal parsed query, replace field term , return true on replace
+   // lucene query util: PreOrderTraversal parsed query, replace field term , return true on replace
    replaceTerm(root, field, term) {
     // hack: replace an existing vector with a term, see stringify array handling
     if (root.field === field) {
@@ -288,7 +343,58 @@ export class Search extends Component {
     return replaced;
    }
 
-   // PreOrderTraversal parsed query, recreate query string
+   // lucene query util: PreOrderTraversal parsed query, return field term
+   getTerm(root, field, memo = []) {
+    if (root.field === field) {
+      return  this.getTermContent(root, memo)
+    }
+    var replaced = false ;
+    if (root.left) {
+      memo = this.getTerm(root.left, field, memo);
+    }
+    if (!replaced && root.right) {
+      memo = this.getTerm(root.right, field, memo);
+    }
+    return memo;
+   }
+
+   // lucene query util: get all the terms under this element
+   getTermContent(root, memo) {
+    if (root.term) {
+      return memo.concat([root.term])
+    }
+    if (root.left) {
+      memo = this.getTermContent(root.left, memo);
+    }
+    if (root.right) {
+      memo = this.getTermContent(root.right, memo);
+    }
+    return memo;
+   }
+
+   // lucene query util: return all the fields in the query
+   getFields(root, memo=[]) {
+    if (root.field) {
+      return memo.concat([root.field])
+    }
+    if (root.left) {
+      memo = this.getFields(root.left, memo);
+    }
+    if (root.right) {
+      memo = this.getFields(root.right, memo);
+    }
+    return memo;
+   }
+
+   // lucene query util: return all the fields in the query, with associated terms
+   getFieldsAndTerms(root, memo=[]) {
+    const fields = this.getFields(root);
+    return fields.map((f) => {
+     return { key:f, term: this.getTerm(root,f) }
+    }) ;
+   }
+
+   // lucene query util: PreOrderTraversal parsed query, recreate query string
    stringifyQuery(root,str = '') {
      // util funcs
      var quote = (s) => {
@@ -352,11 +458,11 @@ export class Search extends Component {
   render() {
     const props = this.props;
     const _self = this;
-    // display error if parse error, see showParserError()
-    var gutters = ['CodeMirror-ok'];
-    if (this.state.parserError) {
-      gutters = ['CodeMirror-error']
-    }
+    // // display error if parse error, see showParserError()
+    // var gutters = ['CodeMirror-ok'];
+    // if (this.state.parserError) {
+    //   gutters = ['CodeMirror-error']
+    // }
 
     var options = {
       mode: 'solr',
@@ -366,7 +472,7 @@ export class Search extends Component {
          'Ctrl-Space': this.autocomplete,
          'Tab': false,
        },
-      hints: this.get_hints,
+      hints: this.getHints,
       // gutters: gutters
     };
 
@@ -391,7 +497,7 @@ export class Search extends Component {
           <div style={{ margin: 'auto 8px', width: '100%' }}>
             <CodeMirror ref="editor"
                         name="editor"
-                        value={this.props.text}
+                        value={this.state.text}
                         onChange={this.handleChange.bind(this)}
                         options={options}
                         />

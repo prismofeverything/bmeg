@@ -15,12 +15,11 @@ export const reducers = combineReducers({
   schema: schema,
   search: search,
   path: path,
-  // selectedFacets: FacetReducers.selectedFacets,
   facets: FacetReducers.facets,
-  // currentFacet: FacetReducers.currentFacet,
   queries: queries,
   comparison: comparison,
   currentQuery: currentQuery,
   queryObject: queryObject,
   plot: plot,
+  autocomplete: FacetReducers.autocomplete,
 });

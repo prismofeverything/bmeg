@@ -152,7 +152,7 @@ export class Cohort extends Component {
 
     var sidebarContent = (
       <div >
-        <List key={this.props.label} >
+        <List key={this.props.label} style={{height:'100%'}}>
           {facetItems}
         </List>
         {warnings}

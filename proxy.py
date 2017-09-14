@@ -153,6 +153,8 @@ class FacetHandler(tornado.web.RequestHandler):
                 returns {'facets': {label.key:{'type':...}}}
             """
             # '.responses[].hits.hits[]._source.properties | keys'
+            field_string = self.get_query_argument('f', None)
+
             facets = {}
             if not mapping_response:
                 return None
@@ -164,7 +166,9 @@ class FacetHandler(tornado.web.RequestHandler):
                     prop = mapping[_property]
                     if 'fields' in prop:
                         del prop['fields']
-                    facets['{}.{}'.format(_type, _property)] = prop
+                    key = '{}.{}'.format(_type, _property)
+                    if (not field_string or field_string == key):
+                        facets[key] = prop
             return {'facets': facets}
 
         def _update_facets(facets, aggregation_response):
