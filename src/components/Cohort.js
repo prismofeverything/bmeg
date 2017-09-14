@@ -33,6 +33,7 @@ import CohortChooser from './CohortChooser'
 import QueryControls from './QueryControls'
 
 import List from 'material-ui/List';
+import ReactTooltip from 'react-tooltip'
 
 // a `cohort` is a selection from a type/domain/label based on selected criteria
 export class Cohort extends Component {
@@ -72,7 +73,7 @@ export class Cohort extends Component {
       () => {
         window.setTimeout(function() {
           if (!_self.state.sideBarOpen) {
-            _self.setState({oldSidbarSize:_self.state.sidebarSize, sidebarSize: 20 })
+            _self.setState({oldSidbarSize:_self.state.sidebarSize, sidebarSize: 0 })
           } else {
             _self.setState({ sidebarSize: _self.state.oldSidbarSize })
           }
@@ -152,7 +153,7 @@ export class Cohort extends Component {
 
     var sidebarContent = (
       <div >
-        <List key={this.props.label} style={{height:'100%'}}>
+        <List key={this.props.label} style={{height:'100%', paddingLeft:'2em' }}>
           {facetItems}
         </List>
         {warnings}
@@ -202,21 +203,42 @@ export class Cohort extends Component {
       </Card>
     )
 
-    const collapseSidebarStyle = {float:'left', cursor: 'pointer'}
+    var collapseSidebarStyle = {
+                                cursor: 'pointer', position: 'absolute',
+                                left:0, zIndex: 100, width: '1em',
+                                backgroundColor: 'silver', color: 'white',
+                              }
     var collapseSidebar;
     if (this.state.sideBarOpen) {
       collapseSidebar = (
-          <ChevronLeftIcon
-            style={collapseSidebarStyle}
-            onClick={ () => _self.toggleSidebar() } />
+          <div>
+            <ChevronLeftIcon
+              style={collapseSidebarStyle}
+              data-tip
+              data-for='HIDE_FACETS'
+              onClick={ () => _self.toggleSidebar() } />
+            <ReactTooltip id='HIDE_FACETS' type="info">
+              <span>Hide facets</span>
+            </ReactTooltip>
+          </div>
       )
     } else {
+      collapseSidebarStyle.borderRadius = '40%'
       collapseSidebar = (
+        <div>
           <ChevronRightIcon
             style={collapseSidebarStyle}
+            data-tip
+            data-for='SHOW_FACETS'
             onClick={ () => _self.toggleSidebar() } />
+          <ReactTooltip id='SHOW_FACETS' type="info">
+            <span>Show facets</span>
+          </ReactTooltip>
+        </div>
       )
     }
+    ReactTooltip.rebuild()
+
 
     const collapseSchemaStyle = {float:'right', top:'-8px', cursor: 'pointer'}
     var collapseSchema
@@ -261,15 +283,15 @@ export class Cohort extends Component {
               onResizeEnd={this.onSidebarResizeEnd}
               onChange={this.onSidebarChange}
               type="vertical"
-              pane1Style={{ borderRight: '4px solid silver',
+              pane1Style={{ borderRight: '6px solid silver',
                             transition: 'all .25s linear'}}
               >
                 <div>
-                  {collapseSidebar}
                   {sidebarLoading}
                   {sidebarContent}
                 </div>
                 <div>
+                  {collapseSidebar}
                   {schemaContent}
                   {cohortChooser}
                   {resultsContent}
