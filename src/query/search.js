@@ -15,7 +15,7 @@ export default class OphionSearch {
   }
 
   // search from main page
-  static search(scope, value) {
+  static search(focus, value) {
     const O = Ophion()
     return OphionSearch.execute(O.query().searchVertex(value))
       .then(function(results) {
