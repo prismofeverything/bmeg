@@ -20,12 +20,14 @@ import ListItemText from 'material-ui/List/ListItemText';
 import ListItemSecondaryAction from 'material-ui/List/ListItemSecondaryAction';
 import TextField from 'material-ui/TextField';
 
+import FacetAutosuggest from './FacetAutosuggest'
 
 import {
   VictoryPie,
   VictoryChart,
   VictoryBar,
-  Bar
+  Bar,
+  VictoryLabel
 } from 'victory';
 
 // a `cohort` is a selection from a type/domain/label based on selected criteria
@@ -60,7 +62,7 @@ export class Facet extends Component {
       values: newValues
     },() => {
       dispatch({
-        type: 'SELECT_FACET',
+        type: 'SELECTED_FACET',
         facet: {
           label: this.props.label,
           key: key,
@@ -176,21 +178,28 @@ export class Facet extends Component {
         )
       } else if (value_accessor === 'doc_count') {
 
+        // input = (
+        //   <TextField
+        //      margin="dense"
+        //      placeholder="ABC..."
+        //      label="Value"
+        //      helperText="Text"
+        //      autoFocus
+        //      value={_self.state.textInput || '' }
+        //      className={classes.input}
+        //      onChange={ (event) => { _self.updateTextInput(event.target.value) }}
+        //      inputProps={{
+        //        'aria-label': 'Description',
+        //      }}
+        //    />
+        // ) ;
+
         input = (
-          <TextField
-             margin="dense"
-             placeholder="ABC..."
-             label="Value"
-             helperText="Text"
-             autoFocus
-             value={_self.state.textInput || '' }
-             className={classes.input}
-             onChange={ (event) => { _self.updateTextInput(event.target.value) }}
-             inputProps={{
-               'aria-label': 'Description',
-             }}
-           />
+          <FacetAutosuggest
+            property={_self.props.property}
+            onSelect= {(v) => {_self.onFacetValueSelected(key,v)}}  />
         ) ;
+
 
         // terms aggregation
         chart = (
@@ -198,6 +207,10 @@ export class Facet extends Component {
                       x="key"
                       y={value_accessor}
                       colorScale='warm'
+                      style={{ parent: { overflow: "visible" } }}
+                      startAngle={45}
+              				endAngle={-315}
+                      padding={70}                 
                       events={[{
                         target: "data",
                         eventHandlers: {
@@ -237,7 +250,7 @@ export class Facet extends Component {
             </IconButton>
           </ListItemSecondaryAction>
         </ListItem>
-        <Collapse in={_self.state.open} transitionDuration="auto" unmountOnExit>
+        <Collapse in={_self.state.open} transitionDuration="auto" unmountOnExit >
           <div>
             {chart}
             {input}

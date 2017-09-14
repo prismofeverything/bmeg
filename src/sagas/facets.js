@@ -19,23 +19,30 @@ export function* aggregateFacets(action) {
   var queryString = (action.queryString || '*')
   var re = /(\w+).(\w+):/g
   queryString = queryString.replace(re, '$2:');
-  const facets = yield call(Facets.aggregateFacets, queryString);
-  yield put({
-    type: 'FACETS_SAVE',
-    facets: facets,
-  })
+  try {
+    const facets = yield call(Facets.aggregateFacets, queryString);
+    yield put({
+      type: 'FACETS_SAVE',
+      facets: facets,
+    })
+  } catch (error) {
+    yield put({
+      type: 'ERROR',
+      error: error
+    })
+  }
 }
 
-export function* selectFacet(action) {
-  // console.log(action)
-  yield put({...action, type: 'SELECTED_FACET'})
-  // const state = yield select();
-  // yield put({
-  //   type: 'REFRESH_QUERY',
-  //   label: action.facet.label,
-  //   focus: action.facet.label,
-  //   path: state.path,
-  //   schema: state.schema,
-  //   selectedFacets: state.selectedFacets,
-  // })
-}
+// export function* selectFacet(action) {
+//   // console.log(action)
+//   yield put({...action, type: 'SELECTED_FACET'})
+//   // const state = yield select();
+//   // yield put({
+//   //   type: 'REFRESH_QUERY',
+//   //   label: action.facet.label,
+//   //   focus: action.facet.label,
+//   //   path: state.path,
+//   //   schema: state.schema,
+//   //   selectedFacets: state.selectedFacets,
+//   // })
+// }
