@@ -7,11 +7,13 @@ export function* fetchFacets(action) {
   const facets = yield call(Facets.fetchFacets);
   yield put({
     type: 'FACETS_SAVE',
-    facets: facets
+    facets: facets,
+    schema: action.schema,
   })
 }
 
 export function* aggregateFacets(action) {
+  const state = yield select()
   if (action.supressFacetAggregation) {
     return
   }
@@ -24,6 +26,7 @@ export function* aggregateFacets(action) {
     yield put({
       type: 'FACETS_SAVE',
       facets: facets,
+      schema: state.schema,
     })
   } catch (error) {
     yield put({

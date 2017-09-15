@@ -75,6 +75,7 @@ export class Table extends Component {
       label: focus,
       focus: focus,
       path: cq[focus].path,
+      counts: this.props.counts,
       schema: this.props.schema,
       currentQuery: cq[focus].currentQuery,
       queryString: cq[focus].queryString,
@@ -220,6 +221,7 @@ function mapStateToProps(state, own) {
     facets: facets,
     loading: loading,
     currentQuery: currentQuery,
+    counts: state.counts,
     schema: state.schema,
     tableFacets: tableFacets,
   }

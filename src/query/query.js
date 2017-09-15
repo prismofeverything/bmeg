@@ -1,5 +1,7 @@
 import * as _ from 'underscore'
 import Graph from '../state/graph'
+import { Ophion } from 'ophion';
+const O = Ophion()
 
 // const schema = {
 //   vertexes: {
@@ -82,13 +84,121 @@ export function schemaGraph(schema) {
   return graph
 }
 
-export function generateQuery(schema, label, marks, facets, order) {
-  var O = Ophion()
-  var base = O.query().has('gid', 'type:' + focus).outgoing('hasInstance')
-  if (order.by) {
-    base.order(order.by, order.direction)
+function pairs(array) {
+  var p = [], l = array.length;
+  for(var i = 0; i<l; ++i) {
+    for(var j = i+1; j<l; ++j) {
+      p.push([array[i], array[j]])
+    }
   }
-  return base
+
+  return p
+}
+
+function applyFacets(query, facets) {
+  return _.reduce(facets, function(query, facet) {
+    if (facet.value.length > 1) {
+      return query.has(facet.property, O.within(facet.value))
+    } else {
+      return query.has(facet.property, facet.value[0])      
+    }
+  }, query) || query
+}
+
+export function generateQuery(schema, label, counts, facets, order) {
+  console.log('generate query', schema, label, facets, order)
+
+  const expand = expandSchema(schema)
+  const graph = schemaGraph(expand)
+  
+  // const involved = _.keys(_.reduce(_.keys(facets), function(involved, key) {
+  //   involved[facet.label] = true
+  //   return involved
+  // }, {[label]: true}))
+  const involved = _.keys(facets)
+  involved.push(label)
+
+  const terminals = pairs(involved)
+  const paths = _.map(terminals, function(pair) {
+    return graph.pathFromTo(pair[0], pair[1])
+  })
+
+  const possible = _.filter(paths, function(path) {
+    return _.isEmpty(_.difference(involved, path))
+  })
+
+  const ideal = possible.sort(function(a, b) {
+    return counts[a[0]] < counts[b[0]] ? -1 : 1
+  })
+
+  var path = ideal[0]
+
+  console.log('finding path', expand, graph, involved, terminals, paths, possible, ideal, path)
+
+  if (path && path.length > 1) {
+    const step = path[0]
+    const base = O.query().has('gid', 'type:' + step).outgoing('hasInstance')
+    var query = applyFacets(base, facets[step])
+    if (step === label) {
+      query.mark('focus')
+    }
+
+    for (var i = 1; i < path.length; i++) {
+      const step = path[i]
+      console.log('step', step)
+      if (schema.vertexes[step]) {
+        // this is a vertex
+        const previous = path[i-1]
+        const to = schema.to[step]
+        const isIncoming = to ? _.find(to, function(edge) {
+          return edge.label === previous
+        }) : false
+
+        if (isIncoming) {
+          query.inVertex(step)
+        } else {
+          query.outVertex(step)
+        }
+
+        query = applyFacets(query, facets[step])
+        if (step === label) {
+          query.mark('focus')
+        }
+      } else {
+        // this is an edge
+        const previous = path[i-1]
+        const from = schema.from[previous]
+        const isOutgoing = from ? _.find(from, function(edge) {
+          return edge.label === step
+        }) : false
+
+        if (isOutgoing) {
+          query.outEdge(step)
+        } else {
+          query.inEdge(step)
+        }
+
+        query = applyFacets(query, facets[step])
+      }
+    }
+
+    query.select('focus').dedup()
+
+    if (order.by) {
+      query.order(order.by, order.direction)
+    }
+
+    return query
+  } else {
+    const base = O.query().has('gid', 'type:' + label).outgoing('hasInstance')
+    var query = applyFacets(base, facets[label])
+
+    if (order.by) {
+      query.order(order.by, order.direction)
+    }
+
+    return query
+  }
 }
 
 export default class Query {

@@ -4,10 +4,11 @@ import * as _ from 'underscore'
 import OphionSearch from '../query/search'
 import Path from '../query/path'
 import Query from '../query/query'
+import { generateQuery } from '../query/query'
 
 export function* searchAll(action) {
   const results = yield call(OphionSearch.search, action.focus, action.queryString)
-  const state = yield select();
+  const state = yield select()
   yield put({
     type: 'SEARCH_RESULTS_SAVE',
     search: {
@@ -21,9 +22,34 @@ export function* searchAll(action) {
 }
 
 export function* pathQuery(action) {
+  const state = yield select()
   if (!_.isEmpty(action.path)) {
-    const query = Path.translateQuery(action.schema, action.path, action.focus, action.order, action.orderBy).limit(10)
+    // const query = Path.translateQuery(action.schema, action.path, action.focus, action.order, action.orderBy).limit(10)
+    // const results = yield OphionSearch.execute(query)
+
+    const order = {
+      by: action.orderBy,
+      direction: action.order
+    }
+
+    const facets = _.reduce(_.keys(state.currentQuery), function(facets, key) {
+      const facet = state.currentQuery[key].selectedFacets
+      if (facet) {
+        facets[key] = facet
+      }
+      return facets
+    }, {})
+
+    const query = generateQuery(
+      action.schema,
+      action.focus,
+      action.counts,
+      facets,
+      order,
+    ).limit(10)
+
     const results = yield OphionSearch.execute(query)
+
     yield put({
       type: 'QUERY_RESULTS_SAVE',
       path: action.path,
@@ -40,12 +66,13 @@ export function* search(action) {
   // get updated aggregations
   yield put({
     type: 'REFRESH_QUERY',
-    selectedFacets: state.selectedFacets,
+    // selectedFacets: state.selectedFacets,
     supressFacetAggregation: action.supressFacetAggregation,
     label: action.label,
     focus: action.label,
     path: state.path,
     schema: state.schema,
+    counts: state.counts,
     currentQuery: state.currentQuery,
     queryString: action.queryString,
     parsedQuery: action.parsedQuery,
@@ -60,8 +87,9 @@ export function* newQuery(action) {
     focus: action.focus,
     supressFacetAggregation: action.supressFacetAggregation,
     path: [{label: action.focus, facets: []}],
+    counts: state.counts,
     schema: state.schema,
-    selectedFacets: [],
+    // selectedFacets: [],
   })
 }
 
@@ -91,8 +119,9 @@ export function* loadQuery(action) {
     label: action.query.focus,
     focus: action.query.focus,
     path: action.query.path,
+    counts: state.counts,
     schema: state.schema,
-    selectedFacets: [],
+    // selectedFacets: action.query.facets,
   })
 }
 
@@ -118,10 +147,10 @@ export function* startup(action) {
     ...action,
     type: 'SCHEMA_FETCH',
   })
-  yield put({
-    ...action,
-    type: 'FACETS_FETCH',
-  })
+  // yield put({
+  //   ...action,
+  //   type: 'FACETS_FETCH',
+  // })
   yield put({
     ...action,
     type: 'QUERIES_FETCH',

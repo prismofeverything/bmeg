@@ -282,15 +282,27 @@ export class Schema extends Component {
 function mapStateToProps(state, own) {
   const expand = expandSchema({...state.schema})
   const graph = schemaGraph(expand)
+  console.log('counts', state.counts)
 
-  console.log('expand', expand)
-  console.log('graph', graph)
-  console.log('path', graph.pathFromTo('Project', 'GeneDatabase'))
+  // const counts = _.reduce(expand.vertexes, function(counts, vertex) {
+  //   const facet = state.facets[vertex + '.label']
+  //   if (facet) {
+  //     counts[vertex] = facet.buckets[0].doc_count
+  //   }
+  //   return counts
+  // }, {})
+  // console.log(counts)
+
+  // console.log({...state.facets})
+  // console.log('expand', expand)
+  // console.log('graph', graph)
+  // console.log('path', graph.pathFromTo('Project', 'GeneDatabase'))
 
   return {
     schema: state.schema,
     path: state.path,
     query: state.currentQuery,
+    counts: state.counts,
   }
 }
 export default connect(mapStateToProps) (Schema)

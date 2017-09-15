@@ -67,6 +67,7 @@ export class QueryControls extends Component {
       focus: this.props.focus,
       path: this.props.path,
       query: this.props.query,
+      facets: this.props.facets,
     }
 
     console.log(query)
@@ -226,6 +227,7 @@ function mapStateToProps(state, own) {
     focus: focus,
     label: focus,
     path: state.path,
+    facets: state.selectedFacets,
     query: query,
     queries: queries,
   }

@@ -5,11 +5,19 @@ import Schema from '../query/schema'
 import Facets from '../query/facets'
 
 export function* fetchSchema(action) {
-  const schema = yield call(Schema.fetchSchema);
+  const schema = yield call(Schema.fetchSchema)
+  // const facets = yield call(Facets.fetchFacets)
+
   yield put({
     type: 'SCHEMA_SAVE',
     schema: schema,
   })
+
+  yield put({
+    type: 'FETCH_FACETS',
+    schema: schema,
+  })
+
   // run default search
   yield put({
     ...action,
