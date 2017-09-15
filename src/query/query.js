@@ -126,9 +126,7 @@ function applyFacet(query, facet) {
 
 function applyFacets(query, facets) {
   const indexed = _.filter(facets, function(facet) {
-    const index = indexes.indexOf(facet.property)
-    console.log('index', index, facet.property, indexes)
-    return index >= 0
+    return indexes.indexOf(facet.property) >= 0
   })
 
   const unindexed = _.reject(facets, function(facet) {
@@ -174,7 +172,12 @@ export function generateQuery(schema, label, counts, facets, order) {
 
   if (path && path.length > 1) {
     const step = path[0]
-    const base = (facets[step] && facets[step].length > 0) ? O.query() : O.query().has('gid', 'type:' + step).outgoing('hasInstance')
+    const isIndexed = _.filter(facets[step] || [], function(facet) {
+      return indexes.indexOf(facet.property) >= 0
+    }).length > 0
+
+    // const base = (facets[step] && facets[step].length > 0) ? O.query() : O.query().has('gid', 'type:' + step).outgoing('hasInstance')
+    const base = isIndexed ? O.query() : O.query().has('gid', 'type:' + step).outgoing('hasInstance')
     var query = applyFacets(base, facets[step])
     if (step === label) {
       query.mark('focus')
@@ -227,7 +230,11 @@ export function generateQuery(schema, label, counts, facets, order) {
     return query
   } else {
     const step = label
-    const base = (facets[step] && facets[step].length > 0) ? O.query() : O.query().has('gid', 'type:' + step).outgoing('hasInstance')
+    const isIndexed = _.filter(facets[step] || [], function(facet) {
+      return indexes.indexOf(facet.property) >= 0
+    }).length > 0
+
+    const base = isIndexed ? O.query() : O.query().has('gid', 'type:' + step).outgoing('hasInstance')
     var query = applyFacets(base, facets[step])
     // const base = O.query().has('gid', 'type:' + label).outgoing('hasInstance')
     // var query = applyFacets(base, facets[label])
