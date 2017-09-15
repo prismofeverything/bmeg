@@ -6,23 +6,29 @@ import * as _ from 'underscore'
 
 import Path from '../query/path.js'
 import { getIn, assocIn, mergeIn, updateIn } from '../state/state'
+import { expandSchema, schemaGraph, generateQuery } from '../query/query'
 
-function schemaToCytoscape(schema, path) {
+function schemaToCytoscape(schema, path, query) {
   if (_.isEmpty(schema)) {
     return {nodes: [], edges: []}
   } else {
-    var steps = Path.nodesIn(schema, path)
-    var tail = _.last(path)
-    var focus = tail ? tail.label : null
+    // var steps = Path.nodesIn(schema, path)
+    // var tail = _.last(path)
+    // var focus = tail ? tail.label : null
     // console.log('PATH SCHEMA STEPS', focus, path, steps)
+
+    var focus = query.focus
 
     var nodes = Object.keys(schema['vertexes']).map(function(key) {
       var vertex = schema['vertexes'][key]
+      var active = query[vertex.label] ? !_.isEmpty(query[vertex.label].selectedFacets) : false
+
       return {
         data: {
           id: vertex.gid,
           name: vertex.label,
-          active: !_.isEmpty(steps[vertex.label]),
+          active: active,
+          // active: !_.isEmpty(steps[vertex.label]),
           focus: vertex.label === focus,
         }
       }
@@ -216,9 +222,9 @@ export class Schema extends Component {
     // })
   }
 
-  generateSchema(schema, path) {
+  generateSchema(schema, path, query) {
     // console.log('rendering schema')
-    var next = schemaToCytoscape(schema, path)
+    var next = schemaToCytoscape(schema, path, query)
     if (false) { // (this.cy) {
       this.cy.json(next)
     } else {
@@ -231,7 +237,7 @@ export class Schema extends Component {
 
   componentDidMount() {
     if (this.props.schema) {
-      this.generateSchema(this.props.schema, this.props.path)
+      this.generateSchema(this.props.schema, this.props.path, this.props.query)
     }
   }
 
@@ -240,7 +246,7 @@ export class Schema extends Component {
   }
 
   componentWillReceiveProps(props) {
-    this.generateSchema(props.schema, props.path)
+    this.generateSchema(props.schema, props.path, props.query)
   }
 
   componentDidReceiveProps(props) {
@@ -274,9 +280,17 @@ export class Schema extends Component {
 }
 
 function mapStateToProps(state, own) {
+  const expand = expandSchema({...state.schema})
+  const graph = schemaGraph(expand)
+
+  console.log('expand', expand)
+  console.log('graph', graph)
+  console.log('path', graph.pathFromTo('Project', 'GeneDatabase'))
+
   return {
     schema: state.schema,
     path: state.path,
+    query: state.currentQuery,
   }
 }
 export default connect(mapStateToProps) (Schema)
