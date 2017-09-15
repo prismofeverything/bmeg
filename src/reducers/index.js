@@ -2,7 +2,7 @@ import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux';
 import { reducer as formReducer } from 'redux-form';
 import schema from './schema'
-import { queries, currentQuery, queryObject, comparison } from './query'
+import { queries, currentQuery, queryObject, comparison, queryState } from './query'
 import { path } from './path'
 import FacetReducers from './facets'
 import plot from './plot'
@@ -15,6 +15,7 @@ export const reducers = combineReducers({
   schema: schema,
   path: path,
   facets: FacetReducers.facets,
+  queryState: queryState,
   queries: queries,
   comparison: comparison,
   currentQuery: currentQuery,

@@ -257,7 +257,7 @@ export class Search extends Component {
       stringChanged = true;
     }
 
-    if (nextProps.focus !== _self.props.focus) {
+    if (!nextProps.queryState.restore && nextProps.focus !== _self.props.focus) {
       facetChanged = true;
       focusChanged = true;
     }
@@ -538,6 +538,7 @@ function mapStateToProps(state, own) {
   }
 
   return {
+    queryState: state.queryState,
     focus: state.currentQuery.focus,
     facets: state.facets,
     selectedFacets: selectedFacets,

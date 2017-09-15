@@ -23,7 +23,7 @@ export function* searchAll(action) {
 }
 
 export function* pathQuery(action) {
-  if (!_.isEmpty(action.path)) {
+  if (!_.isEmpty(action.path) || action.restore) {
     // const query = Path.translateQuery(action.schema, action.path, action.focus, action.order, action.orderBy).limit(10)
     // const results = yield OphionSearch.execute(query)
 
@@ -129,6 +129,7 @@ export function* loadQuery(action) {
   // yield put({type: 'LOAD_QUERY_SAVE', query: action.query})
   yield put({
     type: 'REFRESH_QUERY',
+    restore: true,
     supressFacetAggregation: action.supressFacetAggregation,
     focus: action.query.focus,
     path: action.query.path,

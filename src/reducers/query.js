@@ -2,6 +2,15 @@ import * as _ from 'underscore'
 import Query from '../query/query'
 import {getIn, assocIn, mergeIn, updateIn} from '../state/state'
 
+export function queryState(state = {}, action) {
+  switch (action.type) {
+    case 'REFRESH_QUERY':
+      return {restore: action.restore}
+    default:
+      return state
+  }
+}
+
 export function query(state = {}, action) {
   switch (action.type) {
     case 'STEP_ON_PATH':
@@ -129,7 +138,7 @@ export function currentQuery(state = {name: 'test' }, action) {
 
     case 'REFRESH_QUERY':
       const current = action.currentQuery || state
-      return assocIn(current, [action.focus, 'loading'], true)
+      return assocIn(current, [action.focus, 'loading'], !action.restore)
 
     case 'QUERY_RESULTS_SAVE':
       // determine default tableFacets see  TOGGLE_IN_TABLE above

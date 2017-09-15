@@ -44,6 +44,27 @@ const O = Ophion()
 //   {property: 'term', order: 'ascending'}
 // ]
 
+const indexes = [
+  'id',
+  'gid',
+  'type',
+  'refseq',
+  'accession',
+  'name',
+  'tag',
+  'term',
+  'pmid',
+  'symbol',
+  'gender',
+  'featureId',
+  'referenceName',
+  'chromosome',
+  'start',
+  'end',
+  'genotype',
+  'phenotype',
+]
+
 export function expandSchema(schema) {
   const vertexes = _.keys(schema.vertexes)
   var edges = _.reduce(_.keys(schema.from), function(edges, from) {
@@ -95,14 +116,35 @@ function pairs(array) {
   return p
 }
 
+function applyFacet(query, facet) {
+  if (facet.value.length > 1) {
+    return query.has(facet.property, O.within(facet.value))
+  } else {
+    return query.has(facet.property, facet.value[0])      
+  }
+}
+
 function applyFacets(query, facets) {
-  return _.reduce(facets, function(query, facet) {
-    if (facet.value.length > 1) {
-      return query.has(facet.property, O.within(facet.value))
-    } else {
-      return query.has(facet.property, facet.value[0])      
-    }
-  }, query) || query
+  const indexed = _.filter(facets, function(facet) {
+    const index = indexes.indexOf(facet.property)
+    console.log('index', index, facet.property, indexes)
+    return index >= 0
+  })
+
+  const unindexed = _.reject(facets, function(facet) {
+    return indexes.indexOf(facet.property) >= 0
+  })
+
+  return _.reduce(indexed.concat(unindexed), applyFacet, query) || query
+
+// function(query, facet) {
+//     if (facet.value.length > 1) {
+//       return query.has(facet.property, O.within(facet.value))
+//     } else {
+//       return query.has(facet.property, facet.value[0])      
+//     }
+//   }, 
+
 }
 
 export function generateQuery(schema, label, counts, facets, order) {
@@ -132,7 +174,7 @@ export function generateQuery(schema, label, counts, facets, order) {
 
   if (path && path.length > 1) {
     const step = path[0]
-    const base = O.query().has('gid', 'type:' + step).outgoing('hasInstance')
+    const base = (facets[step] && facets[step].length > 0) ? O.query() : O.query().has('gid', 'type:' + step).outgoing('hasInstance')
     var query = applyFacets(base, facets[step])
     if (step === label) {
       query.mark('focus')
@@ -184,8 +226,11 @@ export function generateQuery(schema, label, counts, facets, order) {
 
     return query
   } else {
-    const base = O.query().has('gid', 'type:' + label).outgoing('hasInstance')
-    var query = applyFacets(base, facets[label])
+    const step = label
+    const base = (facets[step] && facets[step].length > 0) ? O.query() : O.query().has('gid', 'type:' + step).outgoing('hasInstance')
+    var query = applyFacets(base, facets[step])
+    // const base = O.query().has('gid', 'type:' + label).outgoing('hasInstance')
+    // var query = applyFacets(base, facets[label])
 
     if (order.by) {
       query.order(order.by, order.direction)
