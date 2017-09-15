@@ -87,6 +87,7 @@ export function* newQuery(action) {
     path: [{label: action.focus, facets: []}],
     counts: state.counts,
     schema: state.schema,
+    currentQuery: {name: 'test', focus: action.focus},
     // selectedFacets: [],
   })
 }
