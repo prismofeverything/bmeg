@@ -12,7 +12,7 @@ export class Results extends Component {
       const keys = _.keys(this.props.schema.vertexes).sort()
       entries = keys.map(key => {
         var each
-        if (this.props.search.results) {
+        if (this.props.search && this.props.search.results) {
           const found = this.props.search.results[key]
           if (!_.isEmpty(found)) {
             each = found.slice(0, 10).map(to => {
