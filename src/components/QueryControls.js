@@ -61,16 +61,17 @@ export class QueryControls extends Component {
 
   saveQuery() {
     const { dispatch } = this.props
+
     const query = {
-      user: 'other',
+      user: 'root',
+      current: this.props.current,
       key: this.state.savingValue,
       focus: this.props.focus,
       path: this.props.path,
       query: this.props.query,
-      facets: this.props.facets,
     }
 
-    console.log(query)
+    console.log('saving query', query)
     this.setState({saving: false})
 
     dispatch({type: 'SAVE_QUERY', query: query})
@@ -221,15 +222,14 @@ const styles = {
 
 function mapStateToProps(state, own) {
   const focus = own.focus
-  var query = state.queryObject
-  const queries = state.queries
+
   return {
     focus: focus,
-    label: focus,
     path: state.path,
-    facets: state.selectedFacets,
-    query: query,
-    queries: queries,
+    // facets: state.selectedFacets,
+    current: state.currentQuery,
+    query: state.queryObject,
+    queries: state.queries,
   }
 }
 export default connect(mapStateToProps) (withStyles(styles) (QueryControls))

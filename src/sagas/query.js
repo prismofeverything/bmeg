@@ -68,7 +68,6 @@ export function* search(action) {
     type: 'REFRESH_QUERY',
     // selectedFacets: state.selectedFacets,
     supressFacetAggregation: action.supressFacetAggregation,
-    label: action.label,
     focus: action.label,
     path: state.path,
     schema: state.schema,
@@ -83,7 +82,6 @@ export function* newQuery(action) {
   const state = yield select();
   yield put({
     type: 'REFRESH_QUERY',
-    label: action.focus,
     focus: action.focus,
     supressFacetAggregation: action.supressFacetAggregation,
     path: [{label: action.focus, facets: []}],
@@ -116,12 +114,11 @@ export function* loadQuery(action) {
   yield put({
     type: 'REFRESH_QUERY',
     supressFacetAggregation: action.supressFacetAggregation,
-    label: action.query.focus,
     focus: action.query.focus,
     path: action.query.path,
     counts: state.counts,
     schema: state.schema,
-    // selectedFacets: action.query.facets,
+    currentQuery: action.query.current,
   })
 }
 

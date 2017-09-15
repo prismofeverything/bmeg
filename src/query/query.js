@@ -86,8 +86,8 @@ export function schemaGraph(schema) {
 
 function pairs(array) {
   var p = [], l = array.length;
-  for(var i = 0; i<l; ++i) {
-    for(var j = i+1; j<l; ++j) {
+  for(var i = 0; i < l; ++i) {
+    for(var j = i + 1; j < l; ++j) {
       p.push([array[i], array[j]])
     }
   }
@@ -110,11 +110,6 @@ export function generateQuery(schema, label, counts, facets, order) {
 
   const expand = expandSchema(schema)
   const graph = schemaGraph(expand)
-  
-  // const involved = _.keys(_.reduce(_.keys(facets), function(involved, key) {
-  //   involved[facet.label] = true
-  //   return involved
-  // }, {[label]: true}))
   const involved = _.keys(facets)
   involved.push(label)
 
@@ -145,7 +140,6 @@ export function generateQuery(schema, label, counts, facets, order) {
 
     for (var i = 1; i < path.length; i++) {
       const step = path[i]
-      console.log('step', step)
       if (schema.vertexes[step]) {
         // this is a vertex
         const previous = path[i-1]
