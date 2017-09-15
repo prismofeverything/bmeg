@@ -123,7 +123,7 @@ export function generateQuery(schema, label, counts, facets, order) {
   })
 
   const ideal = possible.sort(function(a, b) {
-    return counts[a[0]] < counts[b[0]] ? -1 : 1
+    return counts[a[0]] > counts[b[0]] ? -1 : 1
   })
 
   var path = ideal[0]

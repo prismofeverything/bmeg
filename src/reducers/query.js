@@ -84,7 +84,9 @@ export function currentQuery(state = {name: 'test' }, action) {
       var selectedFacets = state[action.facet.label] ? state[action.facet.label].selectedFacets  : []
       selectedFacets = selectedFacets ? selectedFacets  : []
       selectedFacets = _.filter(selectedFacets, (f) => {return f.key != action.facet.key} )
-      selectedFacets.push(action.facet)
+      if (action.facet.value && action.facet.value.length > 0) {
+        selectedFacets.push(action.facet)
+      }
 
       return mergeIn(state, [action.facet.label], {
         currentFacet: action.facet,
@@ -126,7 +128,8 @@ export function currentQuery(state = {name: 'test' }, action) {
       return assocIn(state, [action.focus, 'selectedFacets'], filteredFacets)
 
     case 'REFRESH_QUERY':
-      return assocIn(state, [action.focus, 'loading'], true)
+      const current = action.currentQuery || state
+      return assocIn(current, [action.focus, 'loading'], true)
 
     case 'QUERY_RESULTS_SAVE':
       // determine default tableFacets see  TOGGLE_IN_TABLE above
@@ -138,7 +141,8 @@ export function currentQuery(state = {name: 'test' }, action) {
       }
 
       return mergeIn(state, [action.focus], {
-        ...action,
+        // ...action,
+        results: action.results,
         loading: false,
         tableSelectedColumns: defaultTableSelectedColumns
       })
