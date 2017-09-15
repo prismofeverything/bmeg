@@ -250,7 +250,9 @@ export class Search extends Component {
         facetChanged = true;
       }
     }
-    if (_self.getText() !== nextProps.currentQuery[nextProps.focus].queryString) {
+
+    const focal = nextProps.currentQuery[nextProps.focus]
+    if (focal && _self.getText() !== focal.queryString) {
       facetChanged = true;
       stringChanged = true;
     }
@@ -261,7 +263,7 @@ export class Search extends Component {
     }
 
     if (focusChanged) {
-      queryText = nextProps.currentQuery[nextProps.focus].queryString || ''
+      queryText = focal.queryString || ''
       this.replaceText(queryText)
       this.triggerSearch(queryText, Parser.parse(queryText), false, nextProps.focus)
       console.log('focusChanged', queryText)
@@ -285,12 +287,13 @@ export class Search extends Component {
       }
     }
     if (queryText) {
-      this.setState({text:queryText,
-                     parsedQuery: currentParsedQuery,
-                     parserError:parserError,
-                     lastFacetKey: nextProps.currentFacet.key,
-                     lastFacetValue: nextProps.currentFacet.value,
-                    })
+      this.setState({
+        text:queryText,
+        parsedQuery: currentParsedQuery,
+        parserError:parserError,
+        lastFacetKey: nextProps.currentFacet.key,
+        lastFacetValue: nextProps.currentFacet.value,
+      })
     }
   }
 
