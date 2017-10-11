@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>BMEG</title>
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body>
+  <nav class="white" role="navigation">
+    <div class="nav-wrapper container">
+      <a id="logo-container" href="#" class="brand-logo">
+        <img src="bmeg-flat.png" width="13%">
+      </a>
+      <ul class="right hide-on-med-and-down">
+        <li><a href="http://github.com/bmeg">github</a></li>
+      </ul>
+
+      <ul id="nav-mobile" class="side-nav">
+        <li><a href="#">bmeg on github</a></li>
+      </ul>
+      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">bmeg</i></a>
+    </div>
+  </nav>
+
+
+  <div class="parallax-container valign-wrapper">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <div class="row center">
+          <h5 class="header col s12 light">Python Examples</h5>
+        </div>
+      </div>
+    </div>
+    <div class="parallax"><img src="fiber.jpg" alt="Unsplashed background img 3"></div>
+  </div>
+
+  
+  <div class="container">
+<!-- Start iPython code -->
+  
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[31]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">ophion</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="kn">as</span> <span class="nn">stats</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">O</span> <span class="o">=</span> <span class="n">ophion</span><span class="o">.</span><span class="n">Ophion</span><span class="p">(</span><span class="s2">&quot;http://bmeg.compbio.ohsu.edu&quot;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#get all CCLE samples</span>
+<span class="n">all_samples</span> <span class="o">=</span> <span class="n">O</span><span class="o">.</span><span class="n">query</span><span class="p">()</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="s2">&quot;gid&quot;</span><span class="p">,</span> <span class="s2">&quot;cohort:CCLE&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">outgoing</span><span class="p">(</span><span class="s2">&quot;hasSample&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">([</span><span class="s2">&quot;gid&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">GENES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CDKN2A&quot;</span><span class="p">,</span> <span class="s2">&quot;PTEN&quot;</span><span class="p">,</span> <span class="s2">&quot;TP53&quot;</span><span class="p">,</span> <span class="s2">&quot;SMAD4&quot;</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">mut_samples</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">norm_samples</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">GENES</span><span class="p">:</span>
+    <span class="c1">#get CCLE samples with mutation</span>
+    <span class="n">mut_samples</span><span class="p">[</span><span class="n">g</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">O</span><span class="o">.</span><span class="n">query</span><span class="p">()</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="s2">&quot;gid&quot;</span><span class="p">,</span> <span class="s2">&quot;gene:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">g</span><span class="p">))</span><span class="o">.</span><span class="n">incoming</span><span class="p">(</span><span class="s2">&quot;variantInGene&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">outgoing</span><span class="p">(</span><span class="s2">&quot;variantInBiosample&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mark</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">incoming</span><span class="p">(</span><span class="s2">&quot;hasSample&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="s2">&quot;gid&quot;</span><span class="p">,</span> <span class="s2">&quot;cohort:CCLE&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">([</span><span class="s2">&quot;gid&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">execute</span><span class="p">()))</span>
+
+    <span class="c1">#get CCLE samples without mutation</span>
+    <span class="n">norm_samples</span><span class="p">[</span><span class="n">g</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">all_samples</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">mut_samples</span><span class="p">[</span><span class="n">g</span><span class="p">]))</span>
+    
+    <span class="k">print</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> Positive Set: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">mut_samples</span><span class="p">[</span><span class="n">g</span><span class="p">]))</span>
+    <span class="k">print</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> Negative Set: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">norm_samples</span><span class="p">[</span><span class="n">g</span><span class="p">]))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>CDKN2A Positive Set: 48
+CDKN2A Negative Set: 998
+PTEN Positive Set: 142
+PTEN Negative Set: 904
+TP53 Positive Set: 553
+TP53 Negative Set: 493
+SMAD4 Positive Set: 62
+SMAD4 Negative Set: 984
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#get response values for the positive set (samples with mutation)</span>
+<span class="c1">#and collect AUC value by drug</span>
+<span class="n">pos_response</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">GENES</span><span class="p">:</span>
+    <span class="n">pos_response</span><span class="p">[</span><span class="n">g</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">O</span><span class="o">.</span><span class="n">query</span><span class="p">()</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="s2">&quot;gid&quot;</span><span class="p">,</span> <span class="n">O</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="n">mut_samples</span><span class="p">[</span><span class="n">g</span><span class="p">]))</span><span class="o">.</span><span class="n">outEdge</span><span class="p">(</span><span class="s2">&quot;responseToCompound&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mark</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">inVertex</span><span class="p">()</span><span class="o">.</span><span class="n">mark</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">execute</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;responseSummary&#39;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;AUC&quot;</span><span class="p">:</span>
+                <span class="n">compound</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">][</span><span class="s1">&#39;gid&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">compound</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pos_response</span><span class="p">[</span><span class="n">g</span><span class="p">]:</span>
+                    <span class="n">pos_response</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">compound</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">pos_response</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">compound</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#get response values for the negative set (samples without mutation)</span>
+<span class="c1">#and collect AUC value by drug</span>
+<span class="n">neg_response</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">GENES</span><span class="p">:</span>
+    <span class="n">neg_response</span><span class="p">[</span><span class="n">g</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">O</span><span class="o">.</span><span class="n">query</span><span class="p">()</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="s2">&quot;gid&quot;</span><span class="p">,</span> <span class="n">O</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="n">norm_samples</span><span class="p">[</span><span class="n">g</span><span class="p">]))</span><span class="o">.</span><span class="n">outEdge</span><span class="p">(</span><span class="s2">&quot;responseToCompound&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mark</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">inVertex</span><span class="p">()</span><span class="o">.</span><span class="n">mark</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">execute</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;responseSummary&#39;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;AUC&quot;</span><span class="p">:</span>
+                <span class="n">compound</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">][</span><span class="s1">&#39;gid&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">compound</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">neg_response</span><span class="p">[</span><span class="n">g</span><span class="p">]:</span>
+                    <span class="n">neg_response</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">compound</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">neg_response</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">compound</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[30]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">print</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos_response</span><span class="p">)</span>
+<span class="k">print</span> <span class="nb">len</span><span class="p">(</span><span class="n">neg_response</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">pos_response</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>4
+4
+[&#39;SMAD4&#39;, &#39;PTEN&#39;, &#39;CDKN2A&#39;, &#39;TP53&#39;]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[39]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#Collect t-test statistics</span>
+<span class="n">drugs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span> <span class="n">i</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">pos_response</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="p">))</span>
+<span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">drug</span> <span class="ow">in</span> <span class="n">drugs</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">GENES</span><span class="p">:</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;drug&quot;</span> <span class="p">:</span> <span class="n">drug</span><span class="p">,</span> <span class="s2">&quot;mutation&quot;</span> <span class="p">:</span> <span class="n">g</span><span class="p">}</span>
+        <span class="n">mut_values</span> <span class="o">=</span> <span class="n">pos_response</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">drug</span><span class="p">]</span>
+        <span class="n">norm_values</span> <span class="o">=</span> <span class="n">neg_response</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">drug</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mut_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">norm_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">mut_values</span><span class="p">,</span> <span class="n">norm_values</span><span class="p">,</span> <span class="n">equal_var</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">[</span><span class="s2">&quot;t-statistic&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">statistic</span>
+            <span class="n">row</span><span class="p">[</span><span class="s2">&quot;t-pvalue&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">pvalue</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">f_oneway</span><span class="p">(</span><span class="n">mut_values</span><span class="p">,</span> <span class="n">norm_values</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">[</span><span class="s2">&quot;a-statistic&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">statistic</span>
+            <span class="n">row</span><span class="p">[</span><span class="s2">&quot;a-pvalue&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">pvalue</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[42]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#print data sorted by statistical value</span>
+<span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;drug&quot;</span><span class="p">,</span> <span class="s2">&quot;mutation&quot;</span><span class="p">,</span> <span class="s2">&quot;t-statistic&quot;</span><span class="p">,</span> <span class="s2">&quot;t-pvalue&quot;</span><span class="p">,</span> <span class="s2">&quot;a-statistic&quot;</span><span class="p">,</span> <span class="s2">&quot;a-pvalue&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;a-pvalue&quot;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[42]:</div>
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>drug</th>
+      <th>mutation</th>
+      <th>t-statistic</th>
+      <th>t-pvalue</th>
+      <th>a-statistic</th>
+      <th>a-pvalue</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1931</th>
+      <td>compound:nutlin-3</td>
+      <td>TP53</td>
+      <td>10.326801</td>
+      <td>9.209386e-23</td>
+      <td>121.681037</td>
+      <td>2.379157e-26</td>
+    </tr>
+    <tr>
+      <th>1526</th>
+      <td>compound:BMS-536924</td>
+      <td>PTEN</td>
+      <td>6.899566</td>
+      <td>9.233542e-11</td>
+      <td>40.151225</td>
+      <td>4.030042e-10</td>
+    </tr>
+    <tr>
+      <th>854</th>
+      <td>compound:pluripotin</td>
+      <td>PTEN</td>
+      <td>5.760531</td>
+      <td>3.527544e-08</td>
+      <td>26.879984</td>
+      <td>2.751518e-07</td>
+    </tr>
+    <tr>
+      <th>347</th>
+      <td>compound:NVP-ADW742</td>
+      <td>PTEN</td>
+      <td>5.243664</td>
+      <td>4.789674e-07</td>
+      <td>25.017915</td>
+      <td>7.067467e-07</td>
+    </tr>
+    <tr>
+      <th>1014</th>
+      <td>compound:navitoclax:pluripotin (1:1 mol/mol)</td>
+      <td>PTEN</td>
+      <td>4.708911</td>
+      <td>5.418047e-06</td>
+      <td>22.479716</td>
+      <td>2.532986e-06</td>
+    </tr>
+    <tr>
+      <th>561</th>
+      <td>compound:linsitinib</td>
+      <td>PTEN</td>
+      <td>5.407455</td>
+      <td>1.765376e-07</td>
+      <td>19.763879</td>
+      <td>1.005021e-05</td>
+    </tr>
+    <tr>
+      <th>943</th>
+      <td>compound:navitoclax:PLX-4032 (1:1 mol/mol)</td>
+      <td>TP53</td>
+      <td>4.296897</td>
+      <td>1.991386e-05</td>
+      <td>19.021662</td>
+      <td>1.469945e-05</td>
+    </tr>
+    <tr>
+      <th>2059</th>
+      <td>compound:dabrafenib</td>
+      <td>TP53</td>
+      <td>3.975291</td>
+      <td>9.566174e-05</td>
+      <td>18.886057</td>
+      <td>1.788078e-05</td>
+    </tr>
+    <tr>
+      <th>967</th>
+      <td>compound:serdemetan</td>
+      <td>TP53</td>
+      <td>4.126450</td>
+      <td>4.235423e-05</td>
+      <td>18.281163</td>
+      <td>2.160410e-05</td>
+    </tr>
+    <tr>
+      <th>2023</th>
+      <td>compound:selumetinib:navitoclax (8:1 mol/mol)</td>
+      <td>TP53</td>
+      <td>4.073451</td>
+      <td>5.205120e-05</td>
+      <td>16.921041</td>
+      <td>4.335244e-05</td>
+    </tr>
+    <tr>
+      <th>165</th>
+      <td>compound:GDC-0879</td>
+      <td>TP53</td>
+      <td>3.844640</td>
+      <td>1.342540e-04</td>
+      <td>16.079124</td>
+      <td>6.676160e-05</td>
+    </tr>
+    <tr>
+      <th>718</th>
+      <td>compound:NVP-TAE684</td>
+      <td>PTEN</td>
+      <td>4.388090</td>
+      <td>2.040751e-05</td>
+      <td>15.777393</td>
+      <td>7.802296e-05</td>
+    </tr>
+    <tr>
+      <th>629</th>
+      <td>compound:selumetinib:UNC0638 (4:1 mol/mol)</td>
+      <td>PTEN</td>
+      <td>4.050775</td>
+      <td>7.620988e-05</td>
+      <td>14.624756</td>
+      <td>1.418611e-04</td>
+    </tr>
+    <tr>
+      <th>1358</th>
+      <td>compound:BMS-754807</td>
+      <td>PTEN</td>
+      <td>4.381186</td>
+      <td>1.922041e-05</td>
+      <td>13.892917</td>
+      <td>2.076023e-04</td>
+    </tr>
+    <tr>
+      <th>1927</th>
+      <td>compound:doxorubicin:navitoclax (2:1 mol/mol)</td>
+      <td>TP53</td>
+      <td>3.649277</td>
+      <td>2.836919e-04</td>
+      <td>13.834950</td>
+      <td>2.140654e-04</td>
+    </tr>
+    <tr>
+      <th>1483</th>
+      <td>compound:crizotinib:PLX-4032 (2:1 mol/mol)</td>
+      <td>TP53</td>
+      <td>3.644311</td>
+      <td>2.898454e-04</td>
+      <td>13.830982</td>
+      <td>2.147645e-04</td>
+    </tr>
+    <tr>
+      <th>1814</th>
+      <td>compound:sunitinib</td>
+      <td>PTEN</td>
+      <td>4.222549</td>
+      <td>3.782568e-05</td>
+      <td>13.379906</td>
+      <td>2.717217e-04</td>
+    </tr>
+    <tr>
+      <th>1571</th>
+      <td>compound:cytarabine hydrochloride</td>
+      <td>TP53</td>
+      <td>3.582308</td>
+      <td>3.652458e-04</td>
+      <td>13.260604</td>
+      <td>2.891346e-04</td>
+    </tr>
+    <tr>
+      <th>518</th>
+      <td>compound:trametinib</td>
+      <td>PTEN</td>
+      <td>4.783709</td>
+      <td>6.508209e-06</td>
+      <td>13.375578</td>
+      <td>2.908652e-04</td>
+    </tr>
+    <tr>
+      <th>1411</th>
+      <td>compound:serdemetan:SCH-529074 (1:1 mol/mol)</td>
+      <td>TP53</td>
+      <td>3.462605</td>
+      <td>5.753622e-04</td>
+      <td>13.071699</td>
+      <td>3.197329e-04</td>
+    </tr>
+    <tr>
+      <th>1364</th>
+      <td>compound:L-685458</td>
+      <td>SMAD4</td>
+      <td>-2.964546</td>
+      <td>4.391772e-03</td>
+      <td>13.000899</td>
+      <td>3.309856e-04</td>
+    </tr>
+    <tr>
+      <th>1206</th>
+      <td>compound:selumetinib:piperlongumine (8:1 mol/mol)</td>
+      <td>PTEN</td>
+      <td>3.717892</td>
+      <td>2.783407e-04</td>
+      <td>12.785889</td>
+      <td>3.719090e-04</td>
+    </tr>
+    <tr>
+      <th>1171</th>
+      <td>compound:oxaliplatin</td>
+      <td>TP53</td>
+      <td>3.491766</td>
+      <td>5.118703e-04</td>
+      <td>12.630983</td>
+      <td>4.025980e-04</td>
+    </tr>
+    <tr>
+      <th>979</th>
+      <td>compound:veliparib</td>
+      <td>TP53</td>
+      <td>3.358972</td>
+      <td>8.298964e-04</td>
+      <td>12.102088</td>
+      <td>5.310482e-04</td>
+    </tr>
+    <tr>
+      <th>630</th>
+      <td>compound:selumetinib:UNC0638 (4:1 mol/mol)</td>
+      <td>TP53</td>
+      <td>3.388666</td>
+      <td>7.465367e-04</td>
+      <td>12.055981</td>
+      <td>5.452538e-04</td>
+    </tr>
+    <tr>
+      <th>1767</th>
+      <td>compound:FGIN-1-27</td>
+      <td>TP53</td>
+      <td>-3.504595</td>
+      <td>5.720758e-04</td>
+      <td>12.266902</td>
+      <td>5.602053e-04</td>
+    </tr>
+    <tr>
+      <th>609</th>
+      <td>compound:tamatinib</td>
+      <td>PTEN</td>
+      <td>4.167302</td>
+      <td>4.592989e-05</td>
+      <td>11.730976</td>
+      <td>6.477151e-04</td>
+    </tr>
+    <tr>
+      <th>1476</th>
+      <td>compound:SR1001</td>
+      <td>SMAD4</td>
+      <td>3.229962</td>
+      <td>2.086903e-03</td>
+      <td>11.619238</td>
+      <td>6.870849e-04</td>
+    </tr>
+    <tr>
+      <th>285</th>
+      <td>compound:chlorambucil</td>
+      <td>TP53</td>
+      <td>3.289987</td>
+      <td>1.056226e-03</td>
+      <td>11.234403</td>
+      <td>8.431888e-04</td>
+    </tr>
+    <tr>
+      <th>1515</th>
+      <td>compound:PD318088</td>
+      <td>TP53</td>
+      <td>3.235629</td>
+      <td>1.274972e-03</td>
+      <td>10.996403</td>
+      <td>9.546246e-04</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1909</th>
+      <td>compound:KU-55933</td>
+      <td>CDKN2A</td>
+      <td>0.020033</td>
+      <td>9.841059e-01</td>
+      <td>0.000379</td>
+      <td>9.844762e-01</td>
+    </tr>
+    <tr>
+      <th>334</th>
+      <td>compound:Mdivi-1</td>
+      <td>CDKN2A</td>
+      <td>0.025064</td>
+      <td>9.801024e-01</td>
+      <td>0.000354</td>
+      <td>9.849844e-01</td>
+    </tr>
+    <tr>
+      <th>419</th>
+      <td>compound:SZ4TA2</td>
+      <td>TP53</td>
+      <td>0.018763</td>
+      <td>9.850406e-01</td>
+      <td>0.000342</td>
+      <td>9.852587e-01</td>
+    </tr>
+    <tr>
+      <th>264</th>
+      <td>compound:PF-750</td>
+      <td>PTEN</td>
+      <td>0.018285</td>
+      <td>9.854348e-01</td>
+      <td>0.000309</td>
+      <td>9.859871e-01</td>
+    </tr>
+    <tr>
+      <th>1432</th>
+      <td>compound:ML258</td>
+      <td>SMAD4</td>
+      <td>-0.021443</td>
+      <td>9.829618e-01</td>
+      <td>0.000287</td>
+      <td>9.864895e-01</td>
+    </tr>
+    <tr>
+      <th>470</th>
+      <td>compound:YK 4-279</td>
+      <td>PTEN</td>
+      <td>-0.018823</td>
+      <td>9.850028e-01</td>
+      <td>0.000279</td>
+      <td>9.866878e-01</td>
+    </tr>
+    <tr>
+      <th>694</th>
+      <td>compound:BRD-K02492147</td>
+      <td>PTEN</td>
+      <td>0.020152</td>
+      <td>9.839421e-01</td>
+      <td>0.000249</td>
+      <td>9.874154e-01</td>
+    </tr>
+    <tr>
+      <th>872</th>
+      <td>compound:BRD-K20514654</td>
+      <td>SMAD4</td>
+      <td>0.013462</td>
+      <td>9.893769e-01</td>
+      <td>0.000248</td>
+      <td>9.874550e-01</td>
+    </tr>
+    <tr>
+      <th>97</th>
+      <td>compound:dinaciclib</td>
+      <td>TP53</td>
+      <td>0.014290</td>
+      <td>9.886073e-01</td>
+      <td>0.000210</td>
+      <td>9.884481e-01</td>
+    </tr>
+    <tr>
+      <th>1316</th>
+      <td>compound:AM-580</td>
+      <td>SMAD4</td>
+      <td>-0.017044</td>
+      <td>9.864549e-01</td>
+      <td>0.000203</td>
+      <td>9.886368e-01</td>
+    </tr>
+    <tr>
+      <th>936</th>
+      <td>compound:C6-ceramide</td>
+      <td>SMAD4</td>
+      <td>-0.016817</td>
+      <td>9.866374e-01</td>
+      <td>0.000191</td>
+      <td>9.889725e-01</td>
+    </tr>
+    <tr>
+      <th>683</th>
+      <td>compound:FSC231</td>
+      <td>PTEN</td>
+      <td>-0.015983</td>
+      <td>9.872876e-01</td>
+      <td>0.000186</td>
+      <td>9.891380e-01</td>
+    </tr>
+    <tr>
+      <th>1892</th>
+      <td>compound:methotrexate</td>
+      <td>SMAD4</td>
+      <td>-0.015246</td>
+      <td>9.878897e-01</td>
+      <td>0.000175</td>
+      <td>9.894534e-01</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>compound:CIL55A</td>
+      <td>SMAD4</td>
+      <td>-0.008349</td>
+      <td>9.934179e-01</td>
+      <td>0.000173</td>
+      <td>9.895070e-01</td>
+    </tr>
+    <tr>
+      <th>1860</th>
+      <td>compound:PF-3758309</td>
+      <td>SMAD4</td>
+      <td>0.017275</td>
+      <td>9.862987e-01</td>
+      <td>0.000158</td>
+      <td>9.899847e-01</td>
+    </tr>
+    <tr>
+      <th>1385</th>
+      <td>compound:BRD-K34099515</td>
+      <td>CDKN2A</td>
+      <td>0.013031</td>
+      <td>9.898089e-01</td>
+      <td>0.000156</td>
+      <td>9.900376e-01</td>
+    </tr>
+    <tr>
+      <th>808</th>
+      <td>compound:docetaxel:tanespimycin (2:1 mol/mol)</td>
+      <td>SMAD4</td>
+      <td>-0.014272</td>
+      <td>9.886571e-01</td>
+      <td>0.000141</td>
+      <td>9.905330e-01</td>
+    </tr>
+    <tr>
+      <th>1899</th>
+      <td>compound:BCL-LZH-4</td>
+      <td>TP53</td>
+      <td>0.011290</td>
+      <td>9.909995e-01</td>
+      <td>0.000134</td>
+      <td>9.907653e-01</td>
+    </tr>
+    <tr>
+      <th>565</th>
+      <td>compound:MST-312</td>
+      <td>PTEN</td>
+      <td>0.010789</td>
+      <td>9.914047e-01</td>
+      <td>0.000114</td>
+      <td>9.914713e-01</td>
+    </tr>
+    <tr>
+      <th>1988</th>
+      <td>compound:vandetanib</td>
+      <td>SMAD4</td>
+      <td>-0.010723</td>
+      <td>9.914836e-01</td>
+      <td>0.000112</td>
+      <td>9.915464e-01</td>
+    </tr>
+    <tr>
+      <th>929</th>
+      <td>compound:lapatinib</td>
+      <td>CDKN2A</td>
+      <td>-0.010817</td>
+      <td>9.914143e-01</td>
+      <td>0.000104</td>
+      <td>9.918475e-01</td>
+    </tr>
+    <tr>
+      <th>410</th>
+      <td>compound:staurosporine</td>
+      <td>PTEN</td>
+      <td>-0.010599</td>
+      <td>9.915739e-01</td>
+      <td>0.000095</td>
+      <td>9.922178e-01</td>
+    </tr>
+    <tr>
+      <th>1353</th>
+      <td>compound:gemcitabine</td>
+      <td>CDKN2A</td>
+      <td>-0.009935</td>
+      <td>9.921238e-01</td>
+      <td>0.000091</td>
+      <td>9.923832e-01</td>
+    </tr>
+    <tr>
+      <th>96</th>
+      <td>compound:dinaciclib</td>
+      <td>PTEN</td>
+      <td>0.009445</td>
+      <td>9.924893e-01</td>
+      <td>0.000073</td>
+      <td>9.931931e-01</td>
+    </tr>
+    <tr>
+      <th>1620</th>
+      <td>compound:BRD-K16147474</td>
+      <td>SMAD4</td>
+      <td>0.010783</td>
+      <td>9.914345e-01</td>
+      <td>0.000058</td>
+      <td>9.939068e-01</td>
+    </tr>
+    <tr>
+      <th>2112</th>
+      <td>compound:O-6-benzylguanine</td>
+      <td>SMAD4</td>
+      <td>-0.008342</td>
+      <td>9.933857e-01</td>
+      <td>0.000040</td>
+      <td>9.949862e-01</td>
+    </tr>
+    <tr>
+      <th>553</th>
+      <td>compound:PHA-793887</td>
+      <td>PTEN</td>
+      <td>0.005309</td>
+      <td>9.957701e-01</td>
+      <td>0.000026</td>
+      <td>9.959112e-01</td>
+    </tr>
+    <tr>
+      <th>544</th>
+      <td>compound:STF-31</td>
+      <td>CDKN2A</td>
+      <td>-0.005057</td>
+      <td>9.959869e-01</td>
+      <td>0.000023</td>
+      <td>9.961368e-01</td>
+    </tr>
+    <tr>
+      <th>821</th>
+      <td>compound:bortezomib</td>
+      <td>CDKN2A</td>
+      <td>0.004502</td>
+      <td>9.964263e-01</td>
+      <td>0.000013</td>
+      <td>9.970965e-01</td>
+    </tr>
+    <tr>
+      <th>481</th>
+      <td>compound:SGX-523</td>
+      <td>CDKN2A</td>
+      <td>0.001947</td>
+      <td>9.984533e-01</td>
+      <td>0.000001</td>
+      <td>9.990910e-01</td>
+    </tr>
+  </tbody>
+</table>
+<p>2172 rows × 6 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[37]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">drug</span> <span class="o">=</span> <span class="s2">&quot;compound:nutlin-3&quot;</span>
+<span class="n">gene</span> <span class="o">=</span> <span class="s2">&quot;TP53&quot;</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">pos_response</span><span class="p">[</span><span class="n">gene</span><span class="p">][</span><span class="n">drug</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;R&quot;</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">neg_response</span><span class="p">[</span><span class="n">gene</span><span class="p">][</span><span class="n">drug</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">pos_response</span><span class="p">[</span><span class="n">gene</span><span class="p">][</span><span class="n">drug</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">pos_response</span><span class="p">[</span><span class="n">gene</span><span class="p">][</span><span class="n">drug</span><span class="p">])</span>
+<span class="k">print</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">neg_response</span><span class="p">[</span><span class="n">gene</span><span class="p">][</span><span class="n">drug</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">neg_response</span><span class="p">[</span><span class="n">gene</span><span class="p">][</span><span class="n">drug</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>13.534497907 0.960924747106
+12.4568282282 1.70322764773
+</pre>
+</div>
+</div>
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+YII=
+"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[38]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">stats</span><span class="o">.</span><span class="n">f_oneway</span><span class="p">(</span><span class="n">pos_response</span><span class="p">[</span><span class="n">gene</span><span class="p">][</span><span class="n">drug</span><span class="p">],</span> <span class="n">neg_response</span><span class="p">[</span><span class="n">gene</span><span class="p">][</span><span class="n">drug</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[38]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>F_onewayResult(statistic=121.68103667046283, pvalue=2.3791567976155418e-26)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span> 
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<!-- End Ipython Code -->
+</div>
+
+</body>
+</html>
