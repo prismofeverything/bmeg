@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Parallax Template - Materialize</title>
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body>
+  <nav class="white" role="navigation">
+    <div class="nav-wrapper container">
+      <a id="logo-container" href="#" class="brand-logo">
+        <img src="bmeg-flat.png" width="13%">
+      </a>
+      <ul class="right hide-on-med-and-down">
+        <li><a href="http://github.com/bmeg">github</a></li>
+      </ul>
+
+      <ul id="nav-mobile" class="side-nav">
+        <li><a href="#">bmeg on github</a></li>
+      </ul>
+      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">bmeg</i></a>
+    </div>
+  </nav>
+
+  <div id="index-banner" class="parallax-container">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <br><br>
+        <h1 class="header center text-lighten-2">Bio Medical Evidence Graph</h1>
+        <div class="row center">
+          <h5 class="header col black-text s12 light">A graph database for merging and analyzing connected data</h5>
+        </div>
+        <div class="row center">
+          <a href="/cohort" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">Launch BMEG</a>
+        </div>
+        <br><br>
+
+      </div>
+    </div>
+    <div class="parallax"><img src="fiber.jpg" alt="BMEG"></div>
+  </div>
+
+
+  <div class="container">
+    <div class="section">
+
+      <!--   Icon Section   -->
+      <div class="row">
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center brown-text"><i class="material-icons">flash_on</i></h2>
+            <h5 class="center">Connecting the Data</h5>
+
+            <p class="light">There are a huge number of data sets available, in an array of different formats. BMEG merges all of this data anywhere a connection can be made, weaving all of the separate datasets into one rich fabric.</p>
+            <p class="light">Currently in BMEG:
+              <ul>
+                <li>CCLE</li>
+                <li>TCGA</li>
+                <li>MC3</li>
+                <li>GDSC</li>
+                <li>Pubchem</li>
+                <li>Hugo</li>
+              </ul>
+            </p>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center brown-text"><i class="material-icons">polymer</i></h2>
+            <h5 class="center">Querying the Graph</h5>
+            <p class="light">BMEG stores data in a large property graph and provides a query language, <a target="_blank" href="http://github.com/bmeg/ophion">Ophion</a> (implementing much of the <a target="_blank" href="https://tinkerpop.apache.org/gremlin.html">gremlin</a> spec), to perform traversals through this graph and collect data along the way.</p>
+
+<p class="light">Ophion expresses queries as data. An example query to start from TP53 and traverse to its adjoining Variants</p>
+<pre class="light">
+[
+  {
+    "has": {
+      "key": "gid",
+      "value": "gene:TP53"
+    }
+  }, {
+    "in": ["variantIn"]
+  }, {
+    "values": ["gid"]
+  }
+]
+</pre>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center brown-text"><i class="material-icons">settings</i></h2>
+            <h5 class="center">Triggering Analysis</h5>
+            <p class="light">Once the data is merged, it can be analyzed at a scale impossible before. BMEG will provide a framework for running analysis based on the creation of new data.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="parallax-container valign-wrapper">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <div class="row center">
+          <h5 class="header col s12 light">BMEG is already helping people discover patterns</h5>
+        </div>
+      </div>
+    </div>
+    <div class="parallax"><img src="blood.jpg" alt="blood"></div>
+  </div>
+
+  <div class="container">
+    <div class="section">
+
+      <div class="row">
+        <div class="col s12 center">
+          <h3><i class="mdi-content-send brown-text"></i></h3>
+          <h4>All of our data adheres to open schemas</h4>
+          <p class="left-align light">Drawing connections between data sets requires that we agree on what the data means. BMEG distinguishes between several unique types of data, such as Samples, Genes, Variants, Compounds etc. and describes the relationships between them. As we discover more and more kinds of data we want to merge in, our <a href="http://github.com/biostream">library of schemas</a> expands</a></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="parallax-container valign-wrapper">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <div class="row center">
+          <h5 class="header col s12 light">We have many plans for the future</h5>
+        </div>
+      </div>
+    </div>
+    <div class="parallax"><img src="clouds.jpg" alt="Unsplashed background img 3"></div>
+  </div>
+
+  <footer class="page-footer teal">
+    <div class="container">
+      <div class="row">
+        <div class="col l6 s12">
+          <h5 class="white-text">Santa Cruz and OHSU</h5>
+          <p class="grey-text text-lighten-4">We are an interdisciplinary team of biologists, geneticists, computationalists and everything in between.</p>
+        </div>
+        <div class="col l3 s12">
+          <h5 class="white-text">Settings</h5>
+          <ul>
+            <li><a class="white-text" href="#!">Link 1</a></li>
+            <li><a class="white-text" href="#!">Link 2</a></li>
+            <li><a class="white-text" href="#!">Link 3</a></li>
+            <li><a class="white-text" href="#!">Link 4</a></li>
+          </ul>
+        </div>
+        <div class="col l3 s12">
+          <h5 class="white-text">Connect</h5>
+          <ul>
+            <li><a class="white-text" href="#!">Link 1</a></li>
+            <li><a class="white-text" href="#!">Link 2</a></li>
+            <li><a class="white-text" href="#!">Link 3</a></li>
+            <li><a class="white-text" href="#!">Link 4</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">
+      </div>
+    </div>
+  </footer>
+
+
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="js/materialize.js"></script>
+  <script src="js/init.js"></script>
+
+  </body>
+</html>
