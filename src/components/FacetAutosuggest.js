@@ -9,43 +9,6 @@ import parse from 'autosuggest-highlight/parse';
 import { withStyles } from 'material-ui/styles';
 import { connect } from "react-redux";
 
-// const suggestions = [
-//   { label: 'Afghanistan' },
-//   { label: 'Aland Islands' },
-//   { label: 'Albania' },
-//   { label: 'Algeria' },
-//   { label: 'American Samoa' },
-//   { label: 'Andorra' },
-//   { label: 'Angola' },
-//   { label: 'Anguilla' },
-//   { label: 'Antarctica' },
-//   { label: 'Antigua and Barbuda' },
-//   { label: 'Argentina' },
-//   { label: 'Armenia' },
-//   { label: 'Aruba' },
-//   { label: 'Australia' },
-//   { label: 'Austria' },
-//   { label: 'Azerbaijan' },
-//   { label: 'Bahamas' },
-//   { label: 'Bahrain' },
-//   { label: 'Bangladesh' },
-//   { label: 'Barbados' },
-//   { label: 'Belarus' },
-//   { label: 'Belgium' },
-//   { label: 'Belize' },
-//   { label: 'Benin' },
-//   { label: 'Bermuda' },
-//   { label: 'Bhutan' },
-//   { label: 'Bolivia, Plurinational State of' },
-//   { label: 'Bonaire, Sint Eustatius and Saba' },
-//   { label: 'Bosnia and Herzegovina' },
-//   { label: 'Botswana' },
-//   { label: 'Bouvet Island' },
-//   { label: 'Brazil' },
-//   { label: 'British Indian Ocean Territory' },
-//   { label: 'Brunei Darussalam' },
-// ];
-
 function renderInput(inputProps) {
   const { classes, home, value, ref, ...other } = inputProps;
 
@@ -160,6 +123,8 @@ class FacetAutosuggest extends React.Component {
     this.handleSuggestionsFetchRequested.bind(this);
     this.handleSuggestionsClearRequested.bind(this);
     this.handleChange.bind(this);
+    this.onKeyUp.bind(this);
+    this.triggerChange.bind(this);
   }
 
 
@@ -182,12 +147,23 @@ class FacetAutosuggest extends React.Component {
     });
   };
 
+  // tell caller
+  triggerChange(newValue) {
+    this.props.onSelect(newValue)
+  }
+  // enter, tell caller
+  onKeyUp(target) {
+    if ( target.keyCode == 13 ) {
+      this.triggerChange(this.state.value)
+    }
+  };
+  // clicks, tell caller
   handleChange(event,{newValue, method}) {
     this.setState({
       value: newValue,
     });
     if (method !== 'type') {
-      this.props.onSelect(newValue)
+      this.triggerChange(newValue)
     }
   };
 
@@ -216,6 +192,7 @@ class FacetAutosuggest extends React.Component {
             placeholder: placeholder,
             value: this.state.value,
             onChange: this.handleChange.bind(this),
+            onKeyUp: this.onKeyUp.bind(this),
           }}
         />
       </div>

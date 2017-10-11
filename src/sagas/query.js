@@ -5,6 +5,7 @@ import OphionSearch from '../query/search'
 import Path from '../query/path'
 import Query from '../query/query'
 import { generateQuery } from '../query/query'
+import { getIn, assocIn, mergeIn, updateIn } from '../state/state'
 
 export function* searchAll(action) {
   const results = yield call(OphionSearch.search, action.focus, action.queryString)
@@ -15,15 +16,14 @@ export function* searchAll(action) {
       focus: action.focus,
       parsedQuery: action.parsedQuery,
       results: results,
-      queryString: action.queryString ,
-      parsedQuery: action.parsedQuery ,
+      queryString: action.queryString,
+      parsedQuery: action.parsedQuery,
     }
   })
 }
 
 export function* pathQuery(action) {
-  const state = yield select()
-  if (!_.isEmpty(action.path)) {
+  if (!_.isEmpty(action.path) || action.restore) {
     // const query = Path.translateQuery(action.schema, action.path, action.focus, action.order, action.orderBy).limit(10)
     // const results = yield OphionSearch.execute(query)
 
@@ -32,8 +32,8 @@ export function* pathQuery(action) {
       direction: action.order
     }
 
-    const facets = _.reduce(_.keys(state.currentQuery), function(facets, key) {
-      const facet = state.currentQuery[key].selectedFacets
+    const facets = _.reduce(_.keys(action.currentQuery), function(facets, key) {
+      const facet = action.currentQuery[key].selectedFacets
       if (facet) {
         facets[key] = facet
       }
@@ -87,17 +87,34 @@ export function* newQuery(action) {
     path: [{label: action.focus, facets: []}],
     counts: state.counts,
     schema: state.schema,
+    currentQuery: {name: 'test', focus: action.focus},
     // selectedFacets: [],
   })
 }
 
 export function* saveQuery(action) {
+  const state = yield select();
+  const vertexes = _.keys(state.schema.vertexes)
   const query = action.query.query
+  // const current = {...action.query.current}
+  // const stripped = _.reduce(vertexes, function(current, vertex) {
+  //   if (current[vertex]) {
+  //     const between = assocIn(current, [vertex, 'tableSelectedColumns'], undefined)
+  //     return assocIn(current, [vertex, 'results'], undefined)
+  //     // current[vertex].tableSelectedColumns = undefined
+  //   } else {
+  //     return current
+  //   }
+  // }, current)
+
+  const serialized = JSON.stringify(action.query.current)
   const queries = yield call(
     Path.saveQuery,
     {
       ...action.query,
-      query: query.slice(0, query.length - 1)
+      query: query.slice(0, query.length - 1),
+      current: serialized,
+      // current: stripped,
     },
   )
 
@@ -113,12 +130,13 @@ export function* loadQuery(action) {
   // yield put({type: 'LOAD_QUERY_SAVE', query: action.query})
   yield put({
     type: 'REFRESH_QUERY',
+    restore: true,
     supressFacetAggregation: action.supressFacetAggregation,
     focus: action.query.focus,
     path: action.query.path,
     counts: state.counts,
     schema: state.schema,
-    currentQuery: action.query.current,
+    currentQuery: JSON.parse(action.query.current),
   })
 }
 
