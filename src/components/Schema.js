@@ -88,8 +88,8 @@ export class Schema extends Component {
 
       // biosample halo
       Cohort: [0.25, 0.18],
-      GeneExpression: [0.36, 0.01],
-      CNASegment: [0.5, 0.06],
+      GeneExpression: [0.38, 0.0],
+      CNASegment: [0.54, 0.05],
       Variant: [0.59, 0.33],
       Compound: [0.59, 0.67],
       OntologyTerm: [0.5, 0.93],
