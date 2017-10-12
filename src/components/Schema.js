@@ -83,21 +83,28 @@ export class Schema extends Component {
       Project: [0.0, 0.5],
       Individual: [0.2, 0.5],
       Biosample: [0.4, 0.5],
-      Variant: [0.6, 0.5],
       Gene: [0.8, 0.5],
       Pubmed: [1.0, 0.5],
 
       // biosample halo
-      Cohort: [0.27, 0.15],
-      GeneExpression: [0.4, 0.0],
-      CNASegment: [0.55, 0.15],
-      Compound: [0.55, 0.85],
-      OntologyTerm: [0.4, 1.0],
+      Cohort: [0.25, 0.18],
+      GeneExpression: [0.36, 0.01],
+      CNASegment: [0.5, 0.06],
+      Variant: [0.59, 0.33],
+      Compound: [0.59, 0.67],
+      OntologyTerm: [0.5, 0.93],
+
+      // // biosample halo
+      // Cohort: [0.27, 0.15],
+      // GeneExpression: [0.4, 0.0],
+      // CNASegment: [0.55, 0.15],
+      // Compound: [0.55, 0.85],
+      // OntologyTerm: [0.4, 1.0],
 
       // gene halo
       GeneFamily: [0.7, 0.0],
       GeneDatabase: [0.9, 0.0],
-      Evidence: [0.8, 1.0],
+      Evidence: [0.9, 1.0],
 
       // Predictor: [0.5, 0.8],
       // LinearSignature: [0.65, 0.75],
