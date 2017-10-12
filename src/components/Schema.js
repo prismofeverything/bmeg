@@ -130,8 +130,10 @@ export class Schema extends Component {
     var focusColor = '#7ec950'
     var activeColor = '#105a8c'
     var nodeText = '#ffffff'
-    var edgeColor = '#f22f08'
     var edgeText = '#ffffff'
+    var edgeColor = '#4286f4'
+    // var edgeColor = '#0f53c1'
+    // var edgeColor = '#f22f08'
     const {dispatch, width, height} = this.props
 
     var radius = Math.min(width, height) * 0.24 // * 0.08;
@@ -187,7 +189,7 @@ export class Schema extends Component {
           'color': edgeText,
           'font-size': radius * 0.18, // 18
           'text-outline-color': edgeColor,
-          'text-outline-width': radius * 0.02, // 2
+          'text-outline-width': radius * 0.03, // 2
         }),
 
       elements: schema
