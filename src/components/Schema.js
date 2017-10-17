@@ -83,21 +83,28 @@ export class Schema extends Component {
       Project: [0.0, 0.5],
       Individual: [0.2, 0.5],
       Biosample: [0.4, 0.5],
-      Variant: [0.6, 0.5],
       Gene: [0.8, 0.5],
       Pubmed: [1.0, 0.5],
 
       // biosample halo
-      Cohort: [0.27, 0.15],
-      GeneExpression: [0.4, 0.0],
-      CNASegment: [0.55, 0.15],
-      Compound: [0.55, 0.85],
-      OntologyTerm: [0.4, 1.0],
+      Cohort: [0.25, 0.18],
+      GeneExpression: [0.38, 0.0],
+      CNASegment: [0.54, 0.05],
+      Variant: [0.59, 0.33],
+      Compound: [0.59, 0.67],
+      OntologyTerm: [0.5, 0.93],
+
+      // // biosample halo
+      // Cohort: [0.27, 0.15],
+      // GeneExpression: [0.4, 0.0],
+      // CNASegment: [0.55, 0.15],
+      // Compound: [0.55, 0.85],
+      // OntologyTerm: [0.4, 1.0],
 
       // gene halo
       GeneFamily: [0.7, 0.0],
       GeneDatabase: [0.9, 0.0],
-      Evidence: [0.8, 1.0],
+      Evidence: [0.9, 1.0],
 
       // Predictor: [0.5, 0.8],
       // LinearSignature: [0.65, 0.75],
@@ -123,8 +130,10 @@ export class Schema extends Component {
     var focusColor = '#7ec950'
     var activeColor = '#105a8c'
     var nodeText = '#ffffff'
-    var edgeColor = '#f22f08'
     var edgeText = '#ffffff'
+    var edgeColor = '#4286f4'
+    // var edgeColor = '#0f53c1'
+    // var edgeColor = '#f22f08'
     const {dispatch, width, height} = this.props
 
     var radius = Math.min(width, height) * 0.24 // * 0.08;
@@ -180,7 +189,7 @@ export class Schema extends Component {
           'color': edgeText,
           'font-size': radius * 0.18, // 18
           'text-outline-color': edgeColor,
-          'text-outline-width': radius * 0.02, // 2
+          'text-outline-width': radius * 0.03, // 2
         }),
 
       elements: schema

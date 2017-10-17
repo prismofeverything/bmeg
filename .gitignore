@@ -1,5 +1,5 @@
 .idea/
 node_modules/
-public/js/
-public/css/
+public/js/bundle.js
+public/css/main.css
 .DS_Store
